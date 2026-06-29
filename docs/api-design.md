@@ -35,6 +35,9 @@ API REST FastAPI, versionnée sous `/api/v1`. Doc interactive : `/docs` (Swagger
 | GET/POST| `/api/v1/daily-entries`       | Saisie de fin de journée (idempotent, audité) | stocks    |
 | GET     | `/api/v1/mlops/metrics`       | MAE/MAPE par produit/modèle (écarts)          | forecasts |
 | POST    | `/api/v1/mlops/retrain`       | Réentraîne le modèle + versionne              | forecasts |
+| GET     | `/api/v1/agents/eval`         | Précision de routage des agents (golden set)  | forecasts |
+| POST    | `/api/v1/rag/index/invoices/{id}`| Indexe une facture (RAG pgvector)          | invoices  |
+| POST    | `/api/v1/rag/query`           | Q&A citée sur les documents (RAG, tenant)     | invoices  |
 | GET     | `/api/v1/stocks`              | Liste des stocks (+ nom produit)              | stocks    |
 | GET     | `/api/v1/stocks/alerts`       | Stocks sous le seuil de réassort              | stocks    |
 | GET     | `/api/v1/invoices`            | Factures + lignes                             | invoices  |
