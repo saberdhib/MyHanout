@@ -26,6 +26,10 @@ class Supplier(Base, TimestampMixin):
     address: Mapped[str | None] = mapped_column(Text, nullable=True)
     # Délai de paiement contractuel (jours).
     payment_terms_days: Mapped[int] = mapped_column(Integer, default=30)
+    # Délai de livraison indicatif (jours) — utilisé par la suggestion de commande.
+    lead_time_days: Mapped[int] = mapped_column(Integer, default=1)
+    # Mode de commande préféré (whatsapp_auto | draft | record_only).
+    default_order_mode: Mapped[str] = mapped_column(String(32), default="record_only")
 
     products: Mapped[list[Product]] = relationship(back_populates="supplier")
     invoices: Mapped[list[Invoice]] = relationship(back_populates="supplier")
