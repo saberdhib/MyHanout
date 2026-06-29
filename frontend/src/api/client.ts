@@ -5,6 +5,38 @@ const baseURL = import.meta.env.VITE_API_BASE_URL || "/api/v1";
 
 export const api = axios.create({ baseURL });
 
+// --- Auth (JWT) : login auto avec les identifiants de démo en dev. ----------
+let accessToken: string | null = localStorage.getItem("token");
+
+const DEMO_EMAIL = import.meta.env.VITE_DEMO_EMAIL || "admin@myhanout.example";
+const DEMO_PASSWORD = import.meta.env.VITE_DEMO_PASSWORD || "admin";
+
+export async function login(email = DEMO_EMAIL, password = DEMO_PASSWORD): Promise<void> {
+  const { data } = await axios.post(`${baseURL}/auth/login`, { email, password });
+  accessToken = data.access_token;
+  localStorage.setItem("token", accessToken!);
+}
+
+api.interceptors.request.use(async (config) => {
+  if (!accessToken) await login();
+  config.headers.Authorization = `Bearer ${accessToken}`;
+  return config;
+});
+
+api.interceptors.response.use(
+  (r) => r,
+  async (error) => {
+    if (error.response?.status === 401 && !error.config._retry) {
+      error.config._retry = true;
+      accessToken = null;
+      await login();
+      error.config.headers.Authorization = `Bearer ${accessToken}`;
+      return api.request(error.config);
+    }
+    return Promise.reject(error);
+  },
+);
+
 export interface ListResponse<T> {
   items: T[];
   total: number;
@@ -70,3 +102,27 @@ export const getForecast = (productId: number, horizon = 14) =>
   api
     .get<Forecast>(`/forecasts/${productId}`, { params: { horizon_days: horizon } })
     .then((r) => r.data);
+
+// --- Onboarding self-service -----------------------------------------------
+
+export interface SignupPayload {
+  email: string;
+  password: string;
+  organization_name: string;
+  business_type?: string;
+}
+
+export async function signup(payload: SignupPayload): Promise<void> {
+  const { data } = await axios.post(`${baseURL}/onboarding/signup`, payload);
+  accessToken = data.access_token;
+  localStorage.setItem("token", accessToken!);
+}
+
+export const addSupplier = (name: string) =>
+  api.post("/onboarding/suppliers", { name }).then((r) => r.data);
+
+export const addProduct = (p: { sku: string; name: string; unit?: string }) =>
+  api.post("/onboarding/products", p).then((r) => r.data);
+
+export const inviteMember = (email: string, role: string) =>
+  api.post("/onboarding/invitations", { email, role }).then((r) => r.data);
