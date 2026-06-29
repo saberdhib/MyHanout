@@ -1,0 +1,101 @@
+---
+import Base from "../layouts/Base.astro";
+import { SITE } from "../consts";
+---
+
+<Base title={`Contact & démo — ${SITE.name}`} description="Demandez une démo personnalisée de MyHanout AI ou posez vos questions. Réponse par un humain.">
+  <section class="container-x py-20 sm:py-24">
+    <div class="grid items-start gap-14 lg:grid-cols-2">
+      <!-- Colonne gauche : pitch + canaux -->
+      <div>
+        <span class="eyebrow reveal">Contact</span>
+        <h1 class="reveal mt-5 text-4xl font-extrabold tracking-tight text-night sm:text-5xl">
+          Voyez MyHanout sur <span class="text-brand">votre</span> commerce
+        </h1>
+        <p class="reveal mt-5 text-lg leading-relaxed text-night-700">
+          Démo de 20 minutes, avec vos produits si vous le souhaitez. On vous montre l'OCR,
+          le réassort expliqué et une promo anti-gaspillage de bout en bout.
+        </p>
+
+        <div class="reveal mt-10 space-y-4">
+          <a href="mailto:hello@myhanout.ai" class="card flex items-center gap-4 transition-shadow hover:shadow-card">
+            <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-dark text-lg">✉️</span>
+            <div>
+              <div class="font-semibold text-night">Par email</div>
+              <div class="text-sm text-night-700/70">hello@myhanout.ai</div>
+            </div>
+          </a>
+          <a href="https://wa.me/0000000000" class="card flex items-center gap-4 transition-shadow hover:shadow-card">
+            <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-dark text-lg">💬</span>
+            <div>
+              <div class="font-semibold text-night">Sur WhatsApp</div>
+              <div class="text-sm text-night-700/70">Réponse rapide, par un humain</div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Colonne droite : formulaire -->
+      <div class="reveal card sm:p-8">
+        <form id="demo-form" class="space-y-5" novalidate>
+          <div class="grid gap-5 sm:grid-cols-2">
+            <label class="block">
+              <span class="text-sm font-semibold text-night">Nom</span>
+              <input name="name" required placeholder="Sara Benali"
+                class="mt-1.5 w-full rounded-card border border-night/10 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand/20" />
+            </label>
+            <label class="block">
+              <span class="text-sm font-semibold text-night">Commerce</span>
+              <input name="shop" placeholder="Boucherie du marché"
+                class="mt-1.5 w-full rounded-card border border-night/10 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand/20" />
+            </label>
+          </div>
+          <label class="block">
+            <span class="text-sm font-semibold text-night">Email</span>
+            <input name="email" type="email" required placeholder="sara@exemple.com"
+              class="mt-1.5 w-full rounded-card border border-night/10 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand/20" />
+          </label>
+          <label class="block">
+            <span class="text-sm font-semibold text-night">Type d'activité</span>
+            <select name="type"
+              class="mt-1.5 w-full rounded-card border border-night/10 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand/20">
+              <option>Boucherie / Charcuterie</option>
+              <option>Boulangerie / Pâtisserie</option>
+              <option>Primeur / Épicerie</option>
+              <option>Autre commerce de proximité</option>
+            </select>
+          </label>
+          <label class="block">
+            <span class="text-sm font-semibold text-night">Message (optionnel)</span>
+            <textarea name="message" rows="3" placeholder="Ce que vous aimeriez voir…"
+              class="mt-1.5 w-full rounded-card border border-night/10 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand/20"></textarea>
+          </label>
+          <button type="submit" class="btn-primary w-full py-3.5 text-base">Demander ma démo</button>
+          <p class="text-center text-xs text-night-700/60">
+            Vos informations ne sont utilisées que pour vous recontacter. Aucun partage à des tiers.
+          </p>
+        </form>
+
+        <!-- Confirmation (mock côté client ; à brancher email/CRM plus tard) -->
+        <div id="demo-ok" class="hidden text-center">
+          <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand-50 text-2xl">✅</div>
+          <h3 class="mt-4 text-xl font-bold text-night">C'est noté, merci !</h3>
+          <p class="mt-2 text-night-700">On vous recontacte très vite pour caler la démo.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script is:inline>
+    const form = document.getElementById("demo-form");
+    form?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+      form.classList.add("hidden");
+      document.getElementById("demo-ok")?.classList.remove("hidden");
+    });
+  </script>
+</Base>

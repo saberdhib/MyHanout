@@ -1,0 +1,32 @@
+---
+// Logo MyHanout AI : échoppe dans une bulle de chat (dégradé vert de marque).
+interface Props {
+  size?: number;
+  withWordmark?: boolean;
+  dark?: boolean; // texte clair sur fond sombre
+}
+const { size = 30, withWordmark = true, dark = false } = Astro.props;
+---
+
+<a href="/" class="flex items-center gap-2.5 group" aria-label="MyHanout AI — accueil">
+  <svg width={size} height={size} viewBox="0 0 48 48" fill="none" class="transition-transform group-hover:scale-105">
+    <defs>
+      <linearGradient id="mh-grad" x1="0" y1="0" x2="48" y2="48">
+        <stop stop-color="#12B76A"></stop>
+        <stop offset="1" stop-color="#0E9A59"></stop>
+      </linearGradient>
+    </defs>
+    <path
+      d="M8 6h32a4 4 0 0 1 4 4v22a4 4 0 0 1-4 4H20l-9 7v-7H8a4 4 0 0 1-4-4V10a4 4 0 0 1 4-4z"
+      fill="url(#mh-grad)"></path>
+    <path d="M14 16h20l-2 5H16l-2-5z" fill="#fff" opacity="0.95"></path>
+    <rect x="16" y="22" width="16" height="8" rx="1.5" fill="#fff" opacity="0.9"></rect>
+  </svg>
+  {
+    withWordmark && (
+      <span class={`text-lg font-extrabold tracking-tight ${dark ? "text-white" : "text-night"}`}>
+        MyHanout<span class="text-brand"> AI</span>
+      </span>
+    )
+  }
+</a>

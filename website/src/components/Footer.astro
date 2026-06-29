@@ -1,0 +1,50 @@
+---
+import Logo from "./Logo.astro";
+import { SITE } from "../consts";
+const year = 2026;
+---
+
+<footer class="border-t border-white/10 bg-night text-surface">
+  <div class="container-x py-14">
+    <div class="grid gap-10 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
+      <div class="max-w-xs">
+        <Logo dark />
+        <p class="mt-4 text-sm leading-relaxed text-white/60">
+          Le copilote IA des commerces de proximité. Explicable, humain, RGPD —
+          piloté depuis WhatsApp & Telegram.
+        </p>
+      </div>
+
+      <div>
+        <h4 class="text-sm font-semibold text-white">Produit</h4>
+        <ul class="mt-4 space-y-2.5 text-sm text-white/60">
+          <li><a href="/#fonctions" class="hover:text-brand-light">Fonctions</a></li>
+          <li><a href="/pricing" class="hover:text-brand-light">Tarifs</a></li>
+          <li><a href={`${SITE.appUrl}/signup`} class="hover:text-brand-light">Créer un compte</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="text-sm font-semibold text-white">Confiance</h4>
+        <ul class="mt-4 space-y-2.5 text-sm text-white/60">
+          <li><a href="/confiance" class="hover:text-brand-light">RGPD & sécurité</a></li>
+          <li><a href="/confiance#human" class="hover:text-brand-light">Human-in-the-loop</a></li>
+          <li><a href="/confiance#explicable" class="hover:text-brand-light">Explicabilité</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="text-sm font-semibold text-white">Contact</h4>
+        <ul class="mt-4 space-y-2.5 text-sm text-white/60">
+          <li><a href="/contact" class="hover:text-brand-light">Demander une démo</a></li>
+          <li><a href="mailto:hello@myhanout.ai" class="hover:text-brand-light">hello@myhanout.ai</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 text-xs text-white/40 sm:flex-row">
+      <p>© {year} {SITE.name}. Tous droits réservés.</p>
+      <p>Conçu pour le commerçant — pas pour la donnée.</p>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,24 @@
+---
+// Cadre navigateur stylisé autour d'une capture produit.
+interface Props {
+  src: string;
+  alt: string;
+  url?: string;
+  class?: string;
+}
+const { src, alt, url = "app.myhanout.ai", class: klass = "" } = Astro.props;
+---
+
+<figure class={`overflow-hidden rounded-xl2 border border-night/10 bg-white shadow-card ${klass}`}>
+  <div class="flex items-center gap-2 border-b border-night/[0.06] bg-surface/70 px-4 py-3">
+    <span class="h-3 w-3 rounded-full bg-[#FF5F57]"></span>
+    <span class="h-3 w-3 rounded-full bg-[#FEBC2E]"></span>
+    <span class="h-3 w-3 rounded-full bg-[#28C840]"></span>
+    <div class="ml-3 flex-1">
+      <div class="mx-auto w-fit rounded-full bg-white px-3 py-1 text-xs text-night-700/60 shadow-soft">
+        {url}
+      </div>
+    </div>
+  </div>
+  <img src={src} alt={alt} loading="lazy" decoding="async" class="block w-full" />
+</figure>

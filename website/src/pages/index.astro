@@ -1,0 +1,269 @@
+---
+import Base from "../layouts/Base.astro";
+import BrowserFrame from "../components/BrowserFrame.astro";
+import { SITE } from "../consts";
+
+const features = [
+  {
+    title: "Factures sans saisie",
+    body: "OCR des factures (photo, PDF, email). L'IA pré-remplit n°, date, fournisseur, montant — vous validez en un clic. Suivi payé / non payé.",
+    icon: "doc",
+    span: "lg:col-span-3",
+  },
+  {
+    title: "Réassort explicable",
+    body: "Des suggestions de commande justifiées : demande prévue + stock + délai fournisseur + météo. Jamais une boîte noire.",
+    icon: "cart",
+    span: "lg:col-span-3",
+  },
+  {
+    title: "Promos anti-gaspillage",
+    body: "Produit en fin de vie ? L'IA propose une promo ciblée, génère l'affiche, et la publie après votre validation — réseaux + clients opt-in.",
+    icon: "spark",
+    span: "lg:col-span-2",
+  },
+  {
+    title: "Prévision de la demande",
+    body: "Anticipez les pics (week-end, fêtes, météo). Modèles naïf → Prophet/LightGBM, suivi de l'écart prévu/réel.",
+    icon: "chart",
+    span: "lg:col-span-2",
+  },
+  {
+    title: "Sur WhatsApp & Telegram",
+    body: "Tout se pilote par message. Pas d'app lourde à installer. Une photo de facture suffit.",
+    icon: "chat",
+    span: "lg:col-span-2",
+  },
+];
+
+const steps = [
+  {
+    n: "01",
+    title: "Connectez votre commerce",
+    body: "Inscription en 2 minutes. Importez votre catalogue (photo, email, JSON, caisse) — ou partez de zéro.",
+  },
+  {
+    n: "02",
+    title: "Laissez l'IA travailler",
+    body: "Factures lues, demande prévue, réassort suggéré, fins de vie repérées. Chaque proposition est expliquée.",
+  },
+  {
+    n: "03",
+    title: "Vous validez, c'est tout",
+    body: "Aucune action sortante sans votre accord. Vous gardez la main ; l'IA fait le travail ingrat.",
+  },
+];
+
+function icon(name: string) {
+  const common = 'fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"';
+  switch (name) {
+    case "doc":
+      return `<svg viewBox="0 0 24 24" ${common}><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2Z"/><path d="M9 13h6M9 17h4"/></svg>`;
+    case "cart":
+      return `<svg viewBox="0 0 24 24" ${common}><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/><path d="M2 3h2l2.4 12.4a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.6L21 7H5.6"/></svg>`;
+    case "spark":
+      return `<svg viewBox="0 0 24 24" ${common}><path d="M12 3v4M12 17v4M5 12H1M23 12h-4M6.3 6.3 8.5 8.5M15.5 15.5l2.2 2.2M17.7 6.3l-2.2 2.2M8.5 15.5l-2.2 2.2"/></svg>`;
+    case "chart":
+      return `<svg viewBox="0 0 24 24" ${common}><path d="M3 3v18h18"/><path d="m7 14 3-4 4 3 5-7"/></svg>`;
+    case "chat":
+      return `<svg viewBox="0 0 24 24" ${common}><path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5Z"/></svg>`;
+    default:
+      return "";
+  }
+}
+---
+
+<Base>
+  <!-- ===================== HERO ===================== -->
+  <section class="relative overflow-hidden">
+    <!-- halos décoratifs -->
+    <div class="pointer-events-none absolute inset-0 -z-10">
+      <div class="absolute -top-32 right-[-10%] h-[420px] w-[420px] rounded-full bg-brand/20 blur-[120px]"></div>
+      <div class="absolute top-40 left-[-10%] h-[360px] w-[360px] rounded-full bg-accent/10 blur-[120px]"></div>
+    </div>
+
+    <div class="container-x pt-20 pb-16 text-center sm:pt-28">
+      <span class="eyebrow reveal">🇲🇦 🇫🇷 Copilote des commerces de proximité</span>
+      <h1 class="reveal mx-auto mt-6 max-w-4xl text-4xl font-extrabold leading-[1.08] tracking-tight text-night sm:text-6xl">
+        L'IA qui gère la paperasse,<br class="hidden sm:block" />
+        <span class="bg-gradient-to-r from-brand to-brand-dark bg-clip-text text-transparent">
+          vous gardez votre commerce.
+        </span>
+      </h1>
+      <p class="reveal mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-night-700">
+        Factures lues automatiquement, réassort suggéré et expliqué, promos anti-gaspillage
+        prêtes à publier. Le tout depuis WhatsApp — sans saisie, sans jargon, sans boîte noire.
+      </p>
+      <div class="reveal mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+        <a href={`${SITE.appUrl}/signup`} class="btn-primary px-6 py-3.5 text-base">
+          Essayer gratuitement
+        </a>
+        <a href="/contact" class="btn-ghost px-6 py-3.5 text-base">Demander une démo</a>
+      </div>
+      <p class="reveal mt-4 text-sm text-night-700/60">
+        Sans carte bancaire · Démo fonctionnelle en mode bac à sable
+      </p>
+
+      <!-- Capture produit réelle -->
+      <div class="reveal relative mt-16">
+        <div class="absolute inset-x-10 -bottom-6 -z-10 h-40 rounded-full bg-brand/30 blur-3xl"></div>
+        <BrowserFrame
+          src="/shots/dashboard.png"
+          alt="Tableau de bord MyHanout AI : stocks, alertes, signaux du jour"
+          class="mx-auto max-w-4xl"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== BANDEAU CONFIANCE ===================== -->
+  <section class="border-y border-night/[0.06] bg-surface/60">
+    <div class="container-x grid grid-cols-2 gap-6 py-8 text-center md:grid-cols-4">
+      {
+        [
+          ["100%", "explicable"],
+          ["0", "saisie de facture"],
+          ["RGPD", "par conception"],
+          ["WhatsApp", "& Telegram"],
+        ].map(([big, small]) => (
+          <div class="reveal">
+            <div class="text-2xl font-extrabold text-night">{big}</div>
+            <div class="text-sm text-night-700/70">{small}</div>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- ===================== FONCTIONS (bento) ===================== -->
+  <section id="fonctions" class="container-x scroll-mt-24 py-24">
+    <div class="mx-auto max-w-2xl text-center">
+      <span class="eyebrow reveal">Ce que ça fait</span>
+      <h2 class="reveal mt-5 text-3xl font-extrabold tracking-tight text-night sm:text-4xl">
+        Tout le back-office, en pilote automatique
+      </h2>
+      <p class="reveal mt-4 text-lg text-night-700">
+        Chaque suggestion est justifiée. Chaque action sortante passe par vous.
+      </p>
+    </div>
+
+    <div class="mt-14 grid gap-5 lg:grid-cols-6">
+      {
+        features.map((f) => (
+          <article class={`reveal card group flex flex-col ${f.span}`}>
+            <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-dark transition-colors group-hover:bg-brand group-hover:text-white">
+              <span class="h-6 w-6" set:html={icon(f.icon)} />
+            </div>
+            <h3 class="mt-5 text-lg font-bold text-night">{f.title}</h3>
+            <p class="mt-2 text-sm leading-relaxed text-night-700">{f.body}</p>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- ===================== PROMOS (split visuel) ===================== -->
+  <section class="bg-night text-surface">
+    <div class="container-x grid items-center gap-12 py-24 lg:grid-cols-2">
+      <div>
+        <span class="eyebrow reveal border-white/15 bg-white/5 text-brand-light">Anti-gaspillage</span>
+        <h2 class="reveal mt-5 text-3xl font-extrabold tracking-tight sm:text-4xl">
+          Transformez les fins de vie en chiffre d'affaires
+        </h2>
+        <p class="reveal mt-4 text-lg leading-relaxed text-white/70">
+          L'IA repère les produits proches de la péremption, rédige un message chaleureux,
+          <strong class="text-white"> génère l'affiche</strong> et la publie après votre validation —
+          sur vos réseaux et auprès des clients qui ont consenti (RGPD).
+        </p>
+        <ul class="reveal mt-7 space-y-3">
+          {
+            [
+              "Message + affiche générés automatiquement",
+              "Diffusion réseaux + clients opt-in uniquement",
+              "Publication validée par vous, tracée (audit)",
+            ].map((t) => (
+              <li class="flex items-start gap-3 text-white/80">
+                <span class="mt-0.5 flex h-5 w-5 flex-none items-center justify-center rounded-full bg-brand text-white text-xs">✓</span>
+                {t}
+              </li>
+            ))
+          }
+        </ul>
+        <a href={`${SITE.appUrl}/promos`} class="btn-primary reveal mt-8">Voir les promos en action</a>
+      </div>
+      <div class="reveal">
+        <BrowserFrame src="/shots/promos.png" alt="Promo flash générée avec affiche et aperçu WhatsApp" url="app.myhanout.ai/promos" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== COMMENT ÇA MARCHE ===================== -->
+  <section class="container-x py-24">
+    <div class="mx-auto max-w-2xl text-center">
+      <span class="eyebrow reveal">Comment ça marche</span>
+      <h2 class="reveal mt-5 text-3xl font-extrabold tracking-tight text-night sm:text-4xl">
+        Opérationnel en une après-midi
+      </h2>
+    </div>
+    <div class="mt-14 grid gap-6 md:grid-cols-3">
+      {
+        steps.map((s) => (
+          <div class="reveal card relative">
+            <span class="text-sm font-extrabold text-brand">{s.n}</span>
+            <h3 class="mt-2 text-lg font-bold text-night">{s.title}</h3>
+            <p class="mt-2 text-sm leading-relaxed text-night-700">{s.body}</p>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- ===================== CONFIANCE TEASER ===================== -->
+  <section class="container-x pb-24">
+    <div class="reveal overflow-hidden rounded-xl2 border border-night/[0.06] bg-gradient-to-br from-surface to-brand-50 p-10 sm:p-14">
+      <div class="grid gap-10 lg:grid-cols-3">
+        <div class="lg:col-span-1">
+          <h2 class="text-2xl font-extrabold tracking-tight text-night sm:text-3xl">
+            Une IA en qui on peut avoir confiance
+          </h2>
+          <a href="/confiance" class="btn-dark mt-6">Notre engagement →</a>
+        </div>
+        <div class="grid gap-6 sm:grid-cols-3 lg:col-span-2">
+          {
+            [
+              ["Human-in-the-loop", "Aucune commande, message ou publication sans votre validation."],
+              ["RGPD par conception", "Consentement explicite, minimisation, rien chez des tiers par défaut."],
+              ["Multi-commerce isolé", "Vos données ne croisent jamais celles d'un autre commerce."],
+            ].map(([t, b]) => (
+              <div>
+                <h3 class="font-bold text-night">{t}</h3>
+                <p class="mt-1.5 text-sm leading-relaxed text-night-700">{b}</p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CTA FINAL ===================== -->
+  <section class="relative overflow-hidden bg-night text-center text-white">
+    <div class="pointer-events-none absolute inset-0 -z-0">
+      <div class="absolute left-1/2 top-0 h-72 w-72 -translate-x-1/2 rounded-full bg-brand/30 blur-[120px]"></div>
+    </div>
+    <div class="container-x relative py-24">
+      <h2 class="reveal mx-auto max-w-2xl text-3xl font-extrabold tracking-tight sm:text-5xl">
+        Reprenez votre temps. Confiez-nous la paperasse.
+      </h2>
+      <p class="reveal mx-auto mt-5 max-w-xl text-lg text-white/70">
+        Essayez gratuitement en mode bac à sable — sans clé API, sans carte bancaire.
+      </p>
+      <div class="reveal mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+        <a href={`${SITE.appUrl}/signup`} class="btn-primary px-6 py-3.5 text-base">Créer mon compte</a>
+        <a href="/contact" class="btn px-6 py-3.5 text-base border border-white/20 text-white hover:bg-white/10">
+          Parler à un humain
+        </a>
+      </div>
+    </div>
+  </section>
+</Base>
