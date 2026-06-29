@@ -14,6 +14,8 @@ os.environ.setdefault(
     "DATABASE_URL", "sqlite+aiosqlite:///file:test?mode=memory&cache=shared&uri=true"
 )
 os.environ.setdefault("ENV", "local")
+# Désactivé par défaut dans la suite (app singleton partagé) ; un test dédié le réactive.
+os.environ.setdefault("RATE_LIMIT_ENABLED", "false")
 
 import asyncio
 import datetime

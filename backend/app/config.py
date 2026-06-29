@@ -33,6 +33,14 @@ class Settings(BaseSettings):
     api_host: str = "0.0.0.0"
     api_port: int = 8000
     api_v1_prefix: str = "/api/v1"
+
+    # --- Rate limiting ---
+    rate_limit_enabled: bool = True
+    rate_limit_per_minute: int = 120  # par client (IP ou utilisateur)
+
+    # --- Observabilité / tracing ---
+    otel_enabled: bool = False  # active l'export OpenTelemetry (console) si dispo
+    service_name: str = "myhanout-api"
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:5173"])
 
     # --- Base de données ---
