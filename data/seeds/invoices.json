@@ -1,0 +1,30 @@
+[
+  {
+    "number": "FAC-2026-0418",
+    "supplier_name": "Boucherie Centrale",
+    "issue_date": "2026-04-18",
+    "due_date": "2026-05-18",
+    "currency": "EUR",
+    "status": "processed",
+    "ocr_status": "done",
+    "source_uri": "seeds/sample-invoice-1.pdf",
+    "lines": [
+      {"product_sku": "BOEUF-HACHE", "description": "Boeuf haché 1ère cat.", "quantity": 25, "unit_price": 88.0},
+      {"product_sku": "POULET-ENTIER", "description": "Poulet fermier", "quantity": 40, "unit_price": 41.0}
+    ]
+  },
+  {
+    "number": "FAC-2026-0512",
+    "supplier_name": "Minoterie du Sud",
+    "issue_date": "2026-05-12",
+    "due_date": "2026-06-26",
+    "currency": "EUR",
+    "status": "pending",
+    "ocr_status": "done",
+    "source_uri": "seeds/sample-invoice-2.pdf",
+    "lines": [
+      {"product_sku": "FARINE-T55", "description": "Farine T55 sac 25kg", "quantity": 20, "unit_price": 7.9},
+      {"product_sku": "SUCRE", "description": "Sucre blanc sac 25kg", "quantity": 10, "unit_price": 8.5}
+    ]
+  }
+]

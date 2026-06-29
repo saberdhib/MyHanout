@@ -1,0 +1,11 @@
+sku,name,category,unit,unit_price,perishable,shelf_life_days,supplier_name
+BOEUF-HACHE,Boeuf haché,viande,kg,95.00,true,3,Boucherie Centrale
+POULET-ENTIER,Poulet entier,viande,unit,45.00,true,4,Boucherie Centrale
+FARINE-T55,Farine T55,epicerie,kg,8.50,false,365,Minoterie du Sud
+LEVURE-BOUL,Levure boulangère,epicerie,unit,3.00,true,90,Minoterie du Sud
+TOMATE,Tomates,legume,kg,7.00,true,7,Grossiste FraisPrim
+POMME-TERRE,Pommes de terre,legume,kg,4.50,false,30,Grossiste FraisPrim
+LAIT-1L,Lait entier 1L,frais,unit,6.50,true,10,Coopérative Atlas
+OEUFS-12,Oeufs (boîte de 12),frais,unit,14.00,true,21,Coopérative Atlas
+HUILE-OLIVE,Huile d'olive 1L,epicerie,unit,55.00,false,540,Coopérative Atlas
+SUCRE,Sucre blanc,epicerie,kg,9.00,false,720,Minoterie du Sud
