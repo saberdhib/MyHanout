@@ -77,6 +77,11 @@ class Settings(BaseSettings):
     # --- Génération de visuels (text-to-image) ---
     image_provider: str = "mock"  # mock | huggingface
 
+    # --- Couche financière ---
+    finance_classifier: str = "mock"  # mock | llm (réutilise LLM_PROVIDER)
+    # Seuil d'écart de prix fournisseur déclenchant une alerte (ex. 0.20 = +20%).
+    finance_price_anomaly_pct: float = 0.20
+
     # --- Import factures par email (IMAP) ---
     email_provider: str = "mock"  # mock | imap
     email_imap_host: str = ""

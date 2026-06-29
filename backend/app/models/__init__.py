@@ -8,6 +8,7 @@ from app.models.conversation import Conversation
 from app.models.customer import Customer
 from app.models.daily_entry import DailyEntry
 from app.models.event import Event
+from app.models.expense import ExpenseCategory, ExpenseClassificationFeedback
 from app.models.forecast_evaluation import ForecastEvaluation
 from app.models.invoice import Invoice, InvoiceLine
 from app.models.order import Order, OrderLine
@@ -27,6 +28,8 @@ __all__ = [
     "Customer",
     "DailyEntry",
     "Event",
+    "ExpenseCategory",
+    "ExpenseClassificationFeedback",
     "ForecastEvaluation",
     "Invitation",
     "Invoice",

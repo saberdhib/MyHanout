@@ -137,6 +137,34 @@ async def _seed_business_data(session: AsyncSession, seeds: Path) -> None:
         invoice.total_amount = total
         session.add(invoice)
 
+    # Démo couche finance : charges non-marchandise à classer (OPEX/CAPEX).
+    energy_supplier = Supplier(name="EDF Énergie", payment_terms_days=15)
+    telecom_supplier = Supplier(name="Orange Pro", payment_terms_days=30)
+    session.add_all([energy_supplier, telecom_supplier])
+    await session.flush()
+    expense_invoices = [
+        ("FAC-ELEC-06", energy_supplier, "Électricité juin", 180.0, False),
+        ("FAC-TEL-06", telecom_supplier, "Abonnement fibre + mobile", 49.9, True),
+        ("FAC-FRIGO-01", None, "Vitrine réfrigérée (matériel)", 1290.0, False),
+    ]
+    for number, supplier, label, amount, paid in expense_invoices:
+        inv = Invoice(
+            number=number,
+            supplier=supplier,
+            issue_date=date.today() - timedelta(days=5),
+            due_date=date.today() + timedelta(days=10),
+            currency="EUR",
+            status=InvoiceStatus.PAID if paid else InvoiceStatus.PENDING,
+            ocr_status=OcrStatus.DONE,
+            total_amount=amount,
+            paid=paid,
+            paid_at=datetime.now(UTC) if paid else None,
+        )
+        inv.lines.append(
+            InvoiceLine(description=label, quantity=1, unit_price=amount, line_total=amount)
+        )
+        session.add(inv)
+
     # Démo : un périssable en fin de vie (déclenche la promo flash) + clients opt-in.
     soon = date.today() + timedelta(days=2)
     for product in products.values():
@@ -170,6 +198,11 @@ async def seed() -> None:
         if existing:
             log.info("seed.skip", reason="org demo already present")
             return
+
+        # Référentiel global des catégories de charges (idempotent, non tenant).
+        from app.intelligence.finance.categories import seed_expense_categories
+
+        await seed_expense_categories(session)
 
         # Organisation de démo (tenant).
         org = Organization(name="Commerce Démo", slug="demo", business_type="epicerie")

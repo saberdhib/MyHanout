@@ -9,7 +9,7 @@ from sqlalchemy import Boolean, Date, DateTime, Enum, ForeignKey, Numeric, Strin
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, TimestampMixin
-from app.models.base import InvoiceStatus, OcrStatus
+from app.models.base import ClassificationSource, ExpenseKind, InvoiceStatus, OcrStatus
 from app.models.tenant import TenantMixin
 
 if TYPE_CHECKING:
@@ -54,6 +54,27 @@ class Invoice(Base, TenantMixin, TimestampMixin):
     # Suivi de paiement (facturation électronique : payé / non payé).
     paid: Mapped[bool] = mapped_column(Boolean, default=False)
     paid_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    # --- Couche financière : catégorisation OPEX/CAPEX (pré-compta) ---
+    # Référentiel global (expense_category). Nullable tant que non classé.
+    category_id: Mapped[int | None] = mapped_column(
+        ForeignKey("expense_category.id"), nullable=True
+    )
+    expense_kind: Mapped[ExpenseKind] = mapped_column(
+        Enum(ExpenseKind, native_enum=False, values_callable=lambda e: [m.value for m in e]),
+        default=ExpenseKind.UNKNOWN,
+    )
+    classification_source: Mapped[ClassificationSource | None] = mapped_column(
+        Enum(
+            ClassificationSource,
+            native_enum=False,
+            values_callable=lambda e: [m.value for m in e],
+        ),
+        nullable=True,
+    )
+    classification_confidence: Mapped[float | None] = mapped_column(Numeric(4, 3), nullable=True)
+    # Explicabilité : OBLIGATOIRE dès qu'une suggestion (IA/règle) est posée.
+    classification_explanation: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     supplier: Mapped[Supplier | None] = relationship(back_populates="invoices")
     reviewed_by: Mapped[User | None] = relationship()

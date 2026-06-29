@@ -65,3 +65,19 @@ class EventType(enum.StrEnum):
     INVOICE_DUE = "invoice_due"
     FORECAST_READY = "forecast_ready"
     AGENT_ACTION = "agent_action"
+
+
+class ExpenseKind(enum.StrEnum):
+    """Nature comptable d'une charge (pré-compta, non certifiée)."""
+
+    OPEX = "opex"  # charge d'exploitation (récurrente)
+    CAPEX = "capex"  # investissement (immobilisable)
+    UNKNOWN = "unknown"  # non encore classé
+
+
+class ClassificationSource(enum.StrEnum):
+    """Origine d'une classification de facture."""
+
+    AI = "ai"  # proposée par le classifieur (à valider)
+    HUMAN = "human"  # validée/corrigée par un humain
+    RULE = "rule"  # posée par une règle déterministe
