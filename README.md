@@ -135,10 +135,13 @@ Tests : sqlite (rapide) + intégration **pg+pgvector** (job CI). Migrations rév
 ## 📁 Structure
 ```
 backend/    FastAPI, modèles (TenantMixin), ingestion, intelligence, messaging, workers, alembic
-frontend/   Dashboard React + Vite + TS + Tailwind (dark mode) — chat, promos, factures, prévisions…
+frontend/   Dashboard (app authentifiée) React + Vite + TS + Tailwind (dark mode) — chat, promos, factures…
+website/    Site vitrine public Astro + Tailwind (SSG, SEO) — landing, tarifs, confiance/RGPD, contact
 data/seeds/ Données factices
 docs/       architecture, data-model, api-design, multitenancy, DEMO, DEPLOY, delivery/ (C4, ADRs)
 ```
+> `frontend/` = l'**app** (le commerçant connecté). `website/` = la **vitrine** publique
+> (prospects, SEO). Deux fronts distincts dans le même monorepo. Cf. [`website/README.md`](website/README.md).
 
 ## 🗺️ Roadmap
 Faits : OCR réel, factures (review + payé + **import email**), auth JWT/RBAC, multi-tenant,

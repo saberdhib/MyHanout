@@ -12,7 +12,9 @@ anti-gaspillage — **multi-tenant, human-in-the-loop, RGPD, explicable**.
 ## 2. Stack & commandes
 - **Backend** : Python 3.11, FastAPI, Pydantic v2, SQLAlchemy 2.0 **async** (asyncpg),
   Alembic, Celery/Redis, PostgreSQL 16 + **pgvector**.
-- **Frontend** : React + Vite + TypeScript + Tailwind (dark mode).
+- **Frontend (app)** : `frontend/` — dashboard authentifié, React + Vite + TypeScript + Tailwind (dark mode).
+- **Vitrine (site public)** : `website/` — Astro + Tailwind, statique (SSG, SEO). Marketing/landing,
+  séparé de l'app. Réutilise les mêmes tokens de marque. `cd website && npm run build`. CTA → `PUBLIC_APP_URL`.
 - **Qualité** : `ruff`, `black`, `mypy`, `pytest`. **Le gate doit rester vert à chaque commit.**
 
 ```bash
@@ -106,3 +108,6 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
 - **Import factures email** : `POST /invoices/import/email` (provider `ingestion/email/`).
 - **Import JSON / sync DWH** : `POST /import/json`, `POST /import/dwh/sync`
   (`services/import_service.py`, `ingestion/dwh.py`). Frontend : page « Intégrations ».
+- **Site vitrine** : `website/` (Astro). Pages dans `website/src/pages/`, composants
+  `website/src/components/`, tokens de marque dupliqués dans `website/tailwind.config.mjs`
+  (garder synchro avec `frontend/src/theme/tokens.js`). Détails : `website/README.md`.
