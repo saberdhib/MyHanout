@@ -21,7 +21,12 @@ API REST FastAPI, versionnée sous `/api/v1`. Doc interactive : `/docs` (Swagger
 | GET     | `/metrics`                     | Métriques Prometheus                          | —         |
 | POST    | `/api/v1/auth/login`          | Login → access + refresh tokens               | —         |
 | POST    | `/api/v1/auth/refresh`        | Échange refresh token → nouvel access token   | —         |
-| GET     | `/api/v1/auth/me`              | Utilisateur courant                           | (token)   |
+| GET     | `/api/v1/auth/me`              | Utilisateur courant (+ org active)            | (token)   |
+| POST    | `/api/v1/onboarding/signup`   | Crée compte + organisation (owner)            | —         |
+| POST    | `/api/v1/onboarding/products` | Ajoute un produit (rattaché à l'org)          | stocks    |
+| POST    | `/api/v1/onboarding/suppliers`| Ajoute un fournisseur (rattaché à l'org)      | stocks    |
+| POST    | `/api/v1/onboarding/invitations`| Invite un membre (owner choisit le rôle)    | owner     |
+| POST    | `/api/v1/onboarding/invitations/accept`| Accepte une invitation               | —         |
 | POST    | `/api/v1/invoices/upload`     | Importe un document → facture `pending_review`| invoices  |
 | POST    | `/api/v1/invoices/{id}/approve`| Validation humaine → écrit les lignes + audit | invoices  |
 | POST    | `/api/v1/invoices/{id}/reject`| Rejet humain avec motif (audité)              | invoices  |

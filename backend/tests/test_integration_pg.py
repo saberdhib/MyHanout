@@ -14,7 +14,7 @@ import datetime
 import os
 
 import pytest
-from sqlalchemy import text
+from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 INTEGRATION_URL = os.getenv("INTEGRATION_DATABASE_URL")
@@ -40,47 +40,62 @@ async def test_pgvector_extension_present(pg_session):
         assert version is not None
 
 
+async def _demo_org_id(session) -> int:
+    """Org 'demo' créée par le seed (lancé avant les tests dans le job CI)."""
+    from app.models.organization import Organization
+
+    org = await session.scalar(select(Organization).where(Organization.slug == "demo"))
+    assert org is not None, "Lancer `python -m app.db.seed` avant les tests d'intégration"
+    return org.id
+
+
 @pytest.mark.asyncio
 async def test_invoice_enum_roundtrip_on_pg(pg_session):
     """Vérifie le stockage des enums en valeur minuscule (values_callable)."""
+    from app.core.tenancy import tenant_context
     from app.models.base import InvoiceStatus
     from app.models.invoice import Invoice
 
     async with pg_session() as s:
-        inv = Invoice(
-            number=f"IT-{datetime.datetime.now(datetime.UTC).timestamp()}",
-            currency="EUR",
-            status=InvoiceStatus.PENDING_REVIEW,
-        )
-        s.add(inv)
-        await s.commit()
-        raw = await s.scalar(text("SELECT status FROM invoice WHERE id = :id"), {"id": inv.id})
-        assert raw == "pending_review"
+        org_id = await _demo_org_id(s)
+        with tenant_context(org_id):
+            inv = Invoice(
+                number=f"IT-{datetime.datetime.now(datetime.UTC).timestamp()}",
+                currency="EUR",
+                status=InvoiceStatus.PENDING_REVIEW,
+            )
+            s.add(inv)
+            await s.commit()
+            raw = await s.scalar(text("SELECT status FROM invoice WHERE id = :id"), {"id": inv.id})
+            assert raw == "pending_review"
 
 
 @pytest.mark.asyncio
 async def test_forecast_service_on_pg(pg_session):
-    """Pipeline data->modèle sur vrai PG : seed minimal puis prévision."""
+    """Pipeline data->modèle sur vrai PG : seed minimal puis prévision (tenant)."""
+    from app.core.tenancy import tenant_context
     from app.models.product import Product
     from app.models.sale import Sale
     from app.services.forecast_service import forecast_product
 
     async with pg_session() as s:
-        product = Product(sku=f"IT-{id(s)}", name="Test", unit="kg")
-        s.add(product)
-        await s.flush()
-        base = datetime.datetime(2026, 5, 1)
-        for d in range(30):
-            s.add(
-                Sale(
-                    product_id=product.id,
-                    quantity=10,
-                    unit_price=5,
-                    total=50,
-                    sold_at=base + datetime.timedelta(days=d),
+        org_id = await _demo_org_id(s)
+        with tenant_context(org_id):
+            product = Product(sku=f"IT-{id(s)}", name="Test", unit="kg")
+            s.add(product)
+            await s.flush()
+            base = datetime.datetime(2026, 5, 1)
+            for d in range(30):
+                s.add(
+                    Sale(
+                        product_id=product.id,
+                        quantity=10,
+                        unit_price=5,
+                        total=50,
+                        sold_at=base + datetime.timedelta(days=d),
+                    )
                 )
-            )
-        await s.commit()
-        result = await forecast_product(s, product.id, horizon_days=7)
-        assert result.model == "naive"
-        assert len(result.points) == 7
+            await s.commit()
+            result = await forecast_product(s, product.id, horizon_days=7)
+            assert result.model == "naive"
+            assert len(result.points) == 7

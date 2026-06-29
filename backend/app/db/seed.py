@@ -192,10 +192,10 @@ async def seed() -> None:
         )
 
         # Estampillage automatique des données métier sur l'org démo.
+        # Le commit DOIT rester dans le contexte pour stamper les inserts différés.
         with tenant_context(org.id):
             await _seed_business_data(session, seeds)
-
-        await session.commit()
+            await session.commit()
         log.info("seed.done", organization=org.slug)
 
 

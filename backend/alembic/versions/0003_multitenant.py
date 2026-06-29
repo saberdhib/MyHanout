@@ -67,17 +67,18 @@ def upgrade() -> None:
     op.create_index("ix_invitation_email", "invitation", ["email"])
     op.create_index("ix_invitation_organization_id", "invitation", ["organization_id"])
 
-    # Organisation par défaut pour rattacher les données existantes.
+    # Organisation par défaut pour rattacher les données EXISTANTES (slug interne
+    # distinct du 'demo' du seed, pour ne pas entrer en collision).
     op.execute(
         "INSERT INTO organization (name, slug, created_at, updated_at) "
-        "VALUES ('Commerce Démo', 'demo', now(), now())"
+        "VALUES ('Organisation par défaut', 'default', now(), now())"
     )
 
     for table in _TENANT_TABLES:
         op.add_column(table, sa.Column("organization_id", sa.Integer(), nullable=True))
         op.execute(
             f'UPDATE "{table}" SET organization_id = '
-            "(SELECT id FROM organization WHERE slug='demo')"
+            "(SELECT id FROM organization WHERE slug='default')"
         )
         op.alter_column(table, "organization_id", nullable=False)
         op.create_foreign_key(
