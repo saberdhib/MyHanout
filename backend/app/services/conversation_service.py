@@ -20,8 +20,10 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logging import get_logger
+from app.core.tenancy import tenant_context
 from app.models.base import DailyEntrySource
 from app.models.conversation import Conversation
+from app.models.organization import Organization
 from app.models.product import Product
 from app.schemas.order import AdjustedLine
 from app.services.daily_entry_service import upsert_daily_entry
@@ -45,6 +47,22 @@ async def _get_conversation(session: AsyncSession, phone: str) -> Conversation:
         session.add(conv)
         await session.flush()
     return conv
+
+
+async def _resolve_org(session: AsyncSession, conv: Conversation) -> int | None:
+    """Résout l'organisation rattachée au numéro WhatsApp.
+
+    Le webhook est public (pas de token) : on résout l'org via la conversation,
+    sinon on rattache au premier commerce (hypothèse : un numéro WhatsApp = un
+    commerce). Une vraie association numéro→org se fait à l'onboarding (suite).
+    """
+    if conv.organization_id:
+        return conv.organization_id
+    org = await session.scalar(select(Organization).order_by(Organization.id).limit(1))
+    if org is not None:
+        conv.organization_id = org.id
+        return org.id
+    return None
 
 
 def _format_proposal(lines: list[dict]) -> str:
@@ -140,11 +158,16 @@ async def _handle_stock_entry(session: AsyncSession, text: str) -> str | None:
 
 
 async def handle_text(session: AsyncSession, phone: str, text: str) -> str:
-    """Point d'entrée texte : pilote la machine à états et renvoie la réponse."""
+    """Point d'entrée texte : résout le tenant (via le numéro) puis dispatche."""
     conv = await _get_conversation(session, phone)
-    lowered = text.strip().lower()
-    log.info("conversation.text", phone=phone, state=conv.state)
+    org_id = await _resolve_org(session, conv)
+    log.info("conversation.text", phone=phone, state=conv.state, org=org_id)
+    with tenant_context(org_id):
+        return await _dispatch_text(session, conv, text)
 
+
+async def _dispatch_text(session: AsyncSession, conv: Conversation, text: str) -> str:
+    lowered = text.strip().lower()
     if conv.state == STATE_AWAITING:
         if lowered in _YES:
             return await _confirm_flow(session, conv)
@@ -174,14 +197,17 @@ async def handle_text(session: AsyncSession, phone: str, text: str) -> str:
 
 
 async def handle_image(session: AsyncSession, phone: str, media_id: str) -> str:
-    """Une photo de facture -> téléchargement + pipeline OCR (Phase 1)."""
+    """Une photo de facture -> téléchargement + pipeline OCR (Phase 1), tenant-scopé."""
     from app.messaging.whatsapp import get_whatsapp_client
     from app.services.invoice_service import ingest_and_store
 
+    conv = await _get_conversation(session, phone)
+    org_id = await _resolve_org(session, conv)
     client = get_whatsapp_client()
     content = await client.download_media(media_id)
-    invoice, reasons = await ingest_and_store(
-        session, content, content_type="image/jpeg", filename=f"whatsapp-{media_id}.jpg"
-    )
-    why = " ".join(reasons[:2])
-    return f"📄 Facture reçue (#{invoice.id}), en attente de validation.\n" f"Raison : {why}"
+    with tenant_context(org_id):
+        invoice, reasons = await ingest_and_store(
+            session, content, content_type="image/jpeg", filename=f"whatsapp-{media_id}.jpg"
+        )
+        why = " ".join(reasons[:2])
+        return f"📄 Facture reçue (#{invoice.id}), en attente de validation.\nRaison : {why}"

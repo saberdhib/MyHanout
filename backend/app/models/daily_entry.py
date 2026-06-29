@@ -14,12 +14,13 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, TimestampMixin
 from app.models.base import DailyEntrySource
+from app.models.tenant import TenantMixin
 
 if TYPE_CHECKING:
     from app.models.product import Product
 
 
-class DailyEntry(Base, TimestampMixin):
+class DailyEntry(Base, TenantMixin, TimestampMixin):
     __tablename__ = "daily_entry"
     __table_args__ = (
         UniqueConstraint("product_id", "entry_date", name="uq_daily_entry_product_date"),

@@ -11,7 +11,8 @@ import sqlalchemy as sa
 from alembic import op
 
 revision: str = "0003_phase2_loop"
-down_revision: str | None = "0002_invoice_review"
+# Re-chaîné après 0003_multitenant lors de la consolidation des branches.
+down_revision: str | None = "0003_multitenant"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

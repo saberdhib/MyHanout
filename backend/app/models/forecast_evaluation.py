@@ -13,12 +13,13 @@ from sqlalchemy import Date, ForeignKey, Numeric, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, TimestampMixin
+from app.models.tenant import TenantMixin
 
 if TYPE_CHECKING:
     from app.models.product import Product
 
 
-class ForecastEvaluation(Base, TimestampMixin):
+class ForecastEvaluation(Base, TenantMixin, TimestampMixin):
     __tablename__ = "forecast_evaluation"
     __table_args__ = (
         UniqueConstraint(
