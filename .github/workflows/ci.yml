@@ -31,6 +31,42 @@ jobs:
           DATABASE_URL: sqlite+aiosqlite:///file:test?mode=memory&cache=shared&uri=true
         run: pytest
 
+  integration-postgres:
+    name: Integration — migrations + tests on pg16 + pgvector
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: myhanout
+          POSTGRES_PASSWORD: myhanout
+          POSTGRES_DB: myhanout
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U myhanout"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql+asyncpg://myhanout:myhanout@localhost:5432/myhanout
+      INTEGRATION_DATABASE_URL: postgresql+asyncpg://myhanout:myhanout@localhost:5432/myhanout
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install deps
+        run: pip install ".[dev]"
+      - name: Run Alembic migrations on real Postgres (CREATE EXTENSION vector)
+        run: alembic upgrade head
+      - name: Seed demo data
+        run: python -m app.db.seed
+      - name: Integration tests (real pg + pgvector)
+        run: pytest -m integration
+
   frontend:
     name: Frontend — typecheck & build
     runs-on: ubuntu-latest

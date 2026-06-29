@@ -44,6 +44,23 @@ erDiagram
   migration pour la recherche sémantique sur documents. Hors ORM afin de garder
   les tests compatibles SQLite.
 
+## Divergences SQLite ↔ PostgreSQL
+
+Les tests unitaires/fonctionnels tournent sur **SQLite** (rapides, sans service) ;
+les tests d'intégration et les migrations tournent sur **PostgreSQL 16 + pgvector**
+(job CI `integration-postgres`). Divergences gérées :
+
+| Sujet | PostgreSQL | SQLite | Choix |
+|-------|-----------|--------|-------|
+| Type `vector` (pgvector) | natif (extension) | inexistant | `document_chunk` créé en SQL brut dans la migration, **hors ORM** → `create_all` SQLite ne le voit pas |
+| Énumérations | `VARCHAR` (`native_enum=False` + `values_callable`) | `VARCHAR` | identique des deux côtés, valeurs minuscules (`pending_review`…) |
+| `validation_report` (facture) | `TEXT` (JSON sérialisé) | `TEXT` | portable, pas de type `JSONB` pour rester commun |
+| Application du schéma | `alembic upgrade head` (joue extension + SQL brut) | `Base.metadata.create_all` | la migration (extension/`document_chunk`) n'est exercée que sur PG |
+
+> Validé en réel : `alembic upgrade head` (0001 + 0002) sur pg16, extension
+> `vector` 0.6.0 active, insertion d'un `vector(1536)`, enum stocké en
+> `pending_review`. Voir le job CI `integration-postgres`.
+
 ## Données de seed
 
 `data/seeds/` : `suppliers.csv`, `products.csv`, `sales.csv` (~720 lignes,
