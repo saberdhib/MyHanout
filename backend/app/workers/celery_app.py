@@ -14,6 +14,7 @@ celery_app = Celery(
         "app.workers.ocr_task",
         "app.workers.forecast_task",
         "app.workers.alert_task",
+        "app.workers.mlops_task",
     ],
 )
 
