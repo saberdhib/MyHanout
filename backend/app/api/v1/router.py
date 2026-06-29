@@ -7,7 +7,9 @@ from fastapi import APIRouter
 from app.api.v1 import (
     agents,
     auth,
+    catalog,
     chat,
+    config,
     customers,
     daily_entries,
     equipment,
@@ -15,6 +17,7 @@ from app.api.v1 import (
     forecasts,
     imports,
     invoices,
+    meat,
     mlops,
     onboarding,
     orders,
@@ -28,6 +31,7 @@ from app.api.v1 import (
 
 api_router = APIRouter()
 api_router.include_router(auth.router)
+api_router.include_router(config.router)
 api_router.include_router(onboarding.router)
 api_router.include_router(agents.router)
 api_router.include_router(rag.router)
@@ -40,6 +44,8 @@ api_router.include_router(invoices.router)
 api_router.include_router(imports.router)
 api_router.include_router(finance.router)
 api_router.include_router(equipment.router)
+api_router.include_router(catalog.router)
+api_router.include_router(meat.router)
 api_router.include_router(forecasts.router)
 api_router.include_router(orders.router)
 api_router.include_router(daily_entries.router)
