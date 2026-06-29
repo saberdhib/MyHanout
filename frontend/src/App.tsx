@@ -5,6 +5,9 @@ import Stocks from "./pages/Stocks";
 import Forecasts from "./pages/Forecasts";
 import Invoices from "./pages/Invoices";
 import Suppliers from "./pages/Suppliers";
+import Suggestions from "./pages/Suggestions";
+import EndOfDay from "./pages/EndOfDay";
+import Quality from "./pages/Quality";
 
 export default function App() {
   return (
@@ -13,6 +16,9 @@ export default function App() {
         <Route index element={<Dashboard />} />
         <Route path="stocks" element={<Stocks />} />
         <Route path="forecasts" element={<Forecasts />} />
+        <Route path="suggestions" element={<Suggestions />} />
+        <Route path="end-of-day" element={<EndOfDay />} />
+        <Route path="quality" element={<Quality />} />
         <Route path="invoices" element={<Invoices />} />
         <Route path="suppliers" element={<Suppliers />} />
       </Route>
