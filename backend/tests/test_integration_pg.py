@@ -99,3 +99,29 @@ async def test_forecast_service_on_pg(pg_session):
             result = await forecast_product(s, product.id, horizon_days=7)
             assert result.model == "naive"
             assert len(result.points) == 7
+
+
+@pytest.mark.asyncio
+async def test_pgvector_store_roundtrip(pg_session):
+    """RAG sur vrai pgvector : insertion vector(1536) + recherche cosine, tenant."""
+    from app.core.tenancy import tenant_context
+    from app.intelligence.rag.embeddings import MockEmbeddingProvider
+    from app.intelligence.rag.store import PgVectorStore
+
+    embedder = MockEmbeddingProvider()
+    store = PgVectorStore()
+    async with pg_session() as s:
+        org_id = await _demo_org_id(s)
+        with tenant_context(org_id):
+            await store.add(
+                s,
+                organization_id=org_id,
+                invoice_id=None,
+                content="facture boeuf haché",
+                embedding=embedder.embed("facture boeuf haché"),
+            )
+            await s.commit()
+            res = await store.search(
+                s, organization_id=org_id, embedding=embedder.embed("boeuf"), k=3
+            )
+            assert res and "boeuf" in res[0].content

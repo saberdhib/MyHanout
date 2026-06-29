@@ -41,6 +41,11 @@ class Settings(BaseSettings):
     # --- Observabilité / tracing ---
     otel_enabled: bool = False  # active l'export OpenTelemetry (console) si dispo
     service_name: str = "myhanout-api"
+
+    # --- RAG ---
+    rag_vector_store: str = "memory"  # memory | pgvector
+    embedding_provider: str = "mock"  # mock | mistral
+    rag_top_k: int = 4
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:5173"])
 
     # --- Base de données ---
