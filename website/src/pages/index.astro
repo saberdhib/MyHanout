@@ -29,6 +29,12 @@ const features = [
     span: "lg:col-span-2",
   },
   {
+    title: "Gestion financière",
+    body: "Charges classées OPEX/CAPEX, trésorerie avec alerte cash, valorisation du stock et marges réelles — de la pré-compta explicable.",
+    icon: "euro",
+    span: "lg:col-span-2",
+  },
+  {
     title: "Sur WhatsApp & Telegram",
     body: "Tout se pilote par message. Pas d'app lourde à installer. Une photo de facture suffit.",
     icon: "chat",
@@ -67,6 +73,8 @@ function icon(name: string) {
       return `<svg viewBox="0 0 24 24" ${common}><path d="M3 3v18h18"/><path d="m7 14 3-4 4 3 5-7"/></svg>`;
     case "chat":
       return `<svg viewBox="0 0 24 24" ${common}><path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5Z"/></svg>`;
+    case "euro":
+      return `<svg viewBox="0 0 24 24" ${common}><path d="M15 7a5 5 0 1 0 0 10M4 10h6M4 14h5"/></svg>`;
     default:
       return "";
   }
@@ -193,6 +201,47 @@ function icon(name: string) {
       </div>
       <div class="reveal">
         <BrowserFrame src="/shots/promos.png" alt="Promo flash générée avec affiche et aperçu WhatsApp" url="app.myhanout.ai/promos" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FINANCE (split visuel) ===================== -->
+  <section class="container-x py-24">
+    <div class="grid items-center gap-12 lg:grid-cols-2">
+      <div class="reveal order-2 lg:order-1">
+        <BrowserFrame
+          src="/shots/finance.png"
+          alt="Page Finance : trésorerie, marges et classification OPEX/CAPEX"
+          url="app.myhanout.ai/finance"
+        />
+      </div>
+      <div class="order-1 lg:order-2">
+        <span class="eyebrow reveal">Gestion financière</span>
+        <h2 class="reveal mt-5 text-3xl font-extrabold tracking-tight text-night sm:text-4xl">
+          Vos factures deviennent du pilotage
+        </h2>
+        <p class="reveal mt-4 text-lg leading-relaxed text-night-700">
+          La donnée déjà saisie travaille pour vous : charges classées
+          <strong> OPEX / CAPEX</strong> (validées par vous), trésorerie estimée avec
+          <strong> alerte cash</strong>, valeur du stock et <strong>marges réelles</strong> par produit.
+        </p>
+        <ul class="reveal mt-7 space-y-3">
+          {
+            [
+              "Catégorisation IA expliquée, corrigée en un clic",
+              "Alerte trésorerie + échéances à venir",
+              "Marge réelle & signal de coût d'achat en hausse",
+            ].map((t) => (
+              <li class="flex items-start gap-3 text-night-700">
+                <span class="mt-0.5 flex h-5 w-5 flex-none items-center justify-center rounded-full bg-brand text-white text-xs">✓</span>
+                {t}
+              </li>
+            ))
+          }
+        </ul>
+        <p class="reveal mt-6 text-sm text-night-700/60">
+          Pré-compta / pilotage — pas de comptabilité certifiée.
+        </p>
       </div>
     </div>
   </section>
