@@ -434,3 +434,69 @@ export const syncPos = () =>
       "/import/pos/sync",
     )
     .then((r) => r.data);
+
+// --- Config socle : modules actifs par type de commerce ---------------------
+export interface ModulesConfig {
+  business_type: string | null;
+  enabled: string[];
+  modules: { key: string; label: string; enabled: boolean }[];
+}
+export const getModules = () =>
+  api.get<ModulesConfig>("/config/modules").then((r) => r.data);
+
+// --- Boucherie (lots / décomposition / traçabilité) ------------------------
+export interface MeatLotRow {
+  id: number;
+  lot_code: string;
+  species: string;
+  label: string;
+  status: string;
+  gross_weight_kg: number;
+  purchase_cost: number;
+}
+export interface MeatCutOut {
+  id: number;
+  cut_label: string;
+  product_id: number | null;
+  expected_weight_kg: number | null;
+  actual_weight_kg: number | null;
+  is_waste: boolean;
+  allocated_cost: number | null;
+  cost_per_kg: number | null;
+  explanation: string | null;
+}
+export interface MeatLotSummary {
+  id: number;
+  lot_code: string;
+  species: string;
+  label: string;
+  status: string;
+  gross_weight_kg: number;
+  purchase_cost: number;
+  saleable_weight_kg: number;
+  waste_weight_kg: number;
+  yield_pct: number | null;
+  cost_per_kg: number | null;
+  cuts: MeatCutOut[];
+  traceability: string;
+  explanation: string;
+}
+export interface MeatCutIn {
+  cut_label: string;
+  actual_weight_kg?: number;
+  expected_weight_kg?: number;
+  is_waste?: boolean;
+}
+
+export const getMeatLots = () => api.get<MeatLotRow[]>("/meat/lots").then((r) => r.data);
+export const getMeatLot = (id: number) =>
+  api.get<MeatLotSummary>(`/meat/lots/${id}`).then((r) => r.data);
+export const createMeatLot = (body: {
+  lot_code: string;
+  species: string;
+  label: string;
+  gross_weight_kg: number;
+  purchase_cost: number;
+}) => api.post<MeatLotSummary>("/meat/lots", body).then((r) => r.data);
+export const setMeatBreakdown = (id: number, cuts: MeatCutIn[]) =>
+  api.put<MeatLotSummary>(`/meat/lots/${id}/breakdown`, { cuts }).then((r) => r.data);

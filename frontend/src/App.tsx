@@ -13,6 +13,7 @@ import Chat from "./pages/Chat";
 import Promos from "./pages/Promos";
 import Finance from "./pages/Finance";
 import Equipment from "./pages/Equipment";
+import Boucherie from "./pages/Boucherie";
 import Integrations from "./pages/Integrations";
 
 export default function App() {
@@ -30,6 +31,7 @@ export default function App() {
         <Route path="suggestions" element={<Suggestions />} />
         <Route path="end-of-day" element={<EndOfDay />} />
         <Route path="equipment" element={<Equipment />} />
+        <Route path="boucherie" element={<Boucherie />} />
         <Route path="quality" element={<Quality />} />
         <Route path="invoices" element={<Invoices />} />
         <Route path="integrations" element={<Integrations />} />

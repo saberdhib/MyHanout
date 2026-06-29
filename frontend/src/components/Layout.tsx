@@ -3,42 +3,51 @@ import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { LogoWordmark } from "./Logo";
 import { Icons } from "./icons";
 import { useTheme } from "../hooks/useTheme";
+import { getModules } from "../api/client";
 
-type Item = { to: string; label: string; icon: keyof typeof Icons; end?: boolean };
+// `module` = clé du socle (cf. backend app/core/modules.py) ; null = toujours visible.
+type Item = {
+  to: string;
+  label: string;
+  icon: keyof typeof Icons;
+  end?: boolean;
+  module?: string;
+};
 
 // Navigation regroupée par intention (lisibilité + repérage).
 const groups: { title: string; items: Item[] }[] = [
   {
     title: "Pilotage",
     items: [
-      { to: "/", label: "Dashboard", icon: "dashboard", end: true },
-      { to: "/chat", label: "Assistant", icon: "chat" },
-      { to: "/finance", label: "Finance", icon: "finance" },
+      { to: "/", label: "Dashboard", icon: "dashboard", end: true, module: "dashboard" },
+      { to: "/chat", label: "Assistant", icon: "chat", module: "chat" },
+      { to: "/finance", label: "Finance", icon: "finance", module: "finance" },
     ],
   },
   {
     title: "Commerce",
     items: [
-      { to: "/promos", label: "Promos flash", icon: "promo" },
-      { to: "/stocks", label: "Stocks", icon: "stocks" },
-      { to: "/forecasts", label: "Prévisions", icon: "forecast" },
-      { to: "/suggestions", label: "Suggestions", icon: "suggest" },
+      { to: "/promos", label: "Promos flash", icon: "promo", module: "promos" },
+      { to: "/boucherie", label: "Boucherie", icon: "supplier", module: "meat" },
+      { to: "/stocks", label: "Stocks", icon: "stocks", module: "stocks" },
+      { to: "/forecasts", label: "Prévisions", icon: "forecast", module: "forecasts" },
+      { to: "/suggestions", label: "Suggestions", icon: "suggest", module: "suggestions" },
     ],
   },
   {
     title: "Quotidien",
     items: [
-      { to: "/end-of-day", label: "Fin de journée", icon: "calendar" },
-      { to: "/equipment", label: "Équipements", icon: "thermometer" },
-      { to: "/quality", label: "Qualité (écarts)", icon: "quality" },
-      { to: "/invoices", label: "Factures", icon: "invoice" },
+      { to: "/end-of-day", label: "Fin de journée", icon: "calendar", module: "end_of_day" },
+      { to: "/equipment", label: "Équipements", icon: "thermometer", module: "cold_chain" },
+      { to: "/quality", label: "Qualité (écarts)", icon: "quality", module: "quality" },
+      { to: "/invoices", label: "Factures", icon: "invoice", module: "invoices" },
     ],
   },
   {
     title: "Données",
     items: [
-      { to: "/integrations", label: "Intégrations", icon: "plug" },
-      { to: "/suppliers", label: "Fournisseurs", icon: "supplier" },
+      { to: "/integrations", label: "Intégrations", icon: "plug", module: "integrations" },
+      { to: "/suppliers", label: "Fournisseurs", icon: "supplier", module: "suppliers" },
     ],
   },
 ];
@@ -49,9 +58,20 @@ export default function Layout() {
   const { theme, toggle } = useTheme();
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false); // sidebar mobile (off-canvas)
+  // Modules actifs selon le type de commerce (socle générique configurable).
+  const [enabled, setEnabled] = useState<string[] | null>(null);
   const current =
     allItems.find((i) => (i.end ? pathname === i.to : pathname.startsWith(i.to) && i.to !== "/")) ??
     allItems[0];
+
+  useEffect(() => {
+    getModules()
+      .then((m) => setEnabled(m.enabled))
+      .catch(() => setEnabled(null)); // dégradé : on montre tout si l'appel échoue
+  }, []);
+
+  // Filtre par module actif (null = pas encore chargé / échec → tout visible).
+  const visible = (i: Item) => !i.module || enabled === null || enabled.includes(i.module);
 
   // Referme la sidebar à chaque navigation (mobile).
   useEffect(() => {
@@ -80,7 +100,10 @@ export default function Layout() {
         </div>
 
         <nav className="flex-1 space-y-6 overflow-y-auto px-3 py-2">
-          {groups.map((g) => (
+          {groups
+            .map((g) => ({ ...g, items: g.items.filter(visible) }))
+            .filter((g) => g.items.length > 0)
+            .map((g) => (
             <div key={g.title}>
               <div className="px-3 pb-1.5 text-[11px] font-semibold uppercase tracking-wider text-white/35">
                 {g.title}
