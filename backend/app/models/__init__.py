@@ -12,8 +12,10 @@ from app.models.event import Event
 from app.models.expense import ExpenseCategory, ExpenseClassificationFeedback
 from app.models.forecast_evaluation import ForecastEvaluation
 from app.models.invoice import Invoice, InvoiceLine
+from app.models.meat import MeatCut, MeatLot
 from app.models.order import Order, OrderLine
 from app.models.organization import Invitation, Membership, MembershipRole, Organization
+from app.models.pricing import PriceHistory
 from app.models.product import Product
 from app.models.promo import PromoCampaign
 from app.models.sale import Sale
@@ -37,10 +39,13 @@ __all__ = [
     "Invitation",
     "Invoice",
     "InvoiceLine",
+    "MeatCut",
+    "MeatLot",
     "Membership",
     "MembershipRole",
     "Order",
     "OrderLine",
+    "PriceHistory",
     "Organization",
     "Product",
     "PromoCampaign",

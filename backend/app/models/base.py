@@ -90,3 +90,39 @@ class EquipmentKind(enum.StrEnum):
     FREEZER = "freezer"  # congélateur (négatif)
     OVEN = "oven"  # four / chaud
     OTHER = "other"
+
+
+# Familles produit (notion de regroupement ; les produits unitaires importent peu).
+# Stockées en texte libre sur `product.family` ; cette liste sert de suggestions UI.
+PRODUCT_FAMILIES: list[str] = [
+    "viande",
+    "fruits_legumes",
+    "semoule_farine",
+    "conserve",
+    "boisson",
+    "epice",
+    "cremerie",
+    "autre",
+]
+
+
+class PriceKind(enum.StrEnum):
+    """Type de prix suivi dans l'historique."""
+
+    PURCHASE = "purchase"  # coût d'achat
+    SALE = "sale"  # prix de vente
+
+
+class MeatSpecies(enum.StrEnum):
+    BOEUF = "boeuf"
+    VEAU = "veau"
+    AGNEAU = "agneau"
+    VOLAILLE = "volaille"
+    PORC = "porc"
+    AUTRE = "autre"
+
+
+class MeatLotStatus(enum.StrEnum):
+    RECEIVED = "received"  # bête reçue, pas encore travaillée
+    BREAKING = "breaking"  # en cours de découpe/désossage
+    DONE = "done"  # décomposition terminée (réel saisi)

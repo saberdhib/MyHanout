@@ -36,6 +36,7 @@ class ProductIn(BaseModel):
     unit: str = "unit"
     unit_price: float | None = None
     category: str | None = None
+    family: str | None = None  # notion de regroupement (viande, boisson…)
     perishable: bool = False
     supplier_name: str | None = None
     stock_quantity: float | None = None
@@ -96,6 +97,7 @@ async def import_json(
         product.unit = prod_in.unit
         product.unit_price = prod_in.unit_price
         product.category = prod_in.category
+        product.family = prod_in.family
         product.perishable = prod_in.perishable
         if prod_in.supplier_name:
             sup = supplier_by_name.get(prod_in.supplier_name) or await _upsert_supplier(
@@ -105,6 +107,19 @@ async def import_json(
             product.supplier_id = sup.id
         await session.flush()
         result.products_upserted += 1
+
+        # Historique de prix : trace le prix de vente importé (courbe d'évolution).
+        if prod_in.unit_price is not None:
+            from app.models.base import PriceKind
+            from app.services.price_service import record_price
+
+            await record_price(
+                session,
+                product_id=product.id,
+                kind=PriceKind.SALE,
+                price=prod_in.unit_price,
+                source="import",
+            )
 
         if prod_in.stock_quantity is not None:
             stock = await session.scalar(select(Stock).where(Stock.product_id == product.id))

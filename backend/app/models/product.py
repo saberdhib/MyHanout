@@ -23,6 +23,8 @@ class Product(Base, TenantMixin, TimestampMixin):
     sku: Mapped[str] = mapped_column(String(64), unique=True, index=True)
     name: Mapped[str] = mapped_column(String(255), index=True)
     category: Mapped[str | None] = mapped_column(String(128), nullable=True, index=True)
+    # Famille produit (viande, fruits_legumes, boisson…) — notion de regroupement.
+    family: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
     unit: Mapped[str] = mapped_column(String(32), default="unit")  # kg, unit, L...
     unit_price: Mapped[float | None] = mapped_column(Numeric(10, 2), nullable=True)
 
