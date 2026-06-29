@@ -10,6 +10,7 @@ from app.api.v1 import (
     chat,
     customers,
     daily_entries,
+    finance,
     forecasts,
     imports,
     invoices,
@@ -36,6 +37,7 @@ api_router.include_router(customers.router)
 api_router.include_router(stocks.router)
 api_router.include_router(invoices.router)
 api_router.include_router(imports.router)
+api_router.include_router(finance.router)
 api_router.include_router(forecasts.router)
 api_router.include_router(orders.router)
 api_router.include_router(daily_entries.router)
