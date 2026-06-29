@@ -5,6 +5,9 @@ const links = [
   { to: "/", label: "Dashboard", end: true },
   { to: "/stocks", label: "Stocks" },
   { to: "/forecasts", label: "Prévisions" },
+  { to: "/suggestions", label: "Suggestions" },
+  { to: "/end-of-day", label: "Fin de journée" },
+  { to: "/quality", label: "Qualité (écarts)" },
   { to: "/invoices", label: "Factures" },
   { to: "/suppliers", label: "Fournisseurs" },
 ];

@@ -19,3 +19,8 @@ class MockWhatsAppClient(WhatsAppClient):
         self.outbox.append((to, text))
         log.info("whatsapp.mock.send", to=to, text=text)
         return SendResult(success=True, message_id=f"mock-{len(self.outbox)}", provider=self.name)
+
+    async def download_media(self, media_id: str) -> bytes:
+        """Renvoie un contenu factice : l'OCR mock produira une facture exemple."""
+        log.info("whatsapp.mock.download_media", media_id=media_id)
+        return b"%PDF-1.4 mock-invoice-image"

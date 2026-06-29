@@ -30,6 +30,11 @@ API REST FastAPI, versionnée sous `/api/v1`. Doc interactive : `/docs` (Swagger
 | POST    | `/api/v1/invoices/upload`     | Importe un document → facture `pending_review`| invoices  |
 | POST    | `/api/v1/invoices/{id}/approve`| Validation humaine → écrit les lignes + audit | invoices  |
 | POST    | `/api/v1/invoices/{id}/reject`| Rejet humain avec motif (audité)              | invoices  |
+| POST    | `/api/v1/orders/suggest`      | Suggestion de commande explicable (par ligne) | orders    |
+| POST    | `/api/v1/orders/confirm`      | Valide une suggestion ajustée (3 modes)       | orders    |
+| GET/POST| `/api/v1/daily-entries`       | Saisie de fin de journée (idempotent, audité) | stocks    |
+| GET     | `/api/v1/mlops/metrics`       | MAE/MAPE par produit/modèle (écarts)          | forecasts |
+| POST    | `/api/v1/mlops/retrain`       | Réentraîne le modèle + versionne              | forecasts |
 | GET     | `/api/v1/stocks`              | Liste des stocks (+ nom produit)              | stocks    |
 | GET     | `/api/v1/stocks/alerts`       | Stocks sous le seuil de réassort              | stocks    |
 | GET     | `/api/v1/invoices`            | Factures + lignes                             | invoices  |

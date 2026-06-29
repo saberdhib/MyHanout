@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, Enum, ForeignKey, Numeric
+from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, Numeric, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, TimestampMixin
-from app.models.base import OrderStatus
+from app.models.base import OrderActionMode, OrderStatus
 from app.models.tenant import TenantMixin
 
 if TYPE_CHECKING:
@@ -32,6 +33,17 @@ class Order(Base, TenantMixin, TimestampMixin):
     approved_by_id: Mapped[int | None] = mapped_column(ForeignKey("user.id"), nullable=True)
     # Trace de l'agent ayant proposé la commande (explicabilité).
     proposed_by_agent: Mapped[str | None] = mapped_column(nullable=True)
+
+    # Mode de transmission au fournisseur (whatsapp_auto | draft | record_only).
+    action_mode: Mapped[OrderActionMode] = mapped_column(
+        Enum(OrderActionMode, native_enum=False, values_callable=lambda e: [m.value for m in e]),
+        default=OrderActionMode.RECORD_ONLY,
+    )
+    # Message fournisseur généré (brouillon ou contenu envoyé).
+    supplier_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    # Explicabilité de la suggestion (JSON sérialisé, par ligne).
+    suggestion_rationale: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     supplier: Mapped[Supplier | None] = relationship(back_populates="orders")
     lines: Mapped[list[OrderLine]] = relationship(

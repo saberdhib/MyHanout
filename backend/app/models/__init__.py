@@ -3,7 +3,10 @@
 
 from app.db.base import Base
 from app.models.audit_log import AuditLog
+from app.models.conversation import Conversation
+from app.models.daily_entry import DailyEntry
 from app.models.event import Event
+from app.models.forecast_evaluation import ForecastEvaluation
 from app.models.invoice import Invoice, InvoiceLine
 from app.models.order import Order, OrderLine
 from app.models.organization import Invitation, Membership, MembershipRole, Organization
@@ -16,7 +19,10 @@ from app.models.user import Role, User
 __all__ = [
     "Base",
     "AuditLog",
+    "Conversation",
+    "DailyEntry",
     "Event",
+    "ForecastEvaluation",
     "Invitation",
     "Invoice",
     "InvoiceLine",

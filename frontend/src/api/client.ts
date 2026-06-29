@@ -23,6 +23,7 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
+// Sur 401, on retente une fois après re-login (token expiré).
 api.interceptors.response.use(
   (r) => r,
   async (error) => {
@@ -126,3 +127,63 @@ export const addProduct = (p: { sku: string; name: string; unit?: string }) =>
 
 export const inviteMember = (email: string, role: string) =>
   api.post("/onboarding/invitations", { email, role }).then((r) => r.data);
+
+// --- Phase 2 : suggestions, saisie fin de journée, MLOps -------------------
+
+export interface SuggestionLine {
+  product_id: number;
+  product_name: string | null;
+  unit: string;
+  suggested_quantity: number;
+  predicted_demand: number;
+  safety_buffer: number;
+  current_stock: number;
+  lead_time_days: number;
+  confidence: number;
+  explanation: string;
+}
+
+export interface Suggestion {
+  horizon_days: number;
+  generated_for: string;
+  model: string;
+  lines: SuggestionLine[];
+}
+
+export interface OrderConfirmed {
+  id: number;
+  status: string;
+  action_mode: string;
+  total_amount: number;
+  supplier_message: string | null;
+  lines: { product_id: number; quantity: number; unit_price: number }[];
+}
+
+export interface MlopsMetric {
+  product_id: number;
+  model: string;
+  n: number;
+  mae: number | null;
+  mape: number | null;
+}
+
+export const getSuggestion = (horizon = "demain") =>
+  api.post<Suggestion>("/orders/suggest", { horizon }).then((r) => r.data);
+
+export const confirmOrder = (
+  lines: { product_id: number; quantity: number }[],
+  action_mode = "record_only",
+) =>
+  api
+    .post<OrderConfirmed>("/orders/confirm", { lines, action_mode })
+    .then((r) => r.data);
+
+export const createDailyEntry = (entry: {
+  product_id: number;
+  entry_date: string;
+  quantity_ordered: number;
+  stock_remaining: number;
+}) => api.post("/daily-entries", { ...entry, source: "dashboard" }).then((r) => r.data);
+
+export const getMlopsMetrics = () =>
+  api.get<{ metrics: MlopsMetric[] }>("/mlops/metrics").then((r) => r.data.metrics);
