@@ -5,10 +5,41 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-surface text-night font-sans;
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-surface text-night font-sans antialiased;
+  }
+  .dark body {
+    @apply bg-night text-surface;
+  }
+  ::selection {
+    @apply bg-brand/20;
+  }
 }
 
-.dark body {
-  @apply bg-night text-surface;
+@layer components {
+  /* En-tête de page cohérent (titre + sous-titre). */
+  .page-title {
+    @apply text-2xl font-extrabold tracking-tight;
+  }
+  .page-sub {
+    @apply mt-1 text-sm text-night/50 dark:text-surface/50;
+  }
+  /* Boutons. */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-card px-4 py-2 text-sm font-semibold transition-all duration-150;
+  }
+  .btn-primary {
+    @apply btn bg-brand text-white shadow-soft hover:bg-brand-dark hover:-translate-y-0.5;
+  }
+  .btn-ghost {
+    @apply btn border border-night/10 bg-white text-night hover:bg-surface dark:border-white/15 dark:bg-white/5 dark:text-surface dark:hover:bg-white/10;
+  }
+  .pill {
+    @apply inline-flex items-center gap-1 rounded-pill px-2.5 py-0.5 text-xs font-medium;
+  }
 }

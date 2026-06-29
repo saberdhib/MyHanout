@@ -6,6 +6,7 @@ const links = [
   { to: "/", label: "Dashboard", end: true },
   { to: "/chat", label: "Assistant" },
   { to: "/promos", label: "Promos flash" },
+  { to: "/finance", label: "Finance" },
   { to: "/stocks", label: "Stocks" },
   { to: "/forecasts", label: "Prévisions" },
   { to: "/suggestions", label: "Suggestions" },
@@ -49,8 +50,10 @@ export default function Layout() {
         </nav>
         <div className="p-4 text-xs text-white/60">v0.1.0 — MVP</div>
       </aside>
-      <main className="flex-1 p-8 dark:bg-night dark:text-surface">
-        <Outlet />
+      <main className="flex-1 bg-surface/60 p-8 dark:bg-night dark:text-surface">
+        <div className="mx-auto max-w-6xl">
+          <Outlet />
+        </div>
       </main>
     </div>
   );

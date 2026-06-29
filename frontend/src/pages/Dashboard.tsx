@@ -29,22 +29,26 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Tableau de bord</h1>
-        <span className="text-xs text-gray-400">⟳ live (10s)</span>
+      <div className="flex items-end justify-between">
+        <div>
+          <h1 className="page-title">Tableau de bord</h1>
+          <p className="page-sub">Vue d'ensemble de votre commerce, en temps réel.</p>
+        </div>
+        <span className="pill bg-brand/10 text-brand-dark dark:text-brand-light">⟳ live · 10s</span>
       </div>
       {error && (
-        <div className="rounded bg-red-50 p-3 text-sm text-red-700">
+        <div className="rounded-card bg-red-50 p-3 text-sm text-red-700">
           API injoignable. Lancez le backend (docker compose up).
         </div>
       )}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
-        <Stat label="Références en stock" value={data?.stocks ?? "—"} />
-        <Stat label="Alertes stock" value={data?.alerts ?? "—"} />
-        <Stat label="Factures" value={data?.invoices ?? "—"} />
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Stat label="Références en stock" value={data?.stocks ?? "—"} icon="📦" />
+        <Stat label="Alertes stock" value={data?.alerts ?? "—"} icon="🔔" />
+        <Stat label="Factures" value={data?.invoices ?? "—"} icon="🧾" />
         <Stat
-          label="MAPE moyen (qualité prévision)"
+          label="MAPE (qualité prévision)"
           value={data?.mape != null ? `${data.mape.toFixed(1)}%` : "—"}
+          icon="🎯"
         />
       </div>
       {data?.signals && (

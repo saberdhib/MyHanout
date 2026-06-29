@@ -284,3 +284,112 @@ export const importJson = (payload: unknown) =>
 
 export const syncDwh = () =>
   api.post<DwhSyncResult>("/import/dwh/sync").then((r) => r.data);
+
+// --- Couche financière (pré-compta / pilotage) -----------------------------
+
+export interface TreasuryLine {
+  label: string;
+  amount: number;
+  explanation: string;
+}
+export interface TreasuryView {
+  period_from: string;
+  period_to: string;
+  currency: string;
+  sales_in: number;
+  outflows_paid: number;
+  estimated_balance: number;
+  upcoming_7d: number;
+  upcoming_30d: number;
+  alert: string | null;
+  lines: TreasuryLine[];
+  disclaimer: string;
+}
+
+export interface InventoryItem {
+  product_id: number;
+  product_name: string | null;
+  quantity: number;
+  unit_cost: number;
+  value: number;
+  at_risk: boolean;
+  explanation: string;
+}
+export interface InventoryValuation {
+  currency: string;
+  total_value: number;
+  at_risk_value: number;
+  items: InventoryItem[];
+  explanation: string;
+  disclaimer: string;
+}
+
+export interface ProductMargin {
+  product_id: number;
+  product_name: string | null;
+  units_sold: number;
+  avg_sale_price: number;
+  last_cost: number;
+  margin_unit: number;
+  margin_pct: number | null;
+  cost_trend: string | null;
+  signal: string | null;
+  explanation: string;
+}
+export interface MarginReport {
+  period_from: string;
+  period_to: string;
+  items: ProductMargin[];
+  explanation: string;
+  disclaimer: string;
+}
+
+export interface ExpenseCategory {
+  id: number;
+  code: string;
+  label: string;
+  kind: string;
+  accounting_hint: string | null;
+}
+
+export interface ExpenseInvoice {
+  id: number;
+  number: string | null;
+  supplier_id: number | null;
+  total_amount: number | null;
+  currency: string;
+  paid: boolean;
+  category_id: number | null;
+  expense_kind: string;
+  classification_source: string | null;
+  classification_confidence: number | null;
+  classification_explanation: string | null;
+}
+
+export interface FinanceAlert {
+  type: string;
+  severity: string;
+  title: string;
+  reason: string;
+  invoice_ids: number[];
+  product_id: number | null;
+}
+
+export const getTreasury = () => api.get<TreasuryView>("/finance/treasury").then((r) => r.data);
+export const getInventoryValue = () =>
+  api.get<InventoryValuation>("/finance/inventory-value").then((r) => r.data);
+export const getMargins = () => api.get<MarginReport>("/finance/margins").then((r) => r.data);
+export const getExpenseCategories = () =>
+  api.get<ListResponse<ExpenseCategory>>("/finance/categories").then((r) => r.data.items);
+export const getExpenses = () =>
+  api.get<ListResponse<ExpenseInvoice>>("/finance/expenses").then((r) => r.data.items);
+export const classifyAll = () =>
+  api.post<{ classified: number }>("/finance/expenses/classify-all").then((r) => r.data);
+export const classifyInvoice = (id: number) =>
+  api.post<ExpenseInvoice>(`/finance/invoices/${id}/classify`).then((r) => r.data);
+export const confirmClassification = (id: number, category_id: number, kind: string) =>
+  api
+    .post<ExpenseInvoice>(`/finance/invoices/${id}/classification`, { category_id, kind })
+    .then((r) => r.data);
+export const getFinanceAlerts = () =>
+  api.get<{ alerts: FinanceAlert[]; explanation: string }>("/finance/alerts").then((r) => r.data);

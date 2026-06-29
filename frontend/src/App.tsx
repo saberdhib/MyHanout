@@ -11,6 +11,7 @@ import EndOfDay from "./pages/EndOfDay";
 import Quality from "./pages/Quality";
 import Chat from "./pages/Chat";
 import Promos from "./pages/Promos";
+import Finance from "./pages/Finance";
 import Integrations from "./pages/Integrations";
 
 export default function App() {
@@ -22,6 +23,7 @@ export default function App() {
         <Route index element={<Dashboard />} />
         <Route path="chat" element={<Chat />} />
         <Route path="promos" element={<Promos />} />
+        <Route path="finance" element={<Finance />} />
         <Route path="stocks" element={<Stocks />} />
         <Route path="forecasts" element={<Forecasts />} />
         <Route path="suggestions" element={<Suggestions />} />
