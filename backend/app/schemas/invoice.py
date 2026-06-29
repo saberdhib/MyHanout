@@ -30,4 +30,16 @@ class InvoiceOut(BaseModel):
     currency: str
     status: str
     ocr_status: str
+    ocr_confidence: float | None = None
+    review_reason: str | None = None
     lines: list[InvoiceLineOut] = []
+
+
+class InvoiceReviewOut(InvoiceOut):
+    """Réponse d'upload/review : facture + raisons explicables de la revue."""
+
+    reasons: list[str] = []
+
+
+class InvoiceRejectRequest(BaseModel):
+    reason: str
