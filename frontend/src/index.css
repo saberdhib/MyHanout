@@ -8,3 +8,7 @@
 body {
   @apply bg-surface text-night font-sans;
 }
+
+.dark body {
+  @apply bg-night text-surface;
+}

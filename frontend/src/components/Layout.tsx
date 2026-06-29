@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { LogoWordmark } from "./Logo";
+import { useTheme } from "../hooks/useTheme";
 
 const links = [
   { to: "/", label: "Dashboard", end: true },
@@ -13,11 +14,19 @@ const links = [
 ];
 
 export default function Layout() {
+  const { theme, toggle } = useTheme();
   return (
     <div className="flex min-h-screen">
       <aside className="w-60 bg-night text-white flex flex-col">
-        <div className="px-5 py-5 border-b border-white/10">
+        <div className="flex items-center justify-between px-5 py-5 border-b border-white/10">
           <LogoWordmark />
+          <button
+            onClick={toggle}
+            aria-label="Basculer le thème"
+            className="rounded-card p-1.5 text-lg hover:bg-white/10"
+          >
+            {theme === "dark" ? "☀️" : "🌙"}
+          </button>
         </div>
         <nav className="flex-1 p-3 space-y-1">
           {links.map((l) => (
@@ -37,7 +46,7 @@ export default function Layout() {
         </nav>
         <div className="p-4 text-xs text-white/60">v0.1.0 — MVP</div>
       </aside>
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-8 dark:bg-night dark:text-surface">
         <Outlet />
       </main>
     </div>

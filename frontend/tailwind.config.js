@@ -3,6 +3,7 @@ import { colors, fontFamily, radius } from "./src/theme/tokens.js";
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
+  darkMode: "class",
   theme: {
     extend: {
       // Palette de marque centralisée (cf. src/theme/tokens.js).
