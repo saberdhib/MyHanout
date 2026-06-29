@@ -141,9 +141,14 @@ Tests : sqlite (rapide) + intégration **pg+pgvector** (job CI). Migrations rév
 backend/    FastAPI, modèles (TenantMixin), ingestion, intelligence, messaging, workers, alembic
 frontend/   Dashboard (app authentifiée) React + Vite + TS + Tailwind (dark mode) — chat, promos, factures…
 website/    Site vitrine public Astro + Tailwind (SSG, SEO) — landing, tarifs, confiance/RGPD, contact
-data/seeds/ Données factices
-docs/       architecture, data-model, api-design, multitenancy, DEMO, DEPLOY, delivery/ (C4, ADRs)
+analytics/  Couche analytique : dbt (staging→marts) + Airflow (DAG ELT) + Grafana
+data/seeds/ Données factices (démo)
+docs/       architecture, data-model, api-design, multitenancy, configuration, data-engineering, ai-models, DEMO, DEPLOY
 ```
+> **Cœur (fixe) vs mouvant (par client)** : ce qui est versionné = le produit ;
+> ce qui change pour brancher un commerce (`.env`, données tenant, seed) est isolé.
+> Carte complète : [`docs/configuration.md`](docs/configuration.md).
+> Données : [`docs/data-engineering.md`](docs/data-engineering.md) · Modèles IA & MLOps : [`docs/ai-models.md`](docs/ai-models.md).
 > `frontend/` = l'**app** (le commerçant connecté). `website/` = la **vitrine** publique
 > (prospects, SEO). Deux fronts distincts dans le même monorepo. Cf. [`website/README.md`](website/README.md).
 

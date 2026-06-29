@@ -1,0 +1,19 @@
+# Datasource Grafana provisionnée : Postgres applicatif (lecture analytique).
+# Pointe vers le Postgres de la stack applicative via host-gateway.
+apiVersion: 1
+
+datasources:
+  - name: MyHanout Postgres
+    type: postgres
+    access: proxy
+    url: host.docker.internal:5432
+    user: ${POSTGRES_USER:-myhanout}
+    secureJsonData:
+      password: ${POSTGRES_PASSWORD:-myhanout}
+    jsonData:
+      database: ${POSTGRES_DB:-myhanout}
+      sslmode: disable
+      postgresVersion: 1600
+      timescaledb: false
+    isDefault: true
+    editable: true

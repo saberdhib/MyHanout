@@ -120,3 +120,10 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
 - **Site vitrine** : `website/` (Astro). Pages dans `website/src/pages/`, composants
   `website/src/components/`, tokens de marque dupliqués dans `website/tailwind.config.mjs`
   (garder synchro avec `frontend/src/theme/tokens.js`). Détails : `website/README.md`.
+- **Cœur vs mouvant (par client)** : `docs/configuration.md` — ce qui est versionné
+  (produit, fixe) vs ce qui change pour brancher un commerce (`.env`, données tenant,
+  seed). **Ne jamais coder une valeur spécifique client dans `backend/app/`.**
+- **Data engineering** : `docs/data-engineering.md` (ELT/ETL, pg, dbt, Airflow,
+  Grafana, MinIO, contrats d'entrée). Stack : `docker-compose.data.yml`, `analytics/`.
+- **Modèles IA & MLOps** : `docs/ai-models.md` (variables `.env` par capacité,
+  réglage des paramètres, boucle MLOps).

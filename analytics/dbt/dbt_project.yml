@@ -1,0 +1,19 @@
+name: "myhanout"
+version: "0.1.0"
+config-version: 2
+
+profile: "myhanout"
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  myhanout:
+    staging:
+      +materialized: view
+      +schema: staging
+    marts:
+      +materialized: table
+      +schema: marts

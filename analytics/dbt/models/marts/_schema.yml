@@ -1,0 +1,23 @@
+version: 2
+
+# Tests de qualité sur les marts (exécutés par `dbt build`/`dbt test`).
+models:
+  - name: mart_daily_sales
+    description: Ventes agrégées par jour/org/produit.
+    columns:
+      - name: organization_id
+        tests: [not_null]
+      - name: sale_date
+        tests: [not_null]
+  - name: mart_product_margin
+    description: Marge réelle par produit (vente moyenne - dernier coût d'achat).
+    columns:
+      - name: product_id
+        tests: [not_null]
+  - name: mart_cold_chain
+    description: Température min/max/moyenne par équipement et par jour (HACCP).
+    columns:
+      - name: equipment_id
+        tests: [not_null]
+      - name: out_of_range
+        tests: [not_null]

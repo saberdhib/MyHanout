@@ -1,0 +1,15 @@
+version: 2
+
+# Tables source = OLTP applicatif (schéma public). Multi-tenant : toujours
+# conserver organization_id dans le staging pour pouvoir filtrer/segmenter.
+sources:
+  - name: app
+    schema: public
+    tables:
+      - name: sale
+      - name: invoice
+      - name: invoice_line
+      - name: product
+      - name: stock
+      - name: equipment
+      - name: temperature_reading

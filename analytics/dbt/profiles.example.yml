@@ -1,0 +1,14 @@
+# Copier dans ~/.dbt/profiles.yml et adapter. Pointe vers ton Postgres (OLTP
+# en démo ; un entrepôt dédié en prod). Aucun secret committé.
+myhanout:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('PGHOST', 'localhost') }}"
+      port: "{{ env_var('PGPORT', '5432') | int }}"
+      user: "{{ env_var('PGUSER', 'myhanout') }}"
+      password: "{{ env_var('PGPASSWORD', 'myhanout') }}"
+      dbname: "{{ env_var('PGDATABASE', 'myhanout') }}"
+      schema: analytics
+      threads: 4
