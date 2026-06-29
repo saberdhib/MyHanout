@@ -94,6 +94,14 @@ class Settings(BaseSettings):
     dwh_target: str = "mock"  # mock | http
     dwh_url: str = ""
 
+    # --- Capteurs de température (chaîne du froid) ---
+    sensor_provider: str = "mock"  # mock | http
+    sensor_http_url: str = ""
+
+    # --- Connecteur caisse (POS) ---
+    pos_connector: str = "mock"  # mock | http
+    pos_url: str = ""
+
     # --- Telegram (Bot API) ---
     telegram_provider: str = "mock"  # mock | bot
     telegram_bot_token: str = ""

@@ -7,6 +7,7 @@ from app.models.audit_log import AuditLog
 from app.models.conversation import Conversation
 from app.models.customer import Customer
 from app.models.daily_entry import DailyEntry
+from app.models.equipment import Equipment, TemperatureReading
 from app.models.event import Event
 from app.models.expense import ExpenseCategory, ExpenseClassificationFeedback
 from app.models.forecast_evaluation import ForecastEvaluation
@@ -27,9 +28,11 @@ __all__ = [
     "Conversation",
     "Customer",
     "DailyEntry",
+    "Equipment",
     "Event",
     "ExpenseCategory",
     "ExpenseClassificationFeedback",
+    "TemperatureReading",
     "ForecastEvaluation",
     "Invitation",
     "Invoice",

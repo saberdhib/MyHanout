@@ -81,3 +81,12 @@ class ClassificationSource(enum.StrEnum):
     AI = "ai"  # proposée par le classifieur (à valider)
     HUMAN = "human"  # validée/corrigée par un humain
     RULE = "rule"  # posée par une règle déterministe
+
+
+class EquipmentKind(enum.StrEnum):
+    """Type d'équipement suivi (chaîne du froid + autres machines)."""
+
+    FRIDGE = "fridge"  # réfrigérateur (positif)
+    FREEZER = "freezer"  # congélateur (négatif)
+    OVEN = "oven"  # four / chaud
+    OTHER = "other"

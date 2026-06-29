@@ -165,6 +165,39 @@ async def _seed_business_data(session: AsyncSession, seeds: Path) -> None:
         )
         session.add(inv)
 
+    # Démo chaîne du froid : 2 frigos + 1 congélateur (un capteur en dérive).
+    from app.models.base import EquipmentKind
+    from app.models.equipment import Equipment
+
+    session.add_all(
+        [
+            Equipment(
+                name="Frigo vitrine",
+                kind=EquipmentKind.FRIDGE,
+                location="Magasin",
+                min_temp_c=0,
+                max_temp_c=4,
+                sensor_external_id="sensor-fridge-1",
+            ),
+            Equipment(
+                name="Frigo réserve (à surveiller)",
+                kind=EquipmentKind.FRIDGE,
+                location="Réserve",
+                min_temp_c=0,
+                max_temp_c=4,
+                sensor_external_id="sensor-fridge-hot",  # mock → dérive (démo)
+            ),
+            Equipment(
+                name="Congélateur",
+                kind=EquipmentKind.FREEZER,
+                location="Réserve",
+                min_temp_c=-25,
+                max_temp_c=-18,
+                sensor_external_id="sensor-freezer-1",
+            ),
+        ]
+    )
+
     # Démo : un périssable en fin de vie (déclenche la promo flash) + clients opt-in.
     soon = date.today() + timedelta(days=2)
     for product in products.values():

@@ -15,6 +15,7 @@ from app.services.import_service import (
     import_json,
     sync_to_dwh,
 )
+from app.services.pos_service import POSSyncResult, sync_from_connector
 
 router = APIRouter(prefix="/import", tags=["import"])
 
@@ -42,3 +43,13 @@ async def dwh_sync_endpoint(
 ) -> DwhSyncResult:
     """Pousse un snapshot (catalogue/stock/ventes) vers l'entrepôt de données configuré."""
     return await sync_to_dwh(session, organization_id=_org(user), user_id=user.id)
+
+
+@router.post("/pos/sync", response_model=POSSyncResult)
+async def pos_sync_endpoint(
+    limit: int = 50,
+    session: AsyncSession = Depends(get_db),
+    user: CurrentUser = Depends(require_permission("stocks")),
+) -> POSSyncResult:
+    """Ingère les ventes depuis la caisse (mock keyless ou caisse réelle), idempotent."""
+    return await sync_from_connector(session, user_id=user.id, limit=limit)
