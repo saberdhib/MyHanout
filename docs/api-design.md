@@ -50,6 +50,12 @@ API REST FastAPI, versionnée sous `/api/v1`. Doc interactive : `/docs` (Swagger
 | POST    | `/api/v1/equipment`           | Déclare un équipement à suivre (capteur opt.)   | stocks    |
 | POST    | `/api/v1/equipment/poll`      | Relève les capteurs (mock keyless ou réel)      | stocks    |
 | POST    | `/api/v1/import/pos/sync`     | Ingestion ventes caisse (POS), idempotent       | stocks    |
+| GET     | `/api/v1/config/modules`      | Modules actifs selon le type de commerce        | (auth)    |
+| GET     | `/api/v1/catalog/families`    | Familles produit suggérées                      | stocks    |
+| GET/POST| `/api/v1/catalog/products/{id}/prices`| Historique des prix (lecture / ajout)   | stocks    |
+| GET/POST| `/api/v1/meat/lots`           | Lots boucherie (liste / réception bête)         | stocks    |
+| PUT     | `/api/v1/meat/lots/{id}/breakdown`| Décomposition (coupes prévu/réel)           | stocks    |
+| GET     | `/api/v1/meat/lots/{id}`      | Rendement + coût/kg + traçabilité d'un lot      | stocks    |
 | POST    | `/api/v1/orders/suggest`      | Suggestion de commande explicable (par ligne) | orders    |
 | POST    | `/api/v1/orders/confirm`      | Valide une suggestion ajustée (3 modes)       | orders    |
 | GET/POST| `/api/v1/daily-entries`       | Saisie de fin de journée (idempotent, audité) | stocks    |

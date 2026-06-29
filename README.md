@@ -149,6 +149,7 @@ docs/       architecture, data-model, api-design, multitenancy, configuration, d
 > ce qui change pour brancher un commerce (`.env`, données tenant, seed) est isolé.
 > Carte complète : [`docs/configuration.md`](docs/configuration.md).
 > Données : [`docs/data-engineering.md`](docs/data-engineering.md) · Modèles IA & MLOps : [`docs/ai-models.md`](docs/ai-models.md).
+> Socle retail générique (audit + modules par vertical) : [`docs/retail-platform.md`](docs/retail-platform.md) · Roadmap : [`docs/roadmap.md`](docs/roadmap.md).
 > `frontend/` = l'**app** (le commerçant connecté). `website/` = la **vitrine** publique
 > (prospects, SEO). Deux fronts distincts dans le même monorepo. Cf. [`website/README.md`](website/README.md).
 

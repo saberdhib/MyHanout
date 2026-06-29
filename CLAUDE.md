@@ -66,8 +66,9 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
 - Event `before_flush` : estampille `organization_id` sur les INSERT.
 - Modèles métier héritent de `TenantMixin` (product, stock, sale, supplier, invoice, order,
   daily_entry, forecast_evaluation, customer, promo_campaign, agent_memory, document_chunk,
-  expense_classification_feedback, equipment, temperature_reading). **Exception voulue** :
-  `expense_category` est un référentiel **global** (lookup, non tenant) → non filtré par le garde-fou.
+  expense_classification_feedback, equipment, temperature_reading, price_history,
+  meat_lot, meat_cut). **Exception voulue** : `expense_category` est un référentiel
+  **global** (lookup, non tenant) → non filtré par le garde-fou.
 - **Limite** : le SQL brut (hors ORM) n'est PAS filtré → filtrer l'org explicitement
   (cf. `PgVectorStore`). Test d'isolation : `tests/test_tenancy.py` (A ≠ B).
 
@@ -127,3 +128,9 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   Grafana, MinIO, contrats d'entrée). Stack : `docker-compose.data.yml`, `analytics/`.
 - **Modèles IA & MLOps** : `docs/ai-models.md` (variables `.env` par capacité,
   réglage des paramètres, boucle MLOps).
+- **Socle retail générique** : `docs/retail-platform.md` (audit + modules par
+  vertical). Registry `app/core/modules.py` + `GET /config/modules` ; la nav
+  frontend se filtre par module actif selon le `business_type` du commerce.
+- **Boucherie** : `services/meat_service.py` (lot→coupes, rendement, coût/kg,
+  traçabilité), `api/v1/meat.py`. **Catalogue/prix** : `api/v1/catalog.py`,
+  `services/price_service.py`. Familles produit : `PRODUCT_FAMILIES` (base.py).
