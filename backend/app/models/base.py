@@ -12,6 +12,9 @@ import enum
 
 class InvoiceStatus(enum.StrEnum):
     PENDING = "pending"
+    PENDING_REVIEW = "pending_review"  # OCR fait, en attente de validation humaine
+    APPROVED = "approved"  # validée par un humain -> lignes écrites
+    REJECTED = "rejected"  # rejetée par un humain (motif requis)
     PROCESSED = "processed"
     PAID = "paid"
     OVERDUE = "overdue"
@@ -27,11 +30,27 @@ class OcrStatus(enum.StrEnum):
 
 class OrderStatus(enum.StrEnum):
     DRAFT = "draft"
+    SUGGESTED = "suggested"  # proposée par le système, non validée
     PENDING_APPROVAL = "pending_approval"  # human-in-the-loop
+    CONFIRMED = "confirmed"  # validée par un humain (suggestion ajustée)
     APPROVED = "approved"
-    SENT = "sent"
+    SENT = "sent"  # message fournisseur envoyé (mode whatsapp_auto)
     RECEIVED = "received"
     CANCELLED = "cancelled"
+
+
+class OrderActionMode(enum.StrEnum):
+    """Comment la commande validée est transmise au fournisseur."""
+
+    WHATSAPP_AUTO = "whatsapp_auto"  # message WhatsApp auto au fournisseur
+    DRAFT = "draft"  # brouillon à copier/coller par le commerçant
+    RECORD_ONLY = "record_only"  # enregistrement seul (il appelle lui-même)
+
+
+class DailyEntrySource(enum.StrEnum):
+    WHATSAPP = "whatsapp"
+    DASHBOARD = "dashboard"
+    MANUAL = "manual"
 
 
 class EventType(enum.StrEnum):

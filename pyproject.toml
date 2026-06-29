@@ -31,3 +31,6 @@ testpaths = ["backend/tests"]
 asyncio_mode = "auto"
 addopts = "-q"
 pythonpath = ["backend"]
+markers = [
+    "integration: tests nécessitant un vrai PostgreSQL (INTEGRATION_DATABASE_URL)",
+]

@@ -1,9 +1,13 @@
 import { NavLink, Outlet } from "react-router-dom";
+import { LogoWordmark } from "./Logo";
 
 const links = [
   { to: "/", label: "Dashboard", end: true },
   { to: "/stocks", label: "Stocks" },
   { to: "/forecasts", label: "Prévisions" },
+  { to: "/suggestions", label: "Suggestions" },
+  { to: "/end-of-day", label: "Fin de journée" },
+  { to: "/quality", label: "Qualité (écarts)" },
   { to: "/invoices", label: "Factures" },
   { to: "/suppliers", label: "Fournisseurs" },
 ];
@@ -11,9 +15,9 @@ const links = [
 export default function Layout() {
   return (
     <div className="flex min-h-screen">
-      <aside className="w-60 bg-brand-dark text-white flex flex-col">
-        <div className="px-5 py-5 text-xl font-bold border-b border-white/10">
-          🏪 MyHanout AI
+      <aside className="w-60 bg-night text-white flex flex-col">
+        <div className="px-5 py-5 border-b border-white/10">
+          <LogoWordmark />
         </div>
         <nav className="flex-1 p-3 space-y-1">
           {links.map((l) => (
@@ -22,8 +26,8 @@ export default function Layout() {
               to={l.to}
               end={l.end}
               className={({ isActive }) =>
-                `block rounded px-3 py-2 text-sm ${
-                  isActive ? "bg-white/20 font-semibold" : "hover:bg-white/10"
+                `block rounded-card px-3 py-2 text-sm ${
+                  isActive ? "bg-brand/20 font-semibold text-brand-light" : "hover:bg-white/10"
                 }`
               }
             >

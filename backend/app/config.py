@@ -21,6 +21,14 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     secret_key: str = "change-me"
 
+    # --- Auth / JWT ---
+    jwt_algorithm: str = "HS256"
+    access_token_expire_minutes: int = 30
+    refresh_token_expire_days: int = 7
+    # Mots de passe des comptes de démo (seed). À changer hors local.
+    seed_admin_password: str = "admin"
+    seed_merchant_password: str = "merchant"
+
     # --- API ---
     api_host: str = "0.0.0.0"
     api_port: int = 8000
@@ -57,10 +65,13 @@ class Settings(BaseSettings):
     seed_dir: str = "/data/seeds"
 
     # --- WhatsApp ---
-    whatsapp_provider: str = "mock"
+    whatsapp_provider: str = "mock"  # mock | business
     whatsapp_phone_number_id: str = ""
     whatsapp_access_token: str = ""
     whatsapp_verify_token: str = "local-verify-token"
+    # Secret d'app Meta pour vérifier la signature des webhooks (X-Hub-Signature-256).
+    whatsapp_app_secret: str = ""
+    graph_api_version: str = "v20.0"
 
     @field_validator("cors_origins", mode="before")
     @classmethod

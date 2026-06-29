@@ -23,7 +23,21 @@ pipeline bout-en-bout fonctionnel sur données de seed.
 - [ ] Génération automatique d'alertes (rupture/péremption/échéance) via workers
 - [ ] Envoi WhatsApp réel (Business API) pour les notifications
 
-## 🔮 Phase 2 — Intelligence avancée
+## ✅ Phase 1 & 2 — Chaîne de valeur réelle (livré)
+
+**Phase 1** — OCR Mistral réel (PDF+image, fallback), persistance des factures
+avec validation humaine (upload→review→approve/reject, idempotence), auth JWT/RBAC,
+migrations validées sur pg16+pgvector.
+
+**Phase 2** — Boucle quotidienne fermée :
+- [x] WhatsApp Business réel (webhook signé, texte+image→OCR, machine à états)
+- [x] Saisie de fin de journée (WhatsApp + dashboard, idempotente, auditée)
+- [x] Suggestion de commande explicable à la demande (réutilise le forecasting)
+- [x] Action de commande 3 modes (whatsapp_auto / draft / record_only), human-in-the-loop
+- [x] Dashboard live (stock/prévisions/suggestions/écarts, polling)
+- [x] Boucle MLOps : écart prévu/réel → MAE/MAPE → réentraînement versionné
+
+## 🔮 Phase 3 — Intelligence avancée
 
 - [ ] Forecasting Prophet/LightGBM en production + backtesting/évaluation
 - [ ] Fêtes/saisonnalité paramétrables par commerçant (config en base)

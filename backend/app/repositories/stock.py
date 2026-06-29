@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import date, timedelta
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import joinedload
 
 from app.models.stock import Stock
@@ -13,6 +13,13 @@ from app.repositories.base import BaseRepository
 
 class StockRepository(BaseRepository[Stock]):
     model = Stock
+
+    async def total_quantity(self, product_id: int) -> float:
+        """Quantité totale en stock pour un produit (tous lots confondus)."""
+        value = await self.session.scalar(
+            select(func.coalesce(func.sum(Stock.quantity), 0)).where(Stock.product_id == product_id)
+        )
+        return float(value or 0)
 
     async def list_with_product(self, *, limit: int = 100, offset: int = 0) -> list[Stock]:
         result = await self.session.scalars(

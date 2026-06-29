@@ -9,12 +9,13 @@ from sqlalchemy import Date, ForeignKey, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, TimestampMixin
+from app.models.tenant import TenantMixin
 
 if TYPE_CHECKING:
     from app.models.product import Product
 
 
-class Stock(Base, TimestampMixin):
+class Stock(Base, TenantMixin, TimestampMixin):
     __tablename__ = "stock"
 
     id: Mapped[int] = mapped_column(primary_key=True)
