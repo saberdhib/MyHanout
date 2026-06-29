@@ -45,6 +45,9 @@ Chaque intégration externe a une interface ABC + une impl **mock par défaut, k
 - `ImageProvider` (mock | huggingface) — `intelligence/imaging/` : génère les **affiches promo** (text-to-image). Le mock rend une affiche **SVG déterministe** (data URL), zéro réseau.
 - `MailboxProvider` (mock | imap) — `ingestion/email/` : récupère les factures **par email** (pièces jointes → pipeline OCR existant, idempotent par hash).
 - `DwhSyncTarget` (mock | http) — `ingestion/dwh.py` : pousse un snapshot (catalogue/stock/ventes) vers un **entrepôt de données**.
+- `ExpenseClassifier` (mock | llm) — `intelligence/finance/` : tagging OPEX/CAPEX des factures.
+- `SensorProvider` (mock | http) — `ingestion/sensors/` : relevés de **température** (chaîne du froid). Mock déterministe, zéro matériel.
+- `POSConnector` (mock | http) — `ingestion/pos/` : ingestion des **ventes caisse** (idempotent par `external_ref`).
 - `WhatsAppClient` (mock | business) — `messaging/whatsapp/`
 - `TelegramClient` (mock | bot) — `messaging/telegram.py`
 - `PublishChannel` (social | customers) — `messaging/publish.py`
@@ -63,8 +66,8 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
 - Event `before_flush` : estampille `organization_id` sur les INSERT.
 - Modèles métier héritent de `TenantMixin` (product, stock, sale, supplier, invoice, order,
   daily_entry, forecast_evaluation, customer, promo_campaign, agent_memory, document_chunk,
-  expense_classification_feedback). **Exception voulue** : `expense_category` est un
-  référentiel **global** (lookup, non tenant) → non filtré par le garde-fou.
+  expense_classification_feedback, equipment, temperature_reading). **Exception voulue** :
+  `expense_category` est un référentiel **global** (lookup, non tenant) → non filtré par le garde-fou.
 - **Limite** : le SQL brut (hors ORM) n'est PAS filtré → filtrer l'org explicitement
   (cf. `PgVectorStore`). Test d'isolation : `tests/test_tenancy.py` (A ≠ B).
 

@@ -46,6 +46,10 @@ API REST FastAPI, versionnée sous `/api/v1`. Doc interactive : `/docs` (Swagger
 | POST    | `/api/v1/finance/invoices/{id}/classify`| Suggestion IA (catégorie/kind/explication)| finance |
 | POST    | `/api/v1/finance/invoices/{id}/classification`| Validation/correction humaine (tracée)| finance |
 | GET     | `/api/v1/finance/alerts`      | Alertes finance (doublon, prix, marge, échéance)| finance |
+| GET     | `/api/v1/equipment`           | Statut chaîne du froid (dernier relevé + plage) | stocks    |
+| POST    | `/api/v1/equipment`           | Déclare un équipement à suivre (capteur opt.)   | stocks    |
+| POST    | `/api/v1/equipment/poll`      | Relève les capteurs (mock keyless ou réel)      | stocks    |
+| POST    | `/api/v1/import/pos/sync`     | Ingestion ventes caisse (POS), idempotent       | stocks    |
 | POST    | `/api/v1/orders/suggest`      | Suggestion de commande explicable (par ligne) | orders    |
 | POST    | `/api/v1/orders/confirm`      | Valide une suggestion ajustée (3 modes)       | orders    |
 | GET/POST| `/api/v1/daily-entries`       | Saisie de fin de journée (idempotent, audité) | stocks    |

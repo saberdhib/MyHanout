@@ -20,7 +20,9 @@ et **répond/agit** par messagerie — toujours sous contrôle humain.
 | 🛒 Réassort | Suggestions **explicables** (demande + stock + délai + signaux), 3 modes d'envoi fournisseur |
 | 🔔 Promos flash | Détection fin de vie → promo IA → **affiche générée (text-to-image)** → publication **réseaux + clients opt-in (RGPD)** |
 | 💶 Gestion financière | **OPEX/CAPEX** (tagging IA explicable, validé humain), **trésorerie** (alerte cash), **valorisation stock**, **marges réelles** + alertes (doublon, prix, marge, échéance) — pré-compta |
-| 🔌 Intégrations | **Import JSON** (catalogue/ventes, idempotent) + **sync entrepôt de données (DWH)** |
+| 🌡️ Chaîne du froid | Suivi **température** des machines (HACCP) via capteurs (mock keyless ou thermomètres connectés), **alertes explicables** anti-gaspillage |
+| 🔌 Intégrations | **Import JSON** + **sync DWH** + **connecteur caisse (POS)** (ingestion ventes idempotente) |
+| 📱 Omni-accès | Web responsive + **PWA installable** (PC / téléphone / tablette de caisse) + WhatsApp/Telegram |
 | 💬 Conversationnel | **WhatsApp & Telegram** (texte + photo→OCR) + **chat web**, même cerveau d'agents |
 | 🤖 Agents IA | order, stock, finance, marketing, support, governance + **mémoire** + **éval routage** |
 | 🧠 RAG | Q&A citée sur ses propres factures (pgvector) |
