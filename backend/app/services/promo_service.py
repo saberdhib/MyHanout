@@ -14,10 +14,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.audit import record_audit
 from app.core.exceptions import AppError, NotFoundError
 from app.core.logging import get_logger
+from app.intelligence.imaging import get_image_provider
 from app.intelligence.llm import LLMMessage, get_llm_provider
 from app.intelligence.signals import get_signals
 from app.messaging.publish import get_channels
 from app.models.base import CampaignStatus
+from app.models.product import Product
 from app.models.promo import PromoCampaign
 from app.repositories.stock import StockRepository
 
@@ -71,6 +73,49 @@ async def scan_expiring(
     )
     log.info("promo.scan", organization_id=organization_id, proposed=len(campaigns))
     return campaigns
+
+
+def _build_visual_prompt(product_name: str, discount_pct: float) -> str:
+    """Construit un prompt text-to-image explicable pour l'affiche promo."""
+    return (
+        f"Affiche promotionnelle commercant de quartier : -{discount_pct:g}% sur "
+        f"« {product_name} ». Style chaleureux, anti-gaspillage, lumineux, appetissant, "
+        f"typographie moderne, vert et orange."
+    )
+
+
+async def generate_visual(
+    session: AsyncSession, *, campaign_id: int, user_id: int | None
+) -> PromoCampaign:
+    """Génère une affiche promo (visuel) pour une campagne — human-in-the-loop.
+
+    Le visuel est un brouillon attaché à la campagne ; rien n'est publié ici. Le
+    prompt est conservé (`visual_prompt`) pour la traçabilité/explicabilité.
+    """
+    campaign = await session.get(PromoCampaign, campaign_id)
+    if not campaign:
+        raise NotFoundError(f"Campagne {campaign_id} introuvable")
+
+    product_name = "produit"
+    if campaign.product_id:
+        product = await session.get(Product, campaign.product_id)
+        if product:
+            product_name = product.name
+
+    prompt = _build_visual_prompt(product_name, float(campaign.discount_pct or 0))
+    image = await get_image_provider().generate(prompt)
+    campaign.visual_url = image.data_url
+    campaign.visual_prompt = prompt
+    await record_audit(
+        session,
+        action="promo.visual",
+        user_id=user_id,
+        resource="promo_campaign",
+        resource_id=campaign.id,
+        detail=f"provider={image.provider} media={image.media_type}",
+    )
+    log.info("promo.visual", campaign_id=campaign.id, provider=image.provider)
+    return campaign
 
 
 async def publish_campaign(

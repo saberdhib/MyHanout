@@ -1,11 +1,30 @@
 import { useEffect, useState } from "react";
 import { Card } from "../components/Card";
-import { getPromos, publishPromo, scanPromos, type Promo } from "../api/client";
+import {
+  generatePromoVisual,
+  getPromos,
+  publishPromo,
+  scanPromos,
+  type Promo,
+} from "../api/client";
 
-// Promos flash : produits en fin de vie -> proposition IA -> publication validée.
+// Aperçu façon bulle WhatsApp du message promo (preview avant publication).
+function WhatsAppBubble({ text }: { text: string }) {
+  return (
+    <div className="rounded-card bg-[#0b141a] p-3">
+      <div className="ml-auto max-w-[90%] rounded-lg rounded-tr-none bg-[#005c4b] px-3 py-2 text-sm text-white whitespace-pre-line">
+        {text}
+        <span className="ml-2 align-bottom text-[10px] text-white/60">✓✓</span>
+      </div>
+    </div>
+  );
+}
+
+// Promos flash : produits en fin de vie -> proposition IA -> affiche + publication validée.
 export default function Promos() {
   const [promos, setPromos] = useState<Promo[]>([]);
   const [msg, setMsg] = useState<string | null>(null);
+  const [busy, setBusy] = useState<number | null>(null);
 
   const refresh = () => getPromos().then((r) => setPromos(r.items)).catch(() => setPromos([]));
   useEffect(() => {
@@ -25,6 +44,17 @@ export default function Promos() {
     refresh();
   }
 
+  async function makeVisual(id: number) {
+    setBusy(id);
+    try {
+      await generatePromoVisual(id);
+      setMsg(`Affiche générée pour la promo #${id}.`);
+      await refresh();
+    } finally {
+      setBusy(null);
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -37,9 +67,18 @@ export default function Promos() {
       <div className="grid gap-4 sm:grid-cols-2">
         {promos.map((p) => (
           <Card key={p.id} title={`${p.title} · -${p.discount_pct}%`}>
-            <p className="text-sm">{p.message}</p>
+            <WhatsAppBubble text={p.message} />
             {p.reason && <p className="mt-2 text-xs text-gray-500">Pourquoi : {p.reason}</p>}
-            <div className="mt-3 flex items-center justify-between">
+
+            {p.visual_url && (
+              <img
+                src={p.visual_url}
+                alt={`Affiche promo ${p.title}`}
+                className="mt-3 w-full rounded-card border border-black/5"
+              />
+            )}
+
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
               <span
                 className={`rounded-pill px-2 py-0.5 text-xs ${
                   p.status === "published"
@@ -50,14 +89,23 @@ export default function Promos() {
                 {p.status}
                 {p.status === "published" && ` · ${p.audience_count} clients`}
               </span>
-              {p.status === "draft" && (
+              <div className="flex gap-2">
                 <button
-                  onClick={() => publish(p.id)}
-                  className="rounded-card bg-brand px-3 py-1 text-xs text-white"
+                  onClick={() => makeVisual(p.id)}
+                  disabled={busy === p.id}
+                  className="rounded-card border border-brand px-3 py-1 text-xs text-brand disabled:opacity-50"
                 >
-                  Publier (réseaux + clients opt-in)
+                  {busy === p.id ? "Génération…" : p.visual_url ? "🎨 Régénérer l'affiche" : "🎨 Générer une affiche"}
                 </button>
-              )}
+                {p.status === "draft" && (
+                  <button
+                    onClick={() => publish(p.id)}
+                    className="rounded-card bg-brand px-3 py-1 text-xs text-white"
+                  >
+                    Publier (réseaux + clients opt-in)
+                  </button>
+                )}
+              </div>
             </div>
           </Card>
         ))}

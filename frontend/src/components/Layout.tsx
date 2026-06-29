@@ -12,6 +12,7 @@ const links = [
   { to: "/end-of-day", label: "Fin de journée" },
   { to: "/quality", label: "Qualité (écarts)" },
   { to: "/invoices", label: "Factures" },
+  { to: "/integrations", label: "Intégrations" },
   { to: "/suppliers", label: "Fournisseurs" },
 ];
 

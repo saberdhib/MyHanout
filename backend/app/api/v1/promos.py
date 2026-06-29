@@ -12,7 +12,7 @@ from app.core.exceptions import PermissionDeniedError
 from app.core.security import CurrentUser
 from app.models.promo import PromoCampaign
 from app.schemas.common import ListResponse
-from app.services.promo_service import publish_campaign, scan_expiring
+from app.services.promo_service import generate_visual, publish_campaign, scan_expiring
 
 router = APIRouter(prefix="/promos", tags=["promos"])
 
@@ -29,6 +29,8 @@ class PromoOut(BaseModel):
     status: str
     channels: str | None = None
     audience_count: int
+    visual_url: str | None = None
+    visual_prompt: str | None = None
 
 
 class PublishRequest(BaseModel):
@@ -63,6 +65,17 @@ async def list_promos(
     )
     items = [PromoOut.model_validate(c) for c in rows]
     return ListResponse(items=items, total=len(items))
+
+
+@router.post("/{campaign_id}/visual", response_model=PromoOut)
+async def visual(
+    campaign_id: int,
+    session: AsyncSession = Depends(get_db),
+    user: CurrentUser = Depends(require_permission("marketing")),
+) -> PromoOut:
+    """Génère une affiche promo (brouillon) pour la campagne (human-in-the-loop)."""
+    campaign = await generate_visual(session, campaign_id=campaign_id, user_id=user.id)
+    return PromoOut.model_validate(campaign)
 
 
 @router.post("/{campaign_id}/publish", response_model=PromoOut)

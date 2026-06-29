@@ -30,3 +30,6 @@ class PromoCampaign(Base, TenantMixin, TimestampMixin):
     channels: Mapped[str | None] = mapped_column(String(128), nullable=True)
     audience_count: Mapped[int] = mapped_column(Integer, default=0)
     published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    # Visuel généré (affiche promo) : data URL + prompt pour la traçabilité.
+    visual_url: Mapped[str | None] = mapped_column(Text, nullable=True)
+    visual_prompt: Mapped[str | None] = mapped_column(Text, nullable=True)

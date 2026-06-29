@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { Card } from "../components/Card";
-import { getInvoices, patchInvoice, uploadInvoice, type Invoice } from "../api/client";
+import {
+  getInvoices,
+  importInvoicesFromEmail,
+  patchInvoice,
+  uploadInvoice,
+  type Invoice,
+} from "../api/client";
 
 // Factures : drag & drop / import, édition pré-remplie, bascule payé/non payé.
 export default function Invoices() {
@@ -27,6 +33,15 @@ export default function Invoices() {
     if (e.dataTransfer.files[0]) await upload(e.dataTransfer.files[0]);
   }
 
+  async function importEmail() {
+    setMsg(null);
+    const r = await importInvoicesFromEmail();
+    setMsg(
+      `📧 ${r.imported} facture(s) importée(s) depuis la boîte mail (${r.provider}) — à valider.`,
+    );
+    refresh();
+  }
+
   async function togglePaid(inv: Invoice) {
     await patchInvoice(inv.id, { paid: !inv.paid });
     refresh();
@@ -42,7 +57,15 @@ export default function Invoices() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Factures</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Factures</h1>
+        <button
+          onClick={importEmail}
+          className="rounded-card bg-brand px-3 py-1 text-sm text-white"
+        >
+          📧 Importer depuis l'email
+        </button>
+      </div>
 
       {/* Zone drag & drop + import fichier */}
       <div

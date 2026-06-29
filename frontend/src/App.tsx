@@ -11,6 +11,7 @@ import EndOfDay from "./pages/EndOfDay";
 import Quality from "./pages/Quality";
 import Chat from "./pages/Chat";
 import Promos from "./pages/Promos";
+import Integrations from "./pages/Integrations";
 
 export default function App() {
   return (
@@ -27,6 +28,7 @@ export default function App() {
         <Route path="end-of-day" element={<EndOfDay />} />
         <Route path="quality" element={<Quality />} />
         <Route path="invoices" element={<Invoices />} />
+        <Route path="integrations" element={<Integrations />} />
         <Route path="suppliers" element={<Suppliers />} />
       </Route>
     </Routes>

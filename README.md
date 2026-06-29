@@ -15,10 +15,11 @@ et **répond/agit** par messagerie — toujours sous contrôle humain.
 
 | Domaine | Détail |
 |---------|--------|
-| 📥 Ingestion factures | OCR (Mistral + fallback PDF), drag & drop / photo WhatsApp/Telegram, validation humaine, suivi **payé/non payé**, édition pré-remplie |
+| 📥 Ingestion factures | OCR (Mistral + fallback PDF), drag & drop / photo WhatsApp/Telegram, **import email (IMAP)**, validation humaine, suivi **payé/non payé**, édition pré-remplie |
 | 📊 Forecasting | Prévision de demande (naïf par défaut, Prophet/LightGBM en option) + saisonnalité/fêtes |
 | 🛒 Réassort | Suggestions **explicables** (demande + stock + délai + signaux), 3 modes d'envoi fournisseur |
-| 🔔 Promos flash | Détection fin de vie → promo IA → publication **réseaux + clients opt-in (RGPD)** |
+| 🔔 Promos flash | Détection fin de vie → promo IA → **affiche générée (text-to-image)** → publication **réseaux + clients opt-in (RGPD)** |
+| 🔌 Intégrations | **Import JSON** (catalogue/ventes, idempotent) + **sync entrepôt de données (DWH)** |
 | 💬 Conversationnel | **WhatsApp & Telegram** (texte + photo→OCR) + **chat web**, même cerveau d'agents |
 | 🤖 Agents IA | order, stock, finance, marketing, support, governance + **mémoire** + **éval routage** |
 | 🧠 RAG | Q&A citée sur ses propres factures (pgvector) |
@@ -101,10 +102,11 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 ## 🔌 API (extrait)
 
 `/auth/*` · `/onboarding/*` (signup, invitations) · `/stocks` · `/invoices` (upload,
-approve, reject, **PATCH** édition + payé) · `/forecasts/{id}` · `/orders` (suggest,
-confirm 3 modes) · `/daily-entries` · `/mlops/*` · `/promos` (scan, publish) ·
-`/customers` · `/signals` · `/chat` · `/rag/*` · `/agents/eval` ·
-`/whatsapp/webhook` · `/telegram/webhook`. Détail : [`docs/api-design.md`](docs/api-design.md).
+approve, reject, **PATCH** édition + payé, **import/email**) · `/forecasts/{id}` ·
+`/orders` (suggest, confirm 3 modes) · `/daily-entries` · `/mlops/*` ·
+`/promos` (scan, **visual**, publish) · `/import` (json, dwh/sync) · `/customers` ·
+`/signals` · `/chat` · `/rag/*` · `/agents/eval` · `/whatsapp/webhook` ·
+`/telegram/webhook`. Détail : [`docs/api-design.md`](docs/api-design.md).
 
 ---
 
@@ -139,7 +141,8 @@ docs/       architecture, data-model, api-design, multitenancy, DEMO, DEPLOY, de
 ```
 
 ## 🗺️ Roadmap
-Faits : OCR réel, factures (review + payé), auth JWT/RBAC, multi-tenant, WhatsApp+Telegram,
-boucle quotidienne, suggestions, promos RGPD, RAG, MLOps, rate limiting, tracing, dark mode.
-Prochaines briques : import JSON/DWH sync, Prophet/LGBM en prod, connecteurs réseaux réels,
+Faits : OCR réel, factures (review + payé + **import email**), auth JWT/RBAC, multi-tenant,
+WhatsApp+Telegram, boucle quotidienne, suggestions, promos RGPD + **affiches générées**,
+**import JSON / sync DWH**, RAG, MLOps, rate limiting, tracing, dark mode.
+Prochaines briques : Prophet/LGBM en prod, connecteurs réseaux réels,
 voice WhatsApp, billing enforcement. Détail : [`docs/roadmap.md`](docs/roadmap.md).

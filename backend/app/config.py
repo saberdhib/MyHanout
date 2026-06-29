@@ -68,10 +68,26 @@ class Settings(BaseSettings):
     anthropic_api_key: str = ""
     llm_model: str = "claude-opus-4-8"
 
-    # --- HuggingFace (LLM + embeddings via Inference API) ---
+    # --- HuggingFace (LLM + embeddings + images via Inference API) ---
     huggingface_api_key: str = ""
     hf_llm_model: str = "mistralai/Mistral-7B-Instruct-v0.3"
     hf_embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
+    hf_image_model: str = "stabilityai/stable-diffusion-xl-base-1.0"
+
+    # --- Génération de visuels (text-to-image) ---
+    image_provider: str = "mock"  # mock | huggingface
+
+    # --- Import factures par email (IMAP) ---
+    email_provider: str = "mock"  # mock | imap
+    email_imap_host: str = ""
+    email_imap_port: int = 993
+    email_imap_user: str = ""
+    email_imap_password: str = ""
+    email_imap_folder: str = "INBOX"
+
+    # --- Entrepôt de données (DWH) / export ---
+    dwh_target: str = "mock"  # mock | http
+    dwh_url: str = ""
 
     # --- Telegram (Bot API) ---
     telegram_provider: str = "mock"  # mock | bot

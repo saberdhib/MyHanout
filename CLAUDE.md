@@ -40,6 +40,9 @@ Chaque intégration externe a une interface ABC + une impl **mock par défaut, k
 - `OCRProvider` (mock | mistral | pdf_fallback) — `ingestion/ocr/`
 - `LLMProvider` (mock | claude | mistral | **huggingface**) — `intelligence/llm/`
 - `EmbeddingProvider` + `VectorStore` (memory | pgvector) — `intelligence/rag/`
+- `ImageProvider` (mock | huggingface) — `intelligence/imaging/` : génère les **affiches promo** (text-to-image). Le mock rend une affiche **SVG déterministe** (data URL), zéro réseau.
+- `MailboxProvider` (mock | imap) — `ingestion/email/` : récupère les factures **par email** (pièces jointes → pipeline OCR existant, idempotent par hash).
+- `DwhSyncTarget` (mock | http) — `ingestion/dwh.py` : pousse un snapshot (catalogue/stock/ventes) vers un **entrepôt de données**.
 - `WhatsAppClient` (mock | business) — `messaging/whatsapp/`
 - `TelegramClient` (mock | bot) — `messaging/telegram.py`
 - `PublishChannel` (social | customers) — `messaging/publish.py`
@@ -77,6 +80,11 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   réactivé dans un test dédié.
 - **Event loop dans un test sync** : ne pas utiliser `asyncio.get_event_loop()` (loop stale
   en suite complète) → créer une `new_event_loop()`.
+- **État partagé entre tests** : la base sqlite mémoire est **partagée** sur toute la session
+  (cache `mode=memory&cache=shared`). Un test qui insère (import email, scan promo…) pollue les
+  listes vues par les autres → **ne pas présumer de l'ordre** d'une liste (`items[0]`). Chercher
+  l'élément voulu (`any(...)`), ou créer ses données dans une org dédiée. (Bug : un import de
+  factures `pending_review` sans lignes passait devant la facture seedée et cassait `items[0]`.)
 
 ## 7. Conventions
 - Code typé, commenté là où c'est utile (le « pourquoi », pas le « quoi »). Pas de sur-ingénierie.
@@ -94,3 +102,7 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
 - API : `backend/app/api/v1/` (`router.py` agrège). Endpoints : `docs/api-design.md`.
 - Démo : `docs/DEMO.md`. Déploiement : `docs/DEPLOY.md`. Tenancy/rôles : `docs/multitenancy.md`.
 - Dossier delivery (discovery/strategy/archi C4/ADRs) : `docs/delivery/`.
+- **Affiches promo** : `POST /promos/{id}/visual` (provider `intelligence/imaging/`).
+- **Import factures email** : `POST /invoices/import/email` (provider `ingestion/email/`).
+- **Import JSON / sync DWH** : `POST /import/json`, `POST /import/dwh/sync`
+  (`services/import_service.py`, `ingestion/dwh.py`). Frontend : page « Intégrations ».

@@ -11,6 +11,7 @@ from app.api.v1 import (
     customers,
     daily_entries,
     forecasts,
+    imports,
     invoices,
     mlops,
     onboarding,
@@ -34,6 +35,7 @@ api_router.include_router(promos.router)
 api_router.include_router(customers.router)
 api_router.include_router(stocks.router)
 api_router.include_router(invoices.router)
+api_router.include_router(imports.router)
 api_router.include_router(forecasts.router)
 api_router.include_router(orders.router)
 api_router.include_router(daily_entries.router)

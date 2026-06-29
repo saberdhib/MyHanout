@@ -82,6 +82,17 @@ export const uploadInvoice = (file: File) => {
   return api.post<Invoice>("/invoices/upload", form).then((r) => r.data);
 };
 
+export interface EmailImportResult {
+  provider: string;
+  imported: number;
+  items: { invoice_id: number; filename: string; sender: string; reasons: string[] }[];
+}
+
+export const importInvoicesFromEmail = (limit = 10) =>
+  api
+    .post<EmailImportResult>("/invoices/import/email", null, { params: { limit } })
+    .then((r) => r.data);
+
 export const patchInvoice = (
   id: number,
   fields: Partial<{
@@ -230,6 +241,8 @@ export interface Promo {
   status: string;
   channels: string | null;
   audience_count: number;
+  visual_url: string | null;
+  visual_prompt: string | null;
 }
 
 export const sendChat = (message: string) =>
@@ -247,3 +260,27 @@ export const getPromos = () =>
 
 export const publishPromo = (id: number, channels = ["social", "customers"]) =>
   api.post<Promo>(`/promos/${id}/publish`, { channels }).then((r) => r.data);
+
+export const generatePromoVisual = (id: number) =>
+  api.post<Promo>(`/promos/${id}/visual`).then((r) => r.data);
+
+// --- Intégrations : import JSON + sync entrepôt de données -----------------
+
+export interface ImportResult {
+  suppliers_upserted: number;
+  products_upserted: number;
+  stocks_upserted: number;
+  sales_inserted: number;
+}
+
+export interface DwhSyncResult {
+  target: string;
+  rows: number;
+  detail: string | null;
+}
+
+export const importJson = (payload: unknown) =>
+  api.post<ImportResult>("/import/json", payload).then((r) => r.data);
+
+export const syncDwh = () =>
+  api.post<DwhSyncResult>("/import/dwh/sync").then((r) => r.data);

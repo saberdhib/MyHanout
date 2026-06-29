@@ -15,6 +15,10 @@ from app.schemas.invoice import (
     InvoiceReviewOut,
     InvoiceUpdate,
 )
+from app.services.email_import_service import (
+    EmailImportResult,
+    import_invoices_from_mailbox,
+)
 from app.services.invoice_service import (
     approve_invoice,
     ingest_and_store,
@@ -60,6 +64,20 @@ async def upload_invoice(
     out = InvoiceReviewOut.model_validate(invoice)
     out.reasons = reasons
     return out
+
+
+@router.post("/import/email", response_model=EmailImportResult)
+async def import_email(
+    limit: int = 10,
+    session: AsyncSession = Depends(get_db),
+    user: CurrentUser = Depends(require_permission("invoices")),
+) -> EmailImportResult:
+    """Récupère les factures reçues par email (mock keyless ou IMAP réel).
+
+    Chaque pièce jointe est ingérée en `pending_review` (idempotent). Aucune
+    ligne n'est écrite sans validation humaine via /approve.
+    """
+    return await import_invoices_from_mailbox(session, user_id=user.id, limit=limit)
 
 
 @router.post("/{invoice_id}/approve", response_model=InvoiceOut)

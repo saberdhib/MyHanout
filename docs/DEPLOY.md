@@ -23,11 +23,14 @@ docker compose exec api python -m app.db.seed   # optionnel (données démo)
 | Variable | Effet | Activation |
 |----------|-------|------------|
 | `HUGGINGFACE_API_KEY` | LLM + embeddings réels (HF Inference) | `LLM_PROVIDER=huggingface`, `EMBEDDING_PROVIDER=huggingface` |
+| `HUGGINGFACE_API_KEY` (+ `HF_IMAGE_MODEL`) | **Affiches promo** générées (text-to-image) | `IMAGE_PROVIDER=huggingface` |
 | `ANTHROPIC_API_KEY` | LLM Claude | `LLM_PROVIDER=claude` |
 | `MISTRAL_API_KEY` | OCR Mistral réel | `OCR_PROVIDER=mistral` |
 | `WHATSAPP_ACCESS_TOKEN` + `WHATSAPP_PHONE_NUMBER_ID` | WhatsApp Business réel | `WHATSAPP_PROVIDER=business` |
 | `WHATSAPP_APP_SECRET` | Vérif signature webhook Meta | renseigner |
 | `TELEGRAM_BOT_TOKEN` | Telegram réel | `TELEGRAM_PROVIDER=bot` |
+| `EMAIL_IMAP_HOST` + `EMAIL_IMAP_USER` + `EMAIL_IMAP_PASSWORD` | **Import factures par email** (IMAP) | `EMAIL_PROVIDER=imap` |
+| `DWH_URL` | **Sync entrepôt de données** (POST snapshot) | `DWH_TARGET=http` |
 | `RAG_VECTOR_STORE=pgvector` | RAG persistant (pgvector) | (pg déjà en place) |
 | `SECRET_KEY` | **À changer** (signature JWT) | obligatoire en prod |
 

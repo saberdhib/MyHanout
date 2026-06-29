@@ -30,6 +30,13 @@ API REST FastAPI, versionnée sous `/api/v1`. Doc interactive : `/docs` (Swagger
 | POST    | `/api/v1/invoices/upload`     | Importe un document → facture `pending_review`| invoices  |
 | POST    | `/api/v1/invoices/{id}/approve`| Validation humaine → écrit les lignes + audit | invoices  |
 | POST    | `/api/v1/invoices/{id}/reject`| Rejet humain avec motif (audité)              | invoices  |
+| PATCH   | `/api/v1/invoices/{id}`       | Édite (n°/date/fournisseur/montant) + payé    | invoices  |
+| POST    | `/api/v1/invoices/import/email`| Import factures depuis la boîte mail (IMAP/mock)| invoices |
+| POST    | `/api/v1/promos/scan`         | Détecte fins de vie → promos (brouillons)     | marketing |
+| POST    | `/api/v1/promos/{id}/visual`  | Génère l'affiche promo (text-to-image)        | marketing |
+| POST    | `/api/v1/promos/{id}/publish` | Publie (réseaux + clients opt-in RGPD)        | marketing |
+| POST    | `/api/v1/import/json`         | Import catalogue/ventes JSON (idempotent SKU) | stocks    |
+| POST    | `/api/v1/import/dwh/sync`     | Pousse un snapshot vers l'entrepôt de données | stocks    |
 | POST    | `/api/v1/orders/suggest`      | Suggestion de commande explicable (par ligne) | orders    |
 | POST    | `/api/v1/orders/confirm`      | Valide une suggestion ajustée (3 modes)       | orders    |
 | GET/POST| `/api/v1/daily-entries`       | Saisie de fin de journée (idempotent, audité) | stocks    |
