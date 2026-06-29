@@ -5,6 +5,7 @@ from app.db.base import Base
 from app.models.agent_memory import AgentMemory
 from app.models.audit_log import AuditLog
 from app.models.conversation import Conversation
+from app.models.customer import Customer
 from app.models.daily_entry import DailyEntry
 from app.models.event import Event
 from app.models.forecast_evaluation import ForecastEvaluation
@@ -12,6 +13,7 @@ from app.models.invoice import Invoice, InvoiceLine
 from app.models.order import Order, OrderLine
 from app.models.organization import Invitation, Membership, MembershipRole, Organization
 from app.models.product import Product
+from app.models.promo import PromoCampaign
 from app.models.sale import Sale
 from app.models.stock import Stock
 from app.models.supplier import Supplier
@@ -22,6 +24,7 @@ __all__ = [
     "AgentMemory",
     "AuditLog",
     "Conversation",
+    "Customer",
     "DailyEntry",
     "Event",
     "ForecastEvaluation",
@@ -34,6 +37,7 @@ __all__ = [
     "OrderLine",
     "Organization",
     "Product",
+    "PromoCampaign",
     "Sale",
     "Stock",
     "Supplier",

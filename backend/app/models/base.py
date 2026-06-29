@@ -53,6 +53,12 @@ class DailyEntrySource(enum.StrEnum):
     MANUAL = "manual"
 
 
+class CampaignStatus(enum.StrEnum):
+    DRAFT = "draft"  # proposée par l'IA, non publiée (human-in-the-loop)
+    PUBLISHED = "published"
+    CANCELLED = "cancelled"
+
+
 class EventType(enum.StrEnum):
     STOCK_LOW = "stock_low"
     STOCK_EXPIRING = "stock_expiring"

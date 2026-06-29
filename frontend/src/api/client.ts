@@ -187,3 +187,44 @@ export const createDailyEntry = (entry: {
 
 export const getMlopsMetrics = () =>
   api.get<{ metrics: MlopsMetric[] }>("/mlops/metrics").then((r) => r.data.metrics);
+
+// --- Demo pack : chat, signaux, promos ------------------------------------
+
+export interface ChatReply {
+  reply: string;
+  agent: string;
+  explanation: string | null;
+}
+
+export interface Signals {
+  weather: { day: string; temp_c: number; condition: string; demand_hint: string };
+  trends: { topic: string; score: number; hint: string }[];
+}
+
+export interface Promo {
+  id: number;
+  product_id: number | null;
+  title: string;
+  message: string;
+  discount_pct: number;
+  reason: string | null;
+  status: string;
+  channels: string | null;
+  audience_count: number;
+}
+
+export const sendChat = (message: string) =>
+  api.post<ChatReply>("/chat", { message }).then((r) => r.data);
+
+export const getSignals = () => api.get<Signals>("/signals").then((r) => r.data);
+
+export const scanPromos = (withinDays = 3) =>
+  api
+    .post<ListResponse<Promo>>("/promos/scan", null, { params: { within_days: withinDays } })
+    .then((r) => r.data);
+
+export const getPromos = () =>
+  api.get<ListResponse<Promo>>("/promos").then((r) => r.data);
+
+export const publishPromo = (id: number, channels = ["social", "customers"]) =>
+  api.post<Promo>(`/promos/${id}/publish`, { channels }).then((r) => r.data);

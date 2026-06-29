@@ -9,6 +9,8 @@ import Onboarding from "./pages/Onboarding";
 import Suggestions from "./pages/Suggestions";
 import EndOfDay from "./pages/EndOfDay";
 import Quality from "./pages/Quality";
+import Chat from "./pages/Chat";
+import Promos from "./pages/Promos";
 
 export default function App() {
   return (
@@ -17,6 +19,8 @@ export default function App() {
       <Route path="/signup" element={<Onboarding />} />
       <Route element={<Layout />}>
         <Route index element={<Dashboard />} />
+        <Route path="chat" element={<Chat />} />
+        <Route path="promos" element={<Promos />} />
         <Route path="stocks" element={<Stocks />} />
         <Route path="forecasts" element={<Forecasts />} />
         <Route path="suggestions" element={<Suggestions />} />

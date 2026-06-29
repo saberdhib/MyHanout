@@ -1,19 +1,26 @@
 import { Card, Stat } from "../components/Card";
-import { getInvoices, getMlopsMetrics, getStockAlerts, getStocks } from "../api/client";
+import {
+  getInvoices,
+  getMlopsMetrics,
+  getSignals,
+  getStockAlerts,
+  getStocks,
+} from "../api/client";
 import { usePolling } from "../hooks/usePolling";
 
 async function loadSummary() {
-  const [s, a, i, m] = await Promise.all([
+  const [s, a, i, m, sig] = await Promise.all([
     getStocks(),
     getStockAlerts(),
     getInvoices(),
     getMlopsMetrics(),
+    getSignals(),
   ]);
   const mape =
     m.length && m.some((x) => x.mape != null)
       ? (m.reduce((acc, x) => acc + (x.mape ?? 0), 0) / m.length) * 100
       : null;
-  return { stocks: s.total, alerts: a.total, invoices: i.total, mape };
+  return { stocks: s.total, alerts: a.total, invoices: i.total, mape, signals: sig };
 }
 
 export default function Dashboard() {
@@ -40,8 +47,23 @@ export default function Dashboard() {
           value={data?.mape != null ? `${data.mape.toFixed(1)}%` : "—"}
         />
       </div>
+      {data?.signals && (
+        <Card title="Signaux du jour (compagnon)">
+          <div className="flex flex-wrap gap-3 text-sm">
+            <span className="rounded-pill bg-accent/15 px-3 py-1">
+              ☀️ {data.signals.weather.temp_c}°C · {data.signals.weather.condition} —{" "}
+              {data.signals.weather.demand_hint}
+            </span>
+            {data.signals.trends.map((t) => (
+              <span key={t.topic} className="rounded-pill bg-brand/15 px-3 py-1">
+                📈 {t.topic} — {t.hint}
+              </span>
+            ))}
+          </div>
+        </Card>
+      )}
       <Card title="Boucle quotidienne">
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-gray-600 dark:text-gray-400">
           Consultez vos stocks et prévisions, recevez des suggestions de commande
           explicables, saisissez votre fin de journée, et suivez l'écart prévu/réel.
           Les actions sensibles (commandes) requièrent une validation humaine.

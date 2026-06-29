@@ -4,6 +4,8 @@ import { useTheme } from "../hooks/useTheme";
 
 const links = [
   { to: "/", label: "Dashboard", end: true },
+  { to: "/chat", label: "Assistant" },
+  { to: "/promos", label: "Promos flash" },
   { to: "/stocks", label: "Stocks" },
   { to: "/forecasts", label: "Prévisions" },
   { to: "/suggestions", label: "Suggestions" },

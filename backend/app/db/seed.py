@@ -10,7 +10,7 @@ from __future__ import annotations
 import asyncio
 import csv
 import json
-from datetime import date, datetime
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 from sqlalchemy import func, select
@@ -22,6 +22,7 @@ from app.core.security import hash_password
 from app.core.tenancy import tenant_context
 from app.db.session import AsyncSessionLocal
 from app.models import (
+    Customer,
     Invoice,
     InvoiceLine,
     Membership,
@@ -135,6 +136,24 @@ async def _seed_business_data(session: AsyncSession, seeds: Path) -> None:
             )
         invoice.total_amount = total
         session.add(invoice)
+
+    # Démo : un périssable en fin de vie (déclenche la promo flash) + clients opt-in.
+    soon = date.today() + timedelta(days=2)
+    for product in products.values():
+        if product.perishable:
+            session.add(Stock(product=product, quantity=4, reorder_threshold=10, expiry_date=soon))
+            break
+    session.add_all(
+        [
+            Customer(
+                name="Amina",
+                phone="+212600000010",
+                consent_opt_in=True,
+                consent_at=datetime.now(UTC),
+            ),
+            Customer(name="Hassan", phone="+212600000011", consent_opt_in=False),
+        ]
+    )
 
     log.info("seed.business", suppliers=len(suppliers), products=len(products), sales=sales_count)
 
