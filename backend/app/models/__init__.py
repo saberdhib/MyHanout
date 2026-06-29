@@ -2,6 +2,7 @@
 `Base.metadata` (requis par Alembic et la création de schéma en test)."""
 
 from app.db.base import Base
+from app.models.agent_memory import AgentMemory
 from app.models.audit_log import AuditLog
 from app.models.conversation import Conversation
 from app.models.daily_entry import DailyEntry
@@ -18,6 +19,7 @@ from app.models.user import Role, User
 
 __all__ = [
     "Base",
+    "AgentMemory",
     "AuditLog",
     "Conversation",
     "DailyEntry",

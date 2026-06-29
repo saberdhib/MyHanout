@@ -189,10 +189,17 @@ async def _dispatch_text(session: AsyncSession, conv: Conversation, text: str) -
     if any(k in lowered for k in _ORDER_INTENT):
         return await _start_order_flow(session, conv, lowered)
 
-    # Fallback : orchestrateur d'agents (Q&A métier).
+    # Fallback : orchestrateur d'agents (Q&A métier), avec mémoire conversationnelle.
+    from app.intelligence.agents.memory import MemoryStore
     from app.intelligence.llm.orchestrator import get_orchestrator
 
-    result = await get_orchestrator().handle(text)
+    memory = MemoryStore(session)
+    history = await memory.recall(agent="agent_support", subject=conv.phone, limit=6)
+    await memory.remember(agent="agent_support", subject=conv.phone, role="user", content=text)
+    result = await get_orchestrator().handle(text, data={"history": history})
+    await memory.remember(
+        agent="agent_support", subject=conv.phone, role="assistant", content=result.reply
+    )
     return result.reply
 
 
