@@ -15,9 +15,7 @@ class MockLLMProvider(LLMProvider):
         temperature: float = 0.2,
         max_tokens: int = 1024,
     ) -> LLMResponse:
-        last_user = next(
-            (m.content for m in reversed(messages) if m.role == "user"), ""
-        )
+        last_user = next((m.content for m in reversed(messages) if m.role == "user"), "")
         content = f"[mock-llm] J'ai bien reçu : « {last_user[:200]} »."
         return LLMResponse(
             content=content,

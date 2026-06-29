@@ -5,7 +5,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.deps import get_db, get_current_user, require_permission
+from app.core.deps import get_current_user, get_db, require_permission
 from app.core.security import CurrentUser
 from app.services.order_service import approve_order
 

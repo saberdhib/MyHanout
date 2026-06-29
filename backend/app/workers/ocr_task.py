@@ -14,8 +14,6 @@ log = get_logger(__name__)
 @celery_app.task(name="ocr.process_document")
 def process_document(content: bytes, content_type: str = "application/pdf") -> dict:
     """Exécute le pipeline d'ingestion sur un document fourni en octets."""
-    result = asyncio.run(
-        ingest_invoice_document(content, content_type=content_type)
-    )
+    result = asyncio.run(ingest_invoice_document(content, content_type=content_type))
     log.info("ocr_task.done", valid=result.validation.ok)
     return result.model_dump(mode="json")

@@ -10,9 +10,7 @@ from app.models.base import OrderStatus
 from app.models.order import Order
 
 
-async def approve_order(
-    session: AsyncSession, order_id: int, *, user_id: int
-) -> Order:
+async def approve_order(session: AsyncSession, order_id: int, *, user_id: int) -> Order:
     """Valide une commande (action sensible : trace d'audit obligatoire)."""
     order = await session.get(Order, order_id)
     if not order:

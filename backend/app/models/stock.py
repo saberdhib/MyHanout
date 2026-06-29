@@ -3,11 +3,15 @@
 from __future__ import annotations
 
 from datetime import date
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Date, ForeignKey, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, TimestampMixin
+
+if TYPE_CHECKING:
+    from app.models.product import Product
 
 
 class Stock(Base, TimestampMixin):
@@ -23,4 +27,4 @@ class Stock(Base, TimestampMixin):
     # Date de péremption du lot (nullable pour le non-périssable).
     expiry_date: Mapped[date | None] = mapped_column(Date, nullable=True, index=True)
 
-    product: Mapped["Product"] = relationship(back_populates="stocks")  # noqa: F821
+    product: Mapped[Product] = relationship(back_populates="stocks")

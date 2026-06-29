@@ -1,15 +1,16 @@
-"""Mixins et énumérations partagés par les modèles."""
+"""Mixins et énumérations partagés par les modèles.
+
+Les énumérations héritent de `enum.StrEnum` : la valeur (minuscule) est utilisée
+en base via `values_callable` sur les colonnes Enum, en cohérence avec les
+valeurs par défaut de la migration et des seeds.
+"""
 
 from __future__ import annotations
 
 import enum
 
 
-class IntEnum(str, enum.Enum):
-    """Base pour énumérations stockées en texte (lisibles en base)."""
-
-
-class InvoiceStatus(str, enum.Enum):
+class InvoiceStatus(enum.StrEnum):
     PENDING = "pending"
     PROCESSED = "processed"
     PAID = "paid"
@@ -17,14 +18,14 @@ class InvoiceStatus(str, enum.Enum):
     ERROR = "error"
 
 
-class OcrStatus(str, enum.Enum):
+class OcrStatus(enum.StrEnum):
     NOT_STARTED = "not_started"
     PROCESSING = "processing"
     DONE = "done"
     FAILED = "failed"
 
 
-class OrderStatus(str, enum.Enum):
+class OrderStatus(enum.StrEnum):
     DRAFT = "draft"
     PENDING_APPROVAL = "pending_approval"  # human-in-the-loop
     APPROVED = "approved"
@@ -33,7 +34,7 @@ class OrderStatus(str, enum.Enum):
     CANCELLED = "cancelled"
 
 
-class EventType(str, enum.Enum):
+class EventType(enum.StrEnum):
     STOCK_LOW = "stock_low"
     STOCK_EXPIRING = "stock_expiring"
     INVOICE_DUE = "invoice_due"

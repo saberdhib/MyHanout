@@ -27,7 +27,7 @@ class ProphetForecastModel(ForecastModel):
             from prophet import Prophet  # noqa: F401
         except ImportError as exc:  # pragma: no cover
             raise RuntimeError(
-                "Prophet non installé. `pip install \".[forecasting]\"` "
+                'Prophet non installé. `pip install ".[forecasting]"` '
                 "ou utilisez FORECAST_MODEL=naive."
             ) from exc
 

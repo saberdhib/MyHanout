@@ -27,7 +27,7 @@ class LightGBMForecastModel(ForecastModel):
             import lightgbm  # noqa: F401
         except ImportError as exc:  # pragma: no cover
             raise RuntimeError(
-                "LightGBM non installé. `pip install \".[forecasting]\"` "
+                'LightGBM non installé. `pip install ".[forecasting]"` '
                 "ou utilisez FORECAST_MODEL=naive."
             ) from exc
 

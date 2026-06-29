@@ -18,9 +18,7 @@ def run_product_forecast(product_id: int, horizon_days: int = 14) -> dict:
 
     async def _run() -> dict:
         async with AsyncSessionLocal() as session:
-            result = await forecast_product(
-                session, product_id, horizon_days=horizon_days
-            )
+            result = await forecast_product(session, product_id, horizon_days=horizon_days)
             return result.model_dump(mode="json")
 
     out = asyncio.run(_run())

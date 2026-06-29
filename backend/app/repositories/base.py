@@ -22,15 +22,11 @@ class BaseRepository(Generic[ModelT]):
         return await self.session.get(self.model, obj_id)
 
     async def list(self, *, limit: int = 100, offset: int = 0) -> list[ModelT]:
-        result = await self.session.scalars(
-            select(self.model).limit(limit).offset(offset)
-        )
+        result = await self.session.scalars(select(self.model).limit(limit).offset(offset))
         return list(result.all())
 
     async def count(self) -> int:
-        return await self.session.scalar(
-            select(func.count()).select_from(self.model)
-        ) or 0
+        return await self.session.scalar(select(func.count()).select_from(self.model)) or 0
 
     async def add(self, obj: ModelT) -> ModelT:
         self.session.add(obj)

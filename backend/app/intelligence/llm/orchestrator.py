@@ -65,14 +65,14 @@ class Orchestrator:
                 return agent
         return self.fallback
 
-    async def handle(self, message: str, *, user_id: int | None = None, data: dict | None = None) -> AgentResult:
+    async def handle(
+        self, message: str, *, user_id: int | None = None, data: dict | None = None
+    ) -> AgentResult:
         intent = detect_intent(message)
         agent = self.select_agent(intent)
         log.info("orchestrator.route", intent=intent, agent=agent.name)
 
-        context = AgentContext(
-            intent=intent, message=message, user_id=user_id, data=data or {}
-        )
+        context = AgentContext(intent=intent, message=message, user_id=user_id, data=data or {})
         result = await agent.run(context)
 
         # Contrôle de gouvernance des actions proposées (human-in-the-loop).

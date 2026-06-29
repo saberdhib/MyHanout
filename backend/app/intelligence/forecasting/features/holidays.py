@@ -10,8 +10,8 @@ from datetime import date
 
 # Quelques dates fixes à titre d'exemple (à enrichir / régionaliser).
 _FIXED_HOLIDAYS: set[tuple[int, int]] = {
-    (1, 1),    # Jour de l'an
-    (5, 1),    # Fête du travail
+    (1, 1),  # Jour de l'an
+    (5, 1),  # Fête du travail
     (12, 25),  # Noël
 }
 

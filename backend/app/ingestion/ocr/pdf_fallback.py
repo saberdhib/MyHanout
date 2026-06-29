@@ -16,9 +16,7 @@ log = get_logger(__name__)
 class PdfFallbackProvider(OCRProvider):
     name = "pdf_fallback"
 
-    async def extract(
-        self, content: bytes, *, content_type: str = "application/pdf"
-    ) -> OCRResult:
+    async def extract(self, content: bytes, *, content_type: str = "application/pdf") -> OCRResult:
         try:
             from pypdf import PdfReader
         except ImportError as exc:  # pragma: no cover

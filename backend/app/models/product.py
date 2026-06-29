@@ -2,10 +2,17 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from sqlalchemy import Boolean, ForeignKey, Integer, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, TimestampMixin
+
+if TYPE_CHECKING:
+    from app.models.sale import Sale
+    from app.models.stock import Stock
+    from app.models.supplier import Supplier
 
 
 class Product(Base, TimestampMixin):
@@ -22,10 +29,8 @@ class Product(Base, TimestampMixin):
     perishable: Mapped[bool] = mapped_column(Boolean, default=False)
     shelf_life_days: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
-    supplier_id: Mapped[int | None] = mapped_column(
-        ForeignKey("supplier.id"), nullable=True
-    )
-    supplier: Mapped["Supplier | None"] = relationship(back_populates="products")  # noqa: F821
+    supplier_id: Mapped[int | None] = mapped_column(ForeignKey("supplier.id"), nullable=True)
+    supplier: Mapped[Supplier | None] = relationship(back_populates="products")
 
-    stocks: Mapped[list["Stock"]] = relationship(back_populates="product")  # noqa: F821
-    sales: Mapped[list["Sale"]] = relationship(back_populates="product")  # noqa: F821
+    stocks: Mapped[list[Stock]] = relationship(back_populates="product")
+    sales: Mapped[list[Sale]] = relationship(back_populates="product")

@@ -52,10 +52,8 @@ class NaiveForecastModel(ForecastModel):
 
         for i in range(1, horizon_days + 1):
             day = last_date + timedelta(days=i)
-            if is_holiday(day):
-                yhat = 0.0  # commerce fermé (hypothèse simplificatrice)
-            else:
-                yhat = baseline * weekday_factor(day) * festival_factor(day)
+            # Jour férié : commerce fermé (hypothèse simplificatrice) -> 0.
+            yhat = 0.0 if is_holiday(day) else baseline * weekday_factor(day) * festival_factor(day)
             points.append(
                 ForecastPoint(
                     ds=day,

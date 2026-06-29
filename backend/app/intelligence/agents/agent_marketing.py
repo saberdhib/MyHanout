@@ -19,7 +19,10 @@ class MarketingAgent(BaseAgent):
         # Démonstration d'usage du LLM (mock par défaut).
         response = await self.llm.complete(
             [
-                LLMMessage(role="system", content="Tu es un assistant marketing pour un commerce de proximité."),
+                LLMMessage(
+                    role="system",
+                    content="Tu es un assistant marketing pour un commerce de proximité.",
+                ),
                 LLMMessage(role="user", content=context.message or "Propose une promo."),
             ]
         )

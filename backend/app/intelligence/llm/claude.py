@@ -31,9 +31,7 @@ class ClaudeLLMProvider(LLMProvider):
         max_tokens: int = 1024,
     ) -> LLMResponse:
         if not self.api_key:
-            raise RuntimeError(
-                "ANTHROPIC_API_KEY manquante. Utilisez LLM_PROVIDER=mock en local."
-            )
+            raise RuntimeError("ANTHROPIC_API_KEY manquante. Utilisez LLM_PROVIDER=mock en local.")
         system = "\n".join(m.content for m in messages if m.role == "system")
         chat = [
             {"role": m.role, "content": m.content}

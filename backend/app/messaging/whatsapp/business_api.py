@@ -21,9 +21,7 @@ class BusinessApiWhatsAppClient(WhatsAppClient):
 
     async def send_text(self, to: str, text: str) -> SendResult:
         if not self.token or not self.phone_id:
-            raise RuntimeError(
-                "Identifiants WhatsApp manquants. Utilisez WHATSAPP_PROVIDER=mock."
-            )
+            raise RuntimeError("Identifiants WhatsApp manquants. Utilisez WHATSAPP_PROVIDER=mock.")
         url = f"{self.base_url}/{self.phone_id}/messages"
         payload = {
             "messaging_product": "whatsapp",

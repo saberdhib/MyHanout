@@ -27,9 +27,7 @@ class MistralLLMProvider(LLMProvider):
         max_tokens: int = 1024,
     ) -> LLMResponse:
         if not self.api_key:
-            raise RuntimeError(
-                "MISTRAL_API_KEY manquante. Utilisez LLM_PROVIDER=mock en local."
-            )
+            raise RuntimeError("MISTRAL_API_KEY manquante. Utilisez LLM_PROVIDER=mock en local.")
         payload = {
             "model": self.model,
             "temperature": temperature,

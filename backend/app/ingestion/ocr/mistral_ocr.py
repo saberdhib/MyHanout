@@ -24,13 +24,9 @@ class MistralOCRProvider(OCRProvider):
         self.api_key = api_key or settings.mistral_api_key
         self.endpoint = "https://api.mistral.ai/v1/ocr"
 
-    async def extract(
-        self, content: bytes, *, content_type: str = "application/pdf"
-    ) -> OCRResult:
+    async def extract(self, content: bytes, *, content_type: str = "application/pdf") -> OCRResult:
         if not self.api_key:
-            raise RuntimeError(
-                "MISTRAL_API_KEY manquante. Utilisez OCR_PROVIDER=mock en local."
-            )
+            raise RuntimeError("MISTRAL_API_KEY manquante. Utilisez OCR_PROVIDER=mock en local.")
         # TODO: brancher l'appel réel à l'API Mistral OCR.
         # Esquisse de l'appel HTTP pour la future implémentation :
         payload = {

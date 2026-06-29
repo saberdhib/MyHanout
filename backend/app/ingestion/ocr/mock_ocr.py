@@ -25,9 +25,7 @@ Total TTC: 3840.00 EUR
 class MockOCRProvider(OCRProvider):
     name = "mock"
 
-    async def extract(
-        self, content: bytes, *, content_type: str = "application/pdf"
-    ) -> OCRResult:
+    async def extract(self, content: bytes, *, content_type: str = "application/pdf") -> OCRResult:
         return OCRResult(
             text=_SAMPLE,
             pages=[_SAMPLE],

@@ -3,11 +3,15 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, ForeignKey, Numeric
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, TimestampMixin
+
+if TYPE_CHECKING:
+    from app.models.product import Product
 
 
 class Sale(Base, TimestampMixin):
@@ -21,4 +25,4 @@ class Sale(Base, TimestampMixin):
     total: Mapped[float] = mapped_column(Numeric(12, 2))
     sold_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
 
-    product: Mapped["Product"] = relationship(back_populates="sales")  # noqa: F821
+    product: Mapped[Product] = relationship(back_populates="sales")

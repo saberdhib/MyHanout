@@ -13,7 +13,10 @@ class Event(Base, TimestampMixin):
     __tablename__ = "event"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    type: Mapped[EventType] = mapped_column(Enum(EventType, native_enum=False), index=True)
+    type: Mapped[EventType] = mapped_column(
+        Enum(EventType, native_enum=False, values_callable=lambda e: [m.value for m in e]),
+        index=True,
+    )
     severity: Mapped[str] = mapped_column(String(16), default="info")  # info|warning|critical
     message: Mapped[str | None] = mapped_column(Text, nullable=True)
 
