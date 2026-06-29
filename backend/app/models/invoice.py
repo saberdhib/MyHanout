@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Date, Enum, ForeignKey, Numeric, String, Text
+from sqlalchemy import Date, DateTime, Enum, ForeignKey, Numeric, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, TimestampMixin
@@ -13,6 +13,7 @@ from app.models.base import InvoiceStatus, OcrStatus
 
 if TYPE_CHECKING:
     from app.models.supplier import Supplier
+    from app.models.user import User
 
 
 class Invoice(Base, TimestampMixin):
@@ -37,8 +38,20 @@ class Invoice(Base, TimestampMixin):
     )
     # Chemin/URI du document source (PDF/photo).
     source_uri: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # Hash SHA-256 du fichier source : garantit l'idempotence (pas de doublon).
+    file_hash: Mapped[str | None] = mapped_column(String(64), unique=True, nullable=True)
+    # Rapport de validation métier (JSON sérialisé) : explique pourquoi en review.
+    validation_report: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # Confiance OCR (0..1) — sert à signaler une lecture peu fiable au réviseur.
+    ocr_confidence: Mapped[float | None] = mapped_column(Numeric(4, 3), nullable=True)
+
+    # Piste de validation humaine (human-in-the-loop).
+    reviewed_by_id: Mapped[int | None] = mapped_column(ForeignKey("user.id"), nullable=True)
+    reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    review_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     supplier: Mapped[Supplier | None] = relationship(back_populates="invoices")
+    reviewed_by: Mapped[User | None] = relationship()
     lines: Mapped[list[InvoiceLine]] = relationship(
         back_populates="invoice", cascade="all, delete-orphan"
     )

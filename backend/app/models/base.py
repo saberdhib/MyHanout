@@ -12,6 +12,9 @@ import enum
 
 class InvoiceStatus(enum.StrEnum):
     PENDING = "pending"
+    PENDING_REVIEW = "pending_review"  # OCR fait, en attente de validation humaine
+    APPROVED = "approved"  # validée par un humain -> lignes écrites
+    REJECTED = "rejected"  # rejetée par un humain (motif requis)
     PROCESSED = "processed"
     PAID = "paid"
     OVERDUE = "overdue"
