@@ -1,0 +1,33 @@
+# =============================================================================
+# Configuration outillage qualité partagée (ruff / black / mypy / pytest).
+# Le package backend a son propre pyproject (dépendances) ; ce fichier-ci, à la
+# racine, centralise la config des outils pour `make lint/typecheck/test`.
+# =============================================================================
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["backend"]
+exclude = [".venv", "frontend", "backend/alembic/versions"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "C4", "SIM"]
+ignore = ["B008"]  # FastAPI Depends() en valeur par défaut d'argument
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+extend-exclude = "frontend|backend/alembic/versions"
+
+[tool.mypy]
+python_version = "3.11"
+plugins = ["pydantic.mypy"]
+ignore_missing_imports = true
+disallow_untyped_defs = false
+warn_unused_ignores = false
+exclude = ["frontend", "backend/alembic", "backend/tests"]
+
+[tool.pytest.ini_options]
+testpaths = ["backend/tests"]
+asyncio_mode = "auto"
+addopts = "-q"
+pythonpath = ["backend"]
