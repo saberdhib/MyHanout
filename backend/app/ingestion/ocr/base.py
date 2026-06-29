@@ -7,6 +7,22 @@ from abc import ABC, abstractmethod
 from pydantic import BaseModel, Field
 
 
+class OCRError(Exception):
+    """Erreur OCR générique (déclenche un fallback explicite en amont)."""
+
+
+class OCRAuthError(OCRError):
+    """Clé API absente ou invalide."""
+
+
+class OCRQuotaError(OCRError):
+    """Quota/débit dépassé (HTTP 429)."""
+
+
+class OCRTimeoutError(OCRError):
+    """Délai dépassé / erreur réseau."""
+
+
 class OCRResult(BaseModel):
     """Résultat brut d'un passage OCR sur un document."""
 
