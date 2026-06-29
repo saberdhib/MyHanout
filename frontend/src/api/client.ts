@@ -393,3 +393,44 @@ export const confirmClassification = (id: number, category_id: number, kind: str
     .then((r) => r.data);
 export const getFinanceAlerts = () =>
   api.get<{ alerts: FinanceAlert[]; explanation: string }>("/finance/alerts").then((r) => r.data);
+
+// --- Chaîne du froid (équipements) -----------------------------------------
+
+export interface EquipmentStatus {
+  id: number;
+  name: string;
+  kind: string;
+  location: string | null;
+  min_temp_c: number;
+  max_temp_c: number;
+  last_temp_c: number | null;
+  last_recorded_at: string | null;
+  status: string; // ok | alert | unknown
+  explanation: string;
+}
+export interface EquipmentStatusList {
+  items: EquipmentStatus[];
+  alerts: number;
+  explanation: string;
+}
+
+export const getEquipment = () =>
+  api.get<EquipmentStatusList>("/equipment").then((r) => r.data);
+export const pollEquipment = () =>
+  api.post<{ provider: string; readings: number; alerts: number }>("/equipment/poll").then((r) => r.data);
+export const createEquipment = (body: {
+  name: string;
+  kind: string;
+  location?: string;
+  min_temp_c: number;
+  max_temp_c: number;
+  sensor_external_id?: string;
+}) => api.post<EquipmentStatus>("/equipment", body).then((r) => r.data);
+
+// --- Connecteur caisse (POS) -----------------------------------------------
+export const syncPos = () =>
+  api
+    .post<{ provider: string; inserted: number; duplicates: number; skipped_unknown_sku: number }>(
+      "/import/pos/sync",
+    )
+    .then((r) => r.data);

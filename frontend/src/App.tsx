@@ -12,6 +12,7 @@ import Quality from "./pages/Quality";
 import Chat from "./pages/Chat";
 import Promos from "./pages/Promos";
 import Finance from "./pages/Finance";
+import Equipment from "./pages/Equipment";
 import Integrations from "./pages/Integrations";
 
 export default function App() {
@@ -28,6 +29,7 @@ export default function App() {
         <Route path="forecasts" element={<Forecasts />} />
         <Route path="suggestions" element={<Suggestions />} />
         <Route path="end-of-day" element={<EndOfDay />} />
+        <Route path="equipment" element={<Equipment />} />
         <Route path="quality" element={<Quality />} />
         <Route path="invoices" element={<Invoices />} />
         <Route path="integrations" element={<Integrations />} />

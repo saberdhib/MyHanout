@@ -33,4 +33,5 @@ export const Icons: Record<string, (p: SVGProps<SVGSVGElement>) => JSX.Element> 
   invoice: P("M14 3v4a1 1 0 0 0 1 1h4|M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2Z|M9 13h6|M9 17h4"),
   plug: P("M9 2v6|M15 2v6|M7 8h10v3a5 5 0 0 1-10 0z|M12 16v6"),
   supplier: P("M3 9l1-5h16l1 5|M5 9v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9|M9 21v-6h6v6"),
+  thermometer: P("M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"),
 };

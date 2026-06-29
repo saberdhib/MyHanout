@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Card } from "../components/Card";
-import { importJson, syncDwh, type DwhSyncResult, type ImportResult } from "../api/client";
+import { importJson, syncDwh, syncPos, type DwhSyncResult, type ImportResult } from "../api/client";
 
 const SAMPLE = JSON.stringify(
   {
@@ -29,6 +29,7 @@ export default function Integrations() {
   const [raw, setRaw] = useState(SAMPLE);
   const [result, setResult] = useState<ImportResult | null>(null);
   const [dwh, setDwh] = useState<DwhSyncResult | null>(null);
+  const [pos, setPos] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
   async function runImport() {
@@ -47,13 +48,38 @@ export default function Integrations() {
     setDwh(await syncDwh());
   }
 
+  async function runPos() {
+    setPos(null);
+    const r = await syncPos();
+    setPos(
+      `Caisse (${r.provider}) : ${r.inserted} vente(s) importée(s), ${r.duplicates} déjà connue(s)` +
+        (r.skipped_unknown_sku ? `, ${r.skipped_unknown_sku} SKU inconnu(s)` : "") +
+        ".",
+    );
+  }
+
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Intégrations</h1>
-      <p className="text-sm text-gray-500">
-        Importez votre catalogue/ventes depuis un export (caisse, ERP, tableur) au format JSON,
-        ou synchronisez un snapshot vers votre entrepôt de données. Idempotent par SKU.
+      <h1 className="page-title">Intégrations</h1>
+      <p className="page-sub">
+        Branchez vos sources : import JSON (caisse/ERP/tableur), synchronisation entrepôt de
+        données, ou ingestion temps réel depuis la caisse. Idempotent.
       </p>
+
+      <Card title="Caisse (POS)" subtitle="Ingestion des ventes — idempotent par ticket">
+        <p className="text-sm text-night/60 dark:text-surface/60">
+          Récupère les ventes depuis la caisse configurée (mock keyless si aucune caisse branchée).
+          Re-synchroniser ne crée jamais de doublon.
+        </p>
+        <button onClick={runPos} className="btn-primary mt-3">
+          Synchroniser la caisse
+        </button>
+        {pos && (
+          <div className="mt-3 rounded-card bg-brand/10 p-3 text-sm text-brand-dark dark:text-brand-light">
+            ✅ {pos}
+          </div>
+        )}
+      </Card>
 
       <Card title="Import JSON">
         <textarea

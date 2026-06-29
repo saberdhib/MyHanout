@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { LogoWordmark } from "./Logo";
 import { Icons } from "./icons";
@@ -28,6 +29,7 @@ const groups: { title: string; items: Item[] }[] = [
     title: "Quotidien",
     items: [
       { to: "/end-of-day", label: "Fin de journée", icon: "calendar" },
+      { to: "/equipment", label: "Équipements", icon: "thermometer" },
       { to: "/quality", label: "Qualité (écarts)", icon: "quality" },
       { to: "/invoices", label: "Factures", icon: "invoice" },
     ],
@@ -46,14 +48,33 @@ const allItems = groups.flatMap((g) => g.items);
 export default function Layout() {
   const { theme, toggle } = useTheme();
   const { pathname } = useLocation();
+  const [open, setOpen] = useState(false); // sidebar mobile (off-canvas)
   const current =
     allItems.find((i) => (i.end ? pathname === i.to : pathname.startsWith(i.to) && i.to !== "/")) ??
     allItems[0];
 
+  // Referme la sidebar à chaque navigation (mobile).
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
   return (
     <div className="flex min-h-screen bg-surface dark:bg-night">
-      {/* ---- Sidebar ---- */}
-      <aside className="sticky top-0 flex h-screen w-64 flex-col bg-night text-white">
+      {/* Voile mobile derrière la sidebar ouverte */}
+      {open && (
+        <div
+          className="fixed inset-0 z-30 bg-night/50 backdrop-blur-sm lg:hidden"
+          onClick={() => setOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* ---- Sidebar (off-canvas sur mobile, fixe sur desktop) ---- */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-40 flex h-screen w-64 transform flex-col bg-night text-white transition-transform duration-200 lg:sticky lg:top-0 lg:translate-x-0 ${
+          open ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
         <div className="flex h-16 items-center px-5">
           <LogoWordmark />
         </div>
@@ -113,10 +134,17 @@ export default function Layout() {
 
       {/* ---- Zone principale ---- */}
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-night/[0.06] bg-surface/80 px-8 backdrop-blur-xl dark:border-white/10 dark:bg-night/80">
-          <div className="flex items-center gap-2 text-sm text-night/50 dark:text-surface/50">
-            <span>MyHanout</span>
-            <span className="text-night/25 dark:text-surface/25">/</span>
+        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-night/[0.06] bg-surface/80 px-4 backdrop-blur-xl sm:px-8 dark:border-white/10 dark:bg-night/80">
+          <div className="flex items-center gap-3 text-sm text-night/50 dark:text-surface/50">
+            <button
+              onClick={() => setOpen(true)}
+              aria-label="Ouvrir le menu"
+              className="flex h-9 w-9 items-center justify-center rounded-card border border-night/10 lg:hidden dark:border-white/15"
+            >
+              ☰
+            </button>
+            <span className="hidden sm:inline">MyHanout</span>
+            <span className="hidden text-night/25 sm:inline dark:text-surface/25">/</span>
             <span className="font-semibold text-night dark:text-surface">{current.label}</span>
           </div>
           <div className="flex items-center gap-3">
@@ -136,7 +164,7 @@ export default function Layout() {
           </div>
         </header>
 
-        <main className="flex-1 px-8 py-8 dark:text-surface">
+        <main className="flex-1 px-4 py-6 sm:px-8 sm:py-8 dark:text-surface">
           <div className="mx-auto max-w-6xl">
             <Outlet />
           </div>
