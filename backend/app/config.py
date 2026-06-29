@@ -65,10 +65,13 @@ class Settings(BaseSettings):
     seed_dir: str = "/data/seeds"
 
     # --- WhatsApp ---
-    whatsapp_provider: str = "mock"
+    whatsapp_provider: str = "mock"  # mock | business
     whatsapp_phone_number_id: str = ""
     whatsapp_access_token: str = ""
     whatsapp_verify_token: str = "local-verify-token"
+    # Secret d'app Meta pour vérifier la signature des webhooks (X-Hub-Signature-256).
+    whatsapp_app_secret: str = ""
+    graph_api_version: str = "v20.0"
 
     @field_validator("cors_origins", mode="before")
     @classmethod

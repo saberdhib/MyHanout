@@ -22,3 +22,14 @@ class WhatsAppClient(ABC):
     async def send_text(self, to: str, text: str) -> SendResult:
         """Envoie un message texte à un destinataire."""
         raise NotImplementedError
+
+    async def send_template(
+        self, to: str, template: str, params: list[str] | None = None
+    ) -> SendResult:
+        """Envoie un message template (par défaut : repli sur un message texte)."""
+        body = f"[{template}] " + " ".join(params or [])
+        return await self.send_text(to, body)
+
+    async def download_media(self, media_id: str) -> bytes:
+        """Télécharge un média entrant (image de facture). À surcharger."""
+        raise NotImplementedError("download_media non supporté par ce client")

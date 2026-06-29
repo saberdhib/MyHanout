@@ -3,6 +3,7 @@
 
 from app.db.base import Base
 from app.models.audit_log import AuditLog
+from app.models.conversation import Conversation
 from app.models.daily_entry import DailyEntry
 from app.models.event import Event
 from app.models.forecast_evaluation import ForecastEvaluation
@@ -17,6 +18,7 @@ from app.models.user import Role, User
 __all__ = [
     "Base",
     "AuditLog",
+    "Conversation",
     "DailyEntry",
     "Event",
     "ForecastEvaluation",

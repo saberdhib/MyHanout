@@ -42,7 +42,7 @@ def build_supplier_message(supplier: Supplier | None, lines: list[tuple[Product,
 async def confirm_suggestion(
     session: AsyncSession,
     *,
-    user_id: int,
+    user_id: int | None,
     lines: list[AdjustedLine],
     supplier_id: int | None = None,
     action_mode: OrderActionMode | None = None,
