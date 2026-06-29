@@ -19,6 +19,7 @@ et **répond/agit** par messagerie — toujours sous contrôle humain.
 | 📊 Forecasting | Prévision de demande (naïf par défaut, Prophet/LightGBM en option) + saisonnalité/fêtes |
 | 🛒 Réassort | Suggestions **explicables** (demande + stock + délai + signaux), 3 modes d'envoi fournisseur |
 | 🔔 Promos flash | Détection fin de vie → promo IA → **affiche générée (text-to-image)** → publication **réseaux + clients opt-in (RGPD)** |
+| 💶 Gestion financière | **OPEX/CAPEX** (tagging IA explicable, validé humain), **trésorerie** (alerte cash), **valorisation stock**, **marges réelles** + alertes (doublon, prix, marge, échéance) — pré-compta |
 | 🔌 Intégrations | **Import JSON** (catalogue/ventes, idempotent) + **sync entrepôt de données (DWH)** |
 | 💬 Conversationnel | **WhatsApp & Telegram** (texte + photo→OCR) + **chat web**, même cerveau d'agents |
 | 🤖 Agents IA | order, stock, finance, marketing, support, governance + **mémoire** + **éval routage** |
@@ -104,7 +105,8 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 `/auth/*` · `/onboarding/*` (signup, invitations) · `/stocks` · `/invoices` (upload,
 approve, reject, **PATCH** édition + payé, **import/email**) · `/forecasts/{id}` ·
 `/orders` (suggest, confirm 3 modes) · `/daily-entries` · `/mlops/*` ·
-`/promos` (scan, **visual**, publish) · `/import` (json, dwh/sync) · `/customers` ·
+`/promos` (scan, **visual**, publish) · `/import` (json, dwh/sync) ·
+`/finance` (treasury, inventory-value, margins, categories, expenses, classify, alerts) · `/customers` ·
 `/signals` · `/chat` · `/rag/*` · `/agents/eval` · `/whatsapp/webhook` ·
 `/telegram/webhook`. Détail : [`docs/api-design.md`](docs/api-design.md).
 
@@ -146,6 +148,7 @@ docs/       architecture, data-model, api-design, multitenancy, DEMO, DEPLOY, de
 ## 🗺️ Roadmap
 Faits : OCR réel, factures (review + payé + **import email**), auth JWT/RBAC, multi-tenant,
 WhatsApp+Telegram, boucle quotidienne, suggestions, promos RGPD + **affiches générées**,
-**import JSON / sync DWH**, RAG, MLOps, rate limiting, tracing, dark mode.
+**import JSON / sync DWH**, **couche financière (OPEX/CAPEX, trésorerie, marges, alertes)**,
+RAG, MLOps, rate limiting, tracing, dark mode.
 Prochaines briques : Prophet/LGBM en prod, connecteurs réseaux réels,
 voice WhatsApp, billing enforcement. Détail : [`docs/roadmap.md`](docs/roadmap.md).

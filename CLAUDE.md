@@ -62,7 +62,9 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   SELECT ORM (y compris `session.get`, jointures).
 - Event `before_flush` : estampille `organization_id` sur les INSERT.
 - Modèles métier héritent de `TenantMixin` (product, stock, sale, supplier, invoice, order,
-  daily_entry, forecast_evaluation, customer, promo_campaign, agent_memory, document_chunk).
+  daily_entry, forecast_evaluation, customer, promo_campaign, agent_memory, document_chunk,
+  expense_classification_feedback). **Exception voulue** : `expense_category` est un
+  référentiel **global** (lookup, non tenant) → non filtré par le garde-fou.
 - **Limite** : le SQL brut (hors ORM) n'est PAS filtré → filtrer l'org explicitement
   (cf. `PgVectorStore`). Test d'isolation : `tests/test_tenancy.py` (A ≠ B).
 
@@ -108,6 +110,10 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
 - **Import factures email** : `POST /invoices/import/email` (provider `ingestion/email/`).
 - **Import JSON / sync DWH** : `POST /import/json`, `POST /import/dwh/sync`
   (`services/import_service.py`, `ingestion/dwh.py`). Frontend : page « Intégrations ».
+- **Couche financière** (pré-compta / pilotage) : endpoints `/finance/*`
+  (`api/v1/finance.py`), services `services/finance/`, classifieur OPEX/CAPEX
+  `intelligence/finance/` (ABC + mock keyless + llm), alertes `intelligence/finance/alerts.py`.
+  Référentiel global `expense_category` (non tenant). Voir `docs/data-model.md`.
 - **Site vitrine** : `website/` (Astro). Pages dans `website/src/pages/`, composants
   `website/src/components/`, tokens de marque dupliqués dans `website/tailwind.config.mjs`
   (garder synchro avec `frontend/src/theme/tokens.js`). Détails : `website/README.md`.

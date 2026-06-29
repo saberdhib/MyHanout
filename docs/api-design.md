@@ -37,6 +37,15 @@ API REST FastAPI, versionnée sous `/api/v1`. Doc interactive : `/docs` (Swagger
 | POST    | `/api/v1/promos/{id}/publish` | Publie (réseaux + clients opt-in RGPD)        | marketing |
 | POST    | `/api/v1/import/json`         | Import catalogue/ventes JSON (idempotent SKU) | stocks    |
 | POST    | `/api/v1/import/dwh/sync`     | Pousse un snapshot vers l'entrepôt de données | stocks    |
+| GET     | `/api/v1/finance/treasury`    | Vue trésorerie (entrées/sorties + alerte cash)| finance   |
+| GET     | `/api/v1/finance/inventory-value`| Valeur du stock (dont périssable à risque) | finance   |
+| GET     | `/api/v1/finance/margins`     | Marge par produit + signal de dégradation     | finance   |
+| GET     | `/api/v1/finance/categories`  | Référentiel catégories de charges (OPEX/CAPEX)| finance   |
+| GET     | `/api/v1/finance/expenses`    | Factures + classification (à valider/corriger)| finance   |
+| POST    | `/api/v1/finance/expenses/classify-all`| Suggestion IA sur factures non classées| finance |
+| POST    | `/api/v1/finance/invoices/{id}/classify`| Suggestion IA (catégorie/kind/explication)| finance |
+| POST    | `/api/v1/finance/invoices/{id}/classification`| Validation/correction humaine (tracée)| finance |
+| GET     | `/api/v1/finance/alerts`      | Alertes finance (doublon, prix, marge, échéance)| finance |
 | POST    | `/api/v1/orders/suggest`      | Suggestion de commande explicable (par ligne) | orders    |
 | POST    | `/api/v1/orders/confirm`      | Valide une suggestion ajustée (3 modes)       | orders    |
 | GET/POST| `/api/v1/daily-entries`       | Saisie de fin de journée (idempotent, audité) | stocks    |

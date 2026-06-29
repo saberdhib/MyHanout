@@ -61,6 +61,20 @@ les tests d'intégration et les migrations tournent sur **PostgreSQL 16 + pgvect
 > `vector` 0.6.0 active, insertion d'un `vector(1536)`, enum stocké en
 > `pending_review`. Voir le job CI `integration-postgres`.
 
+## Couche financière (pré-compta / pilotage)
+
+| Table | Tenant | Rôle |
+|-------|--------|------|
+| `expense_category` | **Non** (référentiel global) | Taxonomie standard des charges (`code`, `label`, `kind` opex/capex, `accounting_hint`). Sans PII, identique pour tous → global, lecture seule. |
+| `invoice` (étendue) | Oui | Classification : `category_id`, `expense_kind`, `classification_source` (ai/human/rule), `classification_confidence`, `classification_explanation`. |
+| `expense_classification_feedback` | Oui | Corrections humaines (signal d'apprentissage) : ancienne/nouvelle catégorie & kind, source remplacée, auteur. |
+
+> `ExpenseCategory` n'hérite pas de `TenantMixin` : le garde-fou central ne le
+> filtre donc pas (voulu, table de lookup). Les chiffres finance (trésorerie,
+> marges, valorisation) sont dérivés **par ORM** des tables tenant (`sale`,
+> `invoice`, `invoice_line`, `stock`) → isolation garantie. Positionnement :
+> **pilotage / pré-compta**, pas de comptabilité certifiée.
+
 ## Données de seed
 
 `data/seeds/` : `suppliers.csv`, `products.csv`, `sales.csv` (~720 lignes,
