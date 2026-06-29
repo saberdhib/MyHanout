@@ -8,6 +8,7 @@ from sqlalchemy import Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, TimestampMixin
+from app.models.tenant import TenantMixin
 
 if TYPE_CHECKING:
     from app.models.invoice import Invoice
@@ -15,7 +16,7 @@ if TYPE_CHECKING:
     from app.models.product import Product
 
 
-class Supplier(Base, TimestampMixin):
+class Supplier(Base, TenantMixin, TimestampMixin):
     __tablename__ = "supplier"
 
     id: Mapped[int] = mapped_column(primary_key=True)

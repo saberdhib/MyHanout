@@ -9,12 +9,13 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, TimestampMixin
 from app.models.base import OrderStatus
+from app.models.tenant import TenantMixin
 
 if TYPE_CHECKING:
     from app.models.supplier import Supplier
 
 
-class Order(Base, TimestampMixin):
+class Order(Base, TenantMixin, TimestampMixin):
     __tablename__ = "order"
 
     id: Mapped[int] = mapped_column(primary_key=True)

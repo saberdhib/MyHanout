@@ -6,6 +6,7 @@ from app.models.audit_log import AuditLog
 from app.models.event import Event
 from app.models.invoice import Invoice, InvoiceLine
 from app.models.order import Order, OrderLine
+from app.models.organization import Invitation, Membership, MembershipRole, Organization
 from app.models.product import Product
 from app.models.sale import Sale
 from app.models.stock import Stock
@@ -16,10 +17,14 @@ __all__ = [
     "Base",
     "AuditLog",
     "Event",
+    "Invitation",
     "Invoice",
     "InvoiceLine",
+    "Membership",
+    "MembershipRole",
     "Order",
     "OrderLine",
+    "Organization",
     "Product",
     "Sale",
     "Stock",

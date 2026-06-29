@@ -8,6 +8,7 @@ from sqlalchemy import Boolean, ForeignKey, Integer, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, TimestampMixin
+from app.models.tenant import TenantMixin
 
 if TYPE_CHECKING:
     from app.models.sale import Sale
@@ -15,7 +16,7 @@ if TYPE_CHECKING:
     from app.models.supplier import Supplier
 
 
-class Product(Base, TimestampMixin):
+class Product(Base, TenantMixin, TimestampMixin):
     __tablename__ = "product"
 
     id: Mapped[int] = mapped_column(primary_key=True)

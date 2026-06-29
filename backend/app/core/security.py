@@ -20,6 +20,8 @@ class CurrentUser(BaseModel):
     email: str
     role: str = "viewer"
     permissions: list[str] = []
+    # Organisation active (tenant courant), issue du token. None si pas de membership.
+    organization_id: int | None = None
 
     def has_permission(self, scope: str) -> bool:
         return "*" in self.permissions or scope in self.permissions

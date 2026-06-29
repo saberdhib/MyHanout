@@ -34,15 +34,17 @@ def test_me_returns_role(client):
     assert resp.json()["role"] == "owner"
 
 
-def test_rbac_viewer_denied_on_invoices(viewer_client):
-    # viewer n'a pas le scope "invoices" -> 403.
-    assert viewer_client.get("/api/v1/invoices").status_code == 403
+def test_rbac_read_only_can_view_but_not_order(viewer_client):
+    # read_only consulte les factures...
+    assert viewer_client.get("/api/v1/invoices").status_code == 200
+    # ...mais n'a pas le scope "orders" -> 403 sur une action commande.
+    assert viewer_client.post("/api/v1/orders/1/approve").status_code == 403
 
 
 def test_refresh_issues_new_access_token(anon_client):
     login = anon_client.post(
         "/api/v1/auth/login",
-        json={"email": "merchant@test.local", "password": "secret"},
+        json={"email": "accountant@test.local", "password": "secret"},
     ).json()
     resp = anon_client.post("/api/v1/auth/refresh", json={"refresh_token": login["refresh_token"]})
     assert resp.status_code == 200

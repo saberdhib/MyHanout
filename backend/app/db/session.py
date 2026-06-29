@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
+import app.core.tenancy  # noqa: F401  (installe les events du garde-fou tenant)
 from app.config import settings
 
 engine = create_async_engine(

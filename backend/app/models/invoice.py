@@ -10,13 +10,14 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, TimestampMixin
 from app.models.base import InvoiceStatus, OcrStatus
+from app.models.tenant import TenantMixin
 
 if TYPE_CHECKING:
     from app.models.supplier import Supplier
     from app.models.user import User
 
 
-class Invoice(Base, TimestampMixin):
+class Invoice(Base, TenantMixin, TimestampMixin):
     __tablename__ = "invoice"
 
     id: Mapped[int] = mapped_column(primary_key=True)
