@@ -15,6 +15,10 @@ def get_llm_provider(name: str | None = None) -> LLMProvider:
         from app.intelligence.llm.mistral import MistralLLMProvider
 
         return MistralLLMProvider()
+    if provider == "huggingface" and settings.huggingface_api_key:
+        from app.intelligence.llm.huggingface import HuggingFaceLLMProvider
+
+        return HuggingFaceLLMProvider()
     from app.intelligence.llm.mock import MockLLMProvider
 
     return MockLLMProvider()

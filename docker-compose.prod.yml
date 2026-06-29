@@ -1,0 +1,31 @@
+# =============================================================================
+# Override production : `docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build`
+# - frontend buildé (nginx) au lieu du dev server
+# - api sans --reload, redémarrage automatique
+# Renseigner .env (clés API réelles : HUGGINGFACE_API_KEY, ANTHROPIC_API_KEY,
+# WHATSAPP_*, TELEGRAM_BOT_TOKEN, ...) avant de lancer.
+# =============================================================================
+services:
+  postgres:
+    restart: unless-stopped
+
+  redis:
+    restart: unless-stopped
+
+  api:
+    restart: unless-stopped
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2"
+
+  worker:
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    restart: unless-stopped
+    command: ["nginx", "-g", "daemon off;"]
+    ports:
+      - "8080:80"

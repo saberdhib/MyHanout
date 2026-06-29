@@ -203,18 +203,25 @@ async def _dispatch_text(session: AsyncSession, conv: Conversation, text: str) -
     return result.reply
 
 
-async def handle_image(session: AsyncSession, phone: str, media_id: str) -> str:
-    """Une photo de facture -> téléchargement + pipeline OCR (Phase 1), tenant-scopé."""
-    from app.messaging.whatsapp import get_whatsapp_client
+async def ingest_invoice_bytes(
+    session: AsyncSession, subject: str, content: bytes, *, filename: str
+) -> str:
+    """Ingestion d'un document (facture) reçu via n'importe quel canal, tenant-scopé."""
     from app.services.invoice_service import ingest_and_store
 
-    conv = await _get_conversation(session, phone)
+    conv = await _get_conversation(session, subject)
     org_id = await _resolve_org(session, conv)
-    client = get_whatsapp_client()
-    content = await client.download_media(media_id)
     with tenant_context(org_id):
         invoice, reasons = await ingest_and_store(
-            session, content, content_type="image/jpeg", filename=f"whatsapp-{media_id}.jpg"
+            session, content, content_type="image/jpeg", filename=filename
         )
         why = " ".join(reasons[:2])
         return f"📄 Facture reçue (#{invoice.id}), en attente de validation.\nRaison : {why}"
+
+
+async def handle_image(session: AsyncSession, phone: str, media_id: str) -> str:
+    """Photo de facture via WhatsApp -> téléchargement + ingestion."""
+    from app.messaging.whatsapp import get_whatsapp_client
+
+    content = await get_whatsapp_client().download_media(media_id)
+    return await ingest_invoice_bytes(session, phone, content, filename=f"whatsapp-{media_id}.jpg")

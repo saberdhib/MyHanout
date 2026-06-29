@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import date, datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Date, DateTime, Enum, ForeignKey, Numeric, String, Text
+from sqlalchemy import Boolean, Date, DateTime, Enum, ForeignKey, Numeric, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, TimestampMixin
@@ -50,6 +50,10 @@ class Invoice(Base, TenantMixin, TimestampMixin):
     reviewed_by_id: Mapped[int | None] = mapped_column(ForeignKey("user.id"), nullable=True)
     reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     review_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    # Suivi de paiement (facturation électronique : payé / non payé).
+    paid: Mapped[bool] = mapped_column(Boolean, default=False)
+    paid_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     supplier: Mapped[Supplier | None] = relationship(back_populates="invoices")
     reviewed_by: Mapped[User | None] = relationship()

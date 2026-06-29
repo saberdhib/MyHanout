@@ -32,6 +32,7 @@ class InvoiceOut(BaseModel):
     ocr_status: str
     ocr_confidence: float | None = None
     review_reason: str | None = None
+    paid: bool = False
     lines: list[InvoiceLineOut] = []
 
 
@@ -43,3 +44,14 @@ class InvoiceReviewOut(InvoiceOut):
 
 class InvoiceRejectRequest(BaseModel):
     reason: str
+
+
+class InvoiceUpdate(BaseModel):
+    """Édition manuelle d'une facture (champs pré-remplis côté UI, tous optionnels)."""
+
+    number: str | None = None
+    supplier_id: int | None = None
+    issue_date: date | None = None
+    due_date: date | None = None
+    total_amount: float | None = None
+    paid: bool | None = None

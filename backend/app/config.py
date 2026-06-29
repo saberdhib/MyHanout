@@ -64,9 +64,19 @@ class Settings(BaseSettings):
     # --- Providers ---
     ocr_provider: str = "mock"
     mistral_api_key: str = ""
-    llm_provider: str = "mock"
+    llm_provider: str = "mock"  # mock | claude | mistral | huggingface
     anthropic_api_key: str = ""
     llm_model: str = "claude-opus-4-8"
+
+    # --- HuggingFace (LLM + embeddings via Inference API) ---
+    huggingface_api_key: str = ""
+    hf_llm_model: str = "mistralai/Mistral-7B-Instruct-v0.3"
+    hf_embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
+
+    # --- Telegram (Bot API) ---
+    telegram_provider: str = "mock"  # mock | bot
+    telegram_bot_token: str = ""
+    telegram_webhook_secret: str = ""
 
     # --- Forecasting ---
     forecast_model: str = "naive"

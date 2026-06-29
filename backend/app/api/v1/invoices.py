@@ -9,11 +9,17 @@ from app.core.deps import get_db, require_permission
 from app.core.security import CurrentUser
 from app.repositories.invoice import InvoiceRepository
 from app.schemas.common import ListResponse
-from app.schemas.invoice import InvoiceOut, InvoiceRejectRequest, InvoiceReviewOut
+from app.schemas.invoice import (
+    InvoiceOut,
+    InvoiceRejectRequest,
+    InvoiceReviewOut,
+    InvoiceUpdate,
+)
 from app.services.invoice_service import (
     approve_invoice,
     ingest_and_store,
     reject_invoice,
+    update_invoice,
 )
 
 router = APIRouter(prefix="/invoices", tags=["invoices"])
@@ -77,5 +83,18 @@ async def reject(
 ) -> InvoiceOut:
     """Rejet humain avec motif (tracé)."""
     invoice = await reject_invoice(session, invoice_id, user_id=user.id, reason=body.reason)
+    await session.refresh(invoice, attribute_names=["lines"])
+    return InvoiceOut.model_validate(invoice)
+
+
+@router.patch("/{invoice_id}", response_model=InvoiceOut)
+async def patch_invoice(
+    invoice_id: int,
+    body: InvoiceUpdate,
+    session: AsyncSession = Depends(get_db),
+    user: CurrentUser = Depends(require_permission("invoices")),
+) -> InvoiceOut:
+    """Édite une facture (n°, date, fournisseur, montant) + bascule payé/non payé."""
+    invoice = await update_invoice(session, invoice_id, user_id=user.id, fields=body.model_dump())
     await session.refresh(invoice, attribute_names=["lines"])
     return InvoiceOut.model_validate(invoice)

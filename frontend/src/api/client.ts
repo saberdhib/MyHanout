@@ -72,8 +72,27 @@ export interface Invoice {
   currency: string;
   status: string;
   ocr_status: string;
+  paid: boolean;
   lines: InvoiceLine[];
 }
+
+export const uploadInvoice = (file: File) => {
+  const form = new FormData();
+  form.append("file", file);
+  return api.post<Invoice>("/invoices/upload", form).then((r) => r.data);
+};
+
+export const patchInvoice = (
+  id: number,
+  fields: Partial<{
+    number: string;
+    issue_date: string;
+    due_date: string;
+    total_amount: number;
+    supplier_id: number;
+    paid: boolean;
+  }>,
+) => api.patch<Invoice>(`/invoices/${id}`, fields).then((r) => r.data);
 
 export interface ForecastPoint {
   ds: string;

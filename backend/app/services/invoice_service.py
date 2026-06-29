@@ -188,3 +188,30 @@ async def reject_invoice(
     )
     log.info("invoice.rejected", invoice_id=invoice.id, reason=reason)
     return invoice
+
+
+async def update_invoice(
+    session: AsyncSession, invoice_id: int, *, user_id: int, fields: dict
+) -> Invoice:
+    """Édition manuelle (champs pré-remplis) + bascule payé/non payé, auditée."""
+    invoice = await session.get(Invoice, invoice_id)  # filtré par tenant
+    if not invoice:
+        raise NotFoundError(f"Facture {invoice_id} introuvable")
+    for key in ("number", "supplier_id", "issue_date", "due_date", "total_amount"):
+        if fields.get(key) is not None:
+            setattr(invoice, key, fields[key])
+    if fields.get("paid") is not None:
+        invoice.paid = bool(fields["paid"])
+        invoice.paid_at = datetime.now(UTC) if invoice.paid else None
+        if invoice.paid:
+            invoice.status = InvoiceStatus.PAID
+    await record_audit(
+        session,
+        action="invoice.update",
+        user_id=user_id,
+        resource="invoice",
+        resource_id=invoice.id,
+        detail=f"fields={sorted(k for k, v in fields.items() if v is not None)}",
+    )
+    log.info("invoice.updated", invoice_id=invoice.id)
+    return invoice

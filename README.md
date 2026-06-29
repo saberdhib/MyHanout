@@ -1,24 +1,30 @@
 # 🏪 MyHanout AI
 
 > Le copilot IA des commerces de proximité — bouchers, boulangers, épiceries, artisans.
-> Interface principale : **WhatsApp**. Principe directeur : **human-in-the-loop, explicable, auditable**.
+> Sur **WhatsApp / Telegram** et un dashboard léger. Principe directeur :
+> **human-in-the-loop, explicable, auditable, RGPD, multi-commerces.**
 
 MyHanout AI ingère le passif documentaire du commerçant (factures PDF/photo via OCR),
-structure les données, produit des **prévisions de demande/réassort**, **alerte** sur les
-ruptures et les péremptions, et **répond/agit** via WhatsApp — toujours sous contrôle humain.
+structure les données, **prévoit la demande**, **alerte** sur ruptures et péremptions,
+propose des **commandes de réassort explicables**, déclenche des **promos anti-gaspillage**,
+et **répond/agit** par messagerie — toujours sous contrôle humain.
 
 ---
 
-## ✨ Fonctions clés
+## ✨ Fonctions
 
-| Domaine        | Description |
-|----------------|-------------|
-| 📥 Ingestion   | OCR des factures (Mistral OCR + fallback PDF), parsing, normalisation, validation |
-| 📊 Forecasting | Prévisions de demande (modèle naïf par défaut, Prophet/LightGBM en option) |
-| 🔔 Alertes     | Ruptures de stock, péremptions, échéances fournisseurs |
-| 🤖 Agents IA   | order, stock, finance, marketing, support, governance |
-| 💬 WhatsApp    | Conversation et actions, avec validation humaine sur les actions sensibles |
-| 🛡️ Gouvernance | RBAC, journal d'audit, conformité RGPD |
+| Domaine | Détail |
+|---------|--------|
+| 📥 Ingestion factures | OCR (Mistral + fallback PDF), drag & drop / photo WhatsApp/Telegram, validation humaine, suivi **payé/non payé**, édition pré-remplie |
+| 📊 Forecasting | Prévision de demande (naïf par défaut, Prophet/LightGBM en option) + saisonnalité/fêtes |
+| 🛒 Réassort | Suggestions **explicables** (demande + stock + délai + signaux), 3 modes d'envoi fournisseur |
+| 🔔 Promos flash | Détection fin de vie → promo IA → publication **réseaux + clients opt-in (RGPD)** |
+| 💬 Conversationnel | **WhatsApp & Telegram** (texte + photo→OCR) + **chat web**, même cerveau d'agents |
+| 🤖 Agents IA | order, stock, finance, marketing, support, governance + **mémoire** + **éval routage** |
+| 🧠 RAG | Q&A citée sur ses propres factures (pgvector) |
+| 🌤️ Compagnon | Signaux **météo + tendances** intégrés aux recommandations |
+| 📈 MLOps | Écart prévu/réel → MAE/MAPE → réentraînement **versionné** |
+| 🛡️ Gouvernance | Multi-tenant isolé, RBAC (owner/staff/accountant/read_only), audit, RGPD |
 
 ---
 
@@ -26,122 +32,114 @@ ruptures et les péremptions, et **répond/agit** via WhatsApp — toujours sous
 
 ```mermaid
 flowchart TB
-    subgraph Applicative["4 · Couche applicative"]
-        API[FastAPI REST]
-        WA[Bot WhatsApp]
-        DASH[Dashboard React]
-        NOTIF[Notifications]
+    subgraph Canaux
+        WA[WhatsApp]
+        TG[Telegram]
+        WEB[Dashboard React]
     end
-    subgraph Intelligence["3 · Couche intelligence"]
-        FC[Forecasting]
-        AG[Agents IA]
-        LLM[Orchestration LLM]
+    subgraph App["Couche applicative — FastAPI"]
+        API[API v1 + Auth JWT + tenant guard]
+        MSG[Messaging + Publish]
     end
-    subgraph Data["2 · Couche data"]
-        MODELS[Modèles SQLAlchemy]
+    subgraph Intel["Intelligence"]
+        FC[Forecasting] 
+        AG[Agents + Orchestrateur]
+        LLM[LLM: Claude/Mistral/HF/mock]
+        RAG[RAG pgvector]
+        SIG[Signaux météo/tendances]
+    end
+    subgraph Data
         REPO[Repositories]
-        ANALYTICS[Analytics]
+        MODELS[Modèles SQLAlchemy + TenantMixin]
     end
-    subgraph Ingestion["1 · Couche ingestion"]
-        OCR[OCR]
-        PARSE[Parsing]
-        ETL[ETL / normalisation]
-        VALID[Validation]
+    subgraph Ingestion
+        OCR[OCR mistral/pdf/mock] --> PARSE[Parsing] --> VALID[Validation]
     end
-
-    WA --> API
-    DASH --> API
-    API --> AG
-    AG --> LLM
-    AG --> FC
-    API --> REPO
-    REPO --> MODELS
-    OCR --> PARSE --> ETL --> VALID --> MODELS
-    FC --> MODELS
-    MODELS --> PG[(PostgreSQL + pgvector)]
+    WA & TG & WEB --> API
+    API --> AG --> LLM
+    AG --> FC & RAG
+    API --> REPO --> MODELS --> PG[(PostgreSQL 16 + pgvector)]
+    VALID --> REPO
+    MSG --> WA & TG
     AG -.queue.-> WORKER[Celery + Redis]
 ```
 
-Détails : [`docs/architecture.md`](docs/architecture.md) · [`docs/data-model.md`](docs/data-model.md) ·
-[`docs/api-design.md`](docs/api-design.md) · [`docs/governance.md`](docs/governance.md) ·
-[`docs/roadmap.md`](docs/roadmap.md).
+Détails : [`docs/delivery/03-solution-architecture.md`](docs/delivery/03-solution-architecture.md)
+(C4 + séquences), [`docs/architecture.md`](docs/architecture.md),
+[`docs/data-model.md`](docs/data-model.md), [`docs/multitenancy.md`](docs/multitenancy.md).
 
 ---
 
-## 🚀 Quickstart
-
-Prérequis : **Docker** + **Docker Compose**.
+## 🚀 Quickstart (démo, 100 % mock, sans aucune clé)
 
 ```bash
-# 1. Configuration
 cp .env.example .env
-
-# 2. Démarrer toute la stack (postgres+pgvector, redis, api, worker, frontend)
-docker compose up -d --build
-#   ... ou : make up
-
-# 3. Vérifier
-curl http://localhost:8000/health           # API
-open http://localhost:8000/docs             # Swagger
-open http://localhost:5173                  # Dashboard
+docker compose up -d --build          # postgres+pgvector, redis, api, worker, frontend
+make seed                             # org démo + produits + 1 périssable en fin de vie + clients opt-in
 ```
+| Service | URL |
+|---------|-----|
+| Dashboard | http://localhost:5173 |
+| API / Swagger | http://localhost:8000/docs |
+| Health / Metrics | http://localhost:8000/health · /metrics |
 
-Charger les données de démonstration :
+Login démo (auto en dev) : `admin@myhanout.example` / `admin`.
+👉 **Script de démo guidé** : [`docs/DEMO.md`](docs/DEMO.md).
+
+### Activer le réel (tes clés dans `.env`)
+HuggingFace, Claude, Mistral, WhatsApp Business, Telegram — chaque provider est optionnel
+et **retombe sur le mock sans clé**. Table d'activation + déploiement prod :
+[`docs/DEPLOY.md`](docs/DEPLOY.md).
 
 ```bash
-make seed
+# Production (frontend buildé + nginx, migrations auto)
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 ```
-
-Services exposés :
-
-| Service   | URL                          |
-|-----------|------------------------------|
-| API       | http://localhost:8000        |
-| Swagger   | http://localhost:8000/docs   |
-| Frontend  | http://localhost:5173        |
-| Postgres  | localhost:5432               |
-| Redis     | localhost:6379               |
 
 ---
 
-## 🧰 Développement
+## 🔌 API (extrait)
 
+`/auth/*` · `/onboarding/*` (signup, invitations) · `/stocks` · `/invoices` (upload,
+approve, reject, **PATCH** édition + payé) · `/forecasts/{id}` · `/orders` (suggest,
+confirm 3 modes) · `/daily-entries` · `/mlops/*` · `/promos` (scan, publish) ·
+`/customers` · `/signals` · `/chat` · `/rag/*` · `/agents/eval` ·
+`/whatsapp/webhook` · `/telegram/webhook`. Détail : [`docs/api-design.md`](docs/api-design.md).
+
+---
+
+## 🛡️ Sécurité, RGPD & pricing
+- **Isolation multi-commerces** par garde-fou central (un commerce ne voit jamais un autre).
+- **RBAC** : owner / staff / accountant (multi-commerces) / read_only.
+- **RGPD** : consentement explicite, minimisation, audit, mock-first (rien ne sort sans config).
+- **Human-in-the-loop** : aucune action sortante sans validation ; tout est audité.
+- **Pricing humain** : pas de coupure brutale (grâce, rétrogradation). Cf.
+  [`docs/delivery/privacy-pricing.md`](docs/delivery/privacy-pricing.md).
+
+---
+
+## 🧰 Développement & qualité
 ```bash
-make help        # liste des commandes
-make check       # lint (ruff) + typecheck (mypy) + tests (pytest)
-make migrate     # applique les migrations Alembic
-make seed        # charge les seeds
+make check        # ruff + mypy + pytest
 pre-commit install
 ```
-
-Stack : Python 3.11 · FastAPI · Pydantic v2 · SQLAlchemy 2.0 (async) · Alembic ·
+Stack : Python 3.11 · FastAPI · Pydantic v2 · SQLAlchemy 2.0 async · Alembic ·
 Celery/Redis · PostgreSQL 16 + pgvector · React/Vite/TS/Tailwind.
+Tests : sqlite (rapide) + intégration **pg+pgvector** (job CI). Migrations réversibles.
+**Contribuer ? Lis [`CLAUDE.md`](CLAUDE.md)** (architecture, conventions, pièges).
 
 ---
 
-## 🗺️ Roadmap MVP
-
-- [x] Scaffold mono-repo, configs, docker-compose
-- [x] Modèle de données + migration initiale
-- [x] Stubs ingestion / OCR (abstraction provider)
-- [x] Forecasting bout-en-bout (modèle naïf sur seeds)
-- [x] Agents + orchestration LLM (stubs)
-- [x] API lecture + webhook WhatsApp (echo + routing)
-- [x] Dashboard frontend
-- [x] CI/CD + documentation
-- [ ] OCR réel + extraction structurée des factures
-- [ ] Forecasting Prophet/LightGBM en production
-- [ ] Actions WhatsApp transactionnelles (commandes) avec validation humaine
-
-Détail : [`docs/roadmap.md`](docs/roadmap.md).
-
----
-
-## 📁 Structure du repo
-
+## 📁 Structure
 ```
-backend/    API FastAPI, modèles, ingestion, intelligence, messaging, workers
-frontend/   Dashboard React + Vite + TypeScript + Tailwind
-data/seeds/ Données factices (produits, ventes, fournisseurs, factures)
-docs/       Architecture, data-model, API, gouvernance, roadmap
+backend/    FastAPI, modèles (TenantMixin), ingestion, intelligence, messaging, workers, alembic
+frontend/   Dashboard React + Vite + TS + Tailwind (dark mode) — chat, promos, factures, prévisions…
+data/seeds/ Données factices
+docs/       architecture, data-model, api-design, multitenancy, DEMO, DEPLOY, delivery/ (C4, ADRs)
 ```
+
+## 🗺️ Roadmap
+Faits : OCR réel, factures (review + payé), auth JWT/RBAC, multi-tenant, WhatsApp+Telegram,
+boucle quotidienne, suggestions, promos RGPD, RAG, MLOps, rate limiting, tracing, dark mode.
+Prochaines briques : import JSON/DWH sync, Prophet/LGBM en prod, connecteurs réseaux réels,
+voice WhatsApp, billing enforcement. Détail : [`docs/roadmap.md`](docs/roadmap.md).
