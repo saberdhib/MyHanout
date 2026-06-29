@@ -16,6 +16,7 @@ from sqlalchemy import func, select
 
 from app.config import settings
 from app.core.logging import configure_logging, get_logger
+from app.core.security import hash_password
 from app.db.session import AsyncSessionLocal
 from app.models import (
     Invoice,
@@ -66,13 +67,21 @@ async def seed() -> None:
             role = Role(name=name, description=desc, permissions=perms)
             session.add(role)
             roles[name] = role
+        # Comptes de démo (mots de passe via env, cf. .env.example).
         session.add(
             User(
                 email="admin@myhanout.example",
                 full_name="Admin Démo",
-                # Hash factice ; auth réelle à implémenter.
-                hashed_password="$placeholder$",
+                hashed_password=hash_password(settings.seed_admin_password),
                 role=roles["owner"],
+            )
+        )
+        session.add(
+            User(
+                email="merchant@myhanout.example",
+                full_name="Commerçant Démo",
+                hashed_password=hash_password(settings.seed_merchant_password),
+                role=roles["manager"],
             )
         )
 

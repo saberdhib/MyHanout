@@ -21,6 +21,14 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     secret_key: str = "change-me"
 
+    # --- Auth / JWT ---
+    jwt_algorithm: str = "HS256"
+    access_token_expire_minutes: int = 30
+    refresh_token_expire_days: int = 7
+    # Mots de passe des comptes de démo (seed). À changer hors local.
+    seed_admin_password: str = "admin"
+    seed_merchant_password: str = "merchant"
+
     # --- API ---
     api_host: str = "0.0.0.0"
     api_port: int = 8000

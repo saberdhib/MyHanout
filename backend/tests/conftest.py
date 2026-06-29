@@ -65,6 +65,34 @@ async def _init_db() -> None:
             )
         )
         s.add(inv)
+
+        # Utilisateurs + rôles pour l'auth réelle (JWT/RBAC).
+        from app.core.security import hash_password
+
+        owner = m.Role(name="owner", permissions="*")
+        manager = m.Role(name="manager", permissions="stocks,orders,invoices,forecasts")
+        viewer = m.Role(name="viewer", permissions="read")
+        s.add_all([owner, manager, viewer])
+        await s.flush()
+        s.add_all(
+            [
+                m.User(
+                    email="admin@test.local",
+                    hashed_password=hash_password("secret"),
+                    role_id=owner.id,
+                ),
+                m.User(
+                    email="merchant@test.local",
+                    hashed_password=hash_password("secret"),
+                    role_id=manager.id,
+                ),
+                m.User(
+                    email="viewer@test.local",
+                    hashed_password=hash_password("secret"),
+                    role_id=viewer.id,
+                ),
+            ]
+        )
         await s.commit()
 
 
@@ -74,16 +102,40 @@ def _setup_db():
     yield
 
 
+async def _override_db():
+    async with TestSession() as s:
+        yield s
+        await s.commit()
+
+
 @pytest.fixture
-def client():
+def anon_client():
+    """Client non authentifié (pour tester les accès refusés)."""
     from fastapi.testclient import TestClient
 
-    async def override_db():
-        async with TestSession() as s:
-            yield s
-            await s.commit()
-
-    app.dependency_overrides[get_db] = override_db
+    app.dependency_overrides[get_db] = _override_db
     with TestClient(app) as c:
         yield c
     app.dependency_overrides.clear()
+
+
+def _login(c, email: str, password: str = "secret") -> str:
+    resp = c.post("/api/v1/auth/login", json={"email": email, "password": password})
+    assert resp.status_code == 200, resp.text
+    return resp.json()["access_token"]
+
+
+@pytest.fixture
+def client(anon_client):
+    """Client authentifié en owner (défaut des tests existants)."""
+    token = _login(anon_client, "admin@test.local")
+    anon_client.headers["Authorization"] = f"Bearer {token}"
+    return anon_client
+
+
+@pytest.fixture
+def viewer_client(anon_client):
+    """Client authentifié en viewer (droits lecture seule)."""
+    token = _login(anon_client, "viewer@test.local")
+    anon_client.headers["Authorization"] = f"Bearer {token}"
+    return anon_client
