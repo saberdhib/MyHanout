@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { LogoWordmark } from "./Logo";
 import { Icons } from "./icons";
+import ChatWidget from "./ChatWidget";
 import { useTheme } from "../hooks/useTheme";
 import { getModules } from "../api/client";
 
@@ -202,6 +203,9 @@ export default function Layout() {
           </div>
         </main>
       </div>
+
+      {/* Fenêtre de chat flottante, disponible partout. */}
+      <ChatWidget />
     </div>
   );
 }

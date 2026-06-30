@@ -116,6 +116,12 @@ class Settings(BaseSettings):
     telegram_bot_token: str = ""
     telegram_webhook_secret: str = ""
 
+    # --- Slack (Web API + Events API) ---
+    slack_provider: str = "mock"  # mock | bot
+    slack_bot_token: str = ""  # xoxb-…
+    slack_signing_secret: str = ""  # vérification de signature (optionnel)
+    slack_default_channel: str = ""  # canal par défaut pour les notifications
+
     # --- Forecasting ---
     forecast_model: str = "naive"
     forecast_horizon_days: int = 14

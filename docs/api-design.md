@@ -89,6 +89,7 @@ API REST FastAPI, versionnée sous `/api/v1`. Doc interactive : `/docs` (Swagger
 | POST    | `/api/v1/orders/{id}/approve` | Validation humaine d'une commande (auditée)   | orders    |
 | GET     | `/api/v1/whatsapp/webhook`    | Handshake de vérification Meta                | —         |
 | POST    | `/api/v1/whatsapp/webhook`    | Réception message → orchestrateur d'agents    | —         |
+| POST    | `/api/v1/slack/webhook`       | Slack Events API (challenge + message → agents) | —       |
 
 ## Exemple — prévision
 

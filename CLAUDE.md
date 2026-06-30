@@ -50,6 +50,7 @@ Chaque intégration externe a une interface ABC + une impl **mock par défaut, k
 - `POSConnector` (mock | http) — `ingestion/pos/` : ingestion des **ventes caisse** (idempotent par `external_ref`).
 - `WhatsAppClient` (mock | business) — `messaging/whatsapp/`
 - `TelegramClient` (mock | bot) — `messaging/telegram.py`
+- `SlackClient` (mock | bot) — `messaging/slack.py` (+ webhook `api/v1/slack.py`, Events API)
 - `PublishChannel` (social | customers) — `messaging/publish.py`
 - `ForecastModel` (naive | prophet | lgbm) — `intelligence/forecasting/`
 - `ExternalSignalProvider` (mock | http) — `ingestion/signals_ext/` : **signaux externes

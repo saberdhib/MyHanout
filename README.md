@@ -62,7 +62,7 @@ simulés tant qu'aucune clé n'est fournie. Scénario pas-à-pas : **[`docs/DEMO
 | 🔌 Intégrations | **Import JSON** + **sync DWH** + **connecteur caisse (POS)** (ingestion ventes idempotente) |
 | 🛰️ Data platform | **Orchestration** de pipelines tracés (`PipelineRun`), **service ML isolé** (fallback in-process), **recos explicites** (substituts/signaux métier), **alertes** & **temps réel SSE**, page **Data Ops** — voir ci-dessous |
 | 📱 Omni-accès | Web responsive + **PWA installable** (PC / téléphone / tablette de caisse) + WhatsApp/Telegram |
-| 💬 Conversationnel | **WhatsApp & Telegram** (texte + photo→OCR) + **chat web**, même cerveau d'agents |
+| 💬 Conversationnel | **WhatsApp, Telegram & Slack** (texte + photo→OCR) + **fenêtre de chat web flottante** (depuis n'importe quelle page), même cerveau d'agents |
 | 🤖 Agents IA | order, stock, finance, marketing, support, governance + **mémoire** + **éval routage** |
 | 🧠 RAG | Q&A citée sur ses propres factures (pgvector) |
 | 🌤️ Compagnon | Signaux **météo + tendances** intégrés aux recommandations |
@@ -218,7 +218,7 @@ approve, reject, **PATCH** édition + payé, **import/email**) · `/forecasts/{i
 `/signals` (definitions, observations, **ingest**) · `/pipelines/*` (runs, trigger, health) ·
 `/recommendations` (+ simulate) · `/alerts` (+ resolve) · `/stream/events` (SSE) ·
 `/chat` · `/rag/*` · `/agents/eval` · `/whatsapp/webhook` ·
-`/telegram/webhook`. Détail : [`docs/api-design.md`](docs/api-design.md).
+`/telegram/webhook` · `/slack/webhook`. Détail : [`docs/api-design.md`](docs/api-design.md).
 
 ---
 

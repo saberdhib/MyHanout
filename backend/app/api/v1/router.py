@@ -27,6 +27,7 @@ from app.api.v1 import (
     rag,
     recommendations,
     signals,
+    slack,
     stocks,
     stream,
     telegram,
@@ -60,3 +61,4 @@ api_router.include_router(alerts.router)
 api_router.include_router(stream.router)
 api_router.include_router(whatsapp.router)
 api_router.include_router(telegram.router)
+api_router.include_router(slack.router)
