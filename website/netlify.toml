@@ -1,0 +1,11 @@
+# Déploiement zero-config de la vitrine (fallback si tu choisis Netlify).
+# Cloudflare Pages reste recommandé (réglages équivalents côté dashboard).
+[build]
+  base = "website"
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+  # URL du dashboard (CTA « Lancer l'app »). À adapter à ton domaine app.
+  PUBLIC_APP_URL = "https://app.myhanout.ai"

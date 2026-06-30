@@ -1,29 +1,25 @@
-"""Smoke test du service ML isolé (keyless, autonome)."""
+"""Smoke test du service ML isolé (keyless, autonome).
 
-from fastapi.testclient import TestClient
+On appelle les handlers directement (pas de `TestClient`) : le service n'a
+besoin ni de httpx ni de réseau pour être testé.
+"""
 
-from app import app
-
-client = TestClient(app)
+from app import PredictRequest, health, model_version, predict
 
 
 def test_health_and_version():
-    assert client.get("/health").json()["status"] == "ok"
-    assert "model_version" in client.get("/model/version").json()
+    assert health()["status"] == "ok"
+    assert "model_version" in model_version()
 
 
 def test_predict_returns_horizon_points():
     history = [{"ds": f"2026-05-{d:02d}", "y": 10 + d} for d in range(1, 20)]
-    resp = client.post(
-        "/predict", json={"product_id": 1, "horizon_days": 7, "model": "naive", "history": history}
-    )
-    assert resp.status_code == 200
-    body = resp.json()
-    assert len(body["points"]) == 7
-    assert all(p["yhat"] >= 0 for p in body["points"])
-    assert body["explanation"]
+    result = predict(PredictRequest(product_id=1, horizon_days=7, model="naive", history=history))
+    assert len(result.points) == 7
+    assert all(p.yhat >= 0 for p in result.points)
+    assert result.explanation
 
 
 def test_predict_empty_history():
-    resp = client.post("/predict", json={"horizon_days": 5, "history": []})
-    assert resp.json()["points"] == []
+    result = predict(PredictRequest(horizon_days=5, history=[]))
+    assert result.points == []
