@@ -694,6 +694,75 @@ export const applyMarkdown = (id: number) =>
 export const rejectMarkdown = (id: number) =>
   api.post<MarkdownSuggestion>(`/markdown/${id}/reject`).then((r) => r.data);
 
+// --- Production & recettes (agent Production) ---
+export interface RecipeItem {
+  id: number;
+  ingredient_product_id: number;
+  ingredient_name: string | null;
+  quantity: number;
+  unit: string;
+}
+export interface Recipe {
+  id: number;
+  product_id: number;
+  product_name: string | null;
+  name: string;
+  yield_quantity: number;
+  unit: string;
+  active: boolean;
+  notes: string | null;
+  items: RecipeItem[];
+}
+export interface ProductionPlan {
+  id: number;
+  product_id: number;
+  product_name: string | null;
+  recipe_id: number | null;
+  plan_date: string | null;
+  horizon_days: number;
+  forecast_demand: number;
+  current_stock: number;
+  suggested_quantity: number;
+  batches: number;
+  confidence: number;
+  status: string;
+  model_version: string;
+  explanation: string;
+}
+export interface IngredientNeed {
+  ingredient_product_id: number;
+  ingredient_name: string | null;
+  quantity: number;
+  unit: string;
+  estimated_cost: number;
+}
+export interface ProductionPlanResult {
+  plans: ProductionPlan[];
+  ingredients: IngredientNeed[];
+  total_ingredient_cost: number;
+}
+
+export const getRecipes = () =>
+  api.get<ListResponse<Recipe>>("/recipes").then((r) => r.data);
+export const createRecipe = (body: {
+  product_id: number;
+  name: string;
+  yield_quantity: number;
+  unit?: string;
+  notes?: string;
+  items: { ingredient_product_id: number; quantity: number; unit?: string }[];
+}) => api.post<Recipe>("/recipes", body).then((r) => r.data);
+export const deleteRecipe = (id: number) => api.delete(`/recipes/${id}`).then((r) => r.data);
+
+export const getProductionPlan = () =>
+  api.get<ProductionPlanResult>("/production/plan").then((r) => r.data);
+export const scanProduction = () =>
+  api.post<ProductionPlanResult>("/production/scan").then((r) => r.data);
+export const confirmProduction = (id: number) =>
+  api.post<ProductionPlan>(`/production/${id}/confirm`).then((r) => r.data);
+export const dismissProduction = (id: number) =>
+  api.post<ProductionPlan>(`/production/${id}/dismiss`).then((r) => r.data);
+
 // Jeton courant (pour le flux SSE qui passe par fetch, pas axios).
 export const currentToken = () => localStorage.getItem("token");
 export const apiBaseUrl = baseURL;

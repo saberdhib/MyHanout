@@ -29,6 +29,8 @@ from app.models import (
     MembershipRole,
     Organization,
     Product,
+    Recipe,
+    RecipeItem,
     Role,
     Sale,
     Stock,
@@ -205,6 +207,46 @@ async def _seed_business_data(session: AsyncSession, seeds: Path) -> None:
         if product.perishable:
             session.add(Stock(product=product, quantity=15, reorder_threshold=10, expiry_date=soon))
             break
+
+    # Démo production : un produit fini fabriqué (pain) + sa recette (nomenclature).
+    pain = Product(
+        sku="PAIN-MAISON",
+        name="Pain maison",
+        category="boulangerie",
+        unit="unit",
+        unit_price=2.50,
+        perishable=True,
+        shelf_life_days=1,
+        supplier=suppliers.get("Minoterie du Sud"),
+    )
+    session.add(pain)
+    session.add(Stock(product=pain, quantity=10, reorder_threshold=20, expiry_date=soon))
+    base_day = datetime.now(UTC) - timedelta(days=25)
+    for d in range(25):  # ventes régulières → demande à couvrir par la production
+        session.add(
+            Sale(
+                product=pain,
+                quantity=8,
+                unit_price=2.50,
+                total=20.0,
+                sold_at=base_day + timedelta(days=d),
+            )
+        )
+    await session.flush()
+    recipe = Recipe(
+        product_id=pain.id,
+        name="Pain maison (fournée)",
+        yield_quantity=20,
+        unit="unit",
+        notes="Recette de démo — fournée de 20 pains.",
+    )
+    recipe.items.append(
+        RecipeItem(ingredient_product_id=products["FARINE-T55"].id, quantity=10, unit="kg")
+    )
+    recipe.items.append(
+        RecipeItem(ingredient_product_id=products["LEVURE-BOUL"].id, quantity=2, unit="unit")
+    )
+    session.add(recipe)
     session.add_all(
         [
             Customer(

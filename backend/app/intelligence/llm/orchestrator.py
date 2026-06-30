@@ -39,6 +39,12 @@ _INTENT_KEYWORDS: dict[str, str] = {
     "demarque": "markdown",
     "gaspillage": "markdown",
     "gaspi": "markdown",
+    "production": "production",
+    "fabrication": "production",
+    "fournée": "production",
+    "fournee": "production",
+    "produire": "production",
+    "recette": "production",
 }
 
 

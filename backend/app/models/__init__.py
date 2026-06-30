@@ -24,6 +24,7 @@ from app.models.pipeline import PipelineRun
 from app.models.pricing import PriceHistory
 from app.models.product import Product
 from app.models.promo import PromoCampaign
+from app.models.recipe import ProductionPlan, Recipe, RecipeItem
 from app.models.recommendation import Recommendation
 from app.models.sale import Sale
 from app.models.signal import SignalDefinition, SignalObservation
@@ -61,6 +62,9 @@ __all__ = [
     "OrderLine",
     "PipelineRun",
     "PriceHistory",
+    "ProductionPlan",
+    "Recipe",
+    "RecipeItem",
     "Recommendation",
     "SignalDefinition",
     "SignalObservation",

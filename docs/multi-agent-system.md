@@ -88,8 +88,11 @@ auto que des actions whitelistées à faible risque. Chaque étape est **tracée
    (`intelligence/markdown/engine.py` : cash récupéré vs perte selon DLC & écoulement) +
    agent (`agent_markdown`) + endpoints (`/markdown`, `/scan`, `/apply|reject`) + page
    `Markdown.tsx` + tests (`test_markdown.py`). Module `markdown`.
-2. **Agent Production + Recettes** (⭐) : `recipe`/`recipe_item` (nomenclature) +
-   plan de production dérivé du forecast + conso matière/coût + agent + endpoint + front + tests.
+2. **Agent Production + Recettes** (⭐) — ✅ **fait** : nomenclature (`recipe`/`recipe_item`),
+   moteur pur (`intelligence/production/engine.py` : besoin net arrondi au rendement),
+   `recipe_service` + `production_service` (plan + besoins ingrédients agrégés/coût), agent
+   `agent_production`, endpoints `/recipes` & `/production/*`, page `Production.tsx`, tests
+   (`test_production.py`). Module `production`.
 3. **Agent Tâches du jour** : agrégation des recos en checklist priorisée + cycle proactif
    (PipelineRun) + Briefing du matin (WhatsApp/Slack).
 4. **Effectifs**, **Prix**, **agentification Froid/Qualité** : ensuite.

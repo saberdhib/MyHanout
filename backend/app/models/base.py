@@ -179,6 +179,14 @@ class MarkdownStatus(enum.StrEnum):
     REJECTED = "rejected"  # écartée par le commerçant
 
 
+class ProductionStatus(enum.StrEnum):
+    """Cycle de vie d'un plan de production en magasin (human-in-the-loop)."""
+
+    SUGGESTED = "suggested"  # proposé par l'agent Production (à valider)
+    CONFIRMED = "confirmed"  # retenu par le commerçant (à produire)
+    DISMISSED = "dismissed"  # écarté par le commerçant
+
+
 class AlertStatus(enum.StrEnum):
     """État d'une alerte (human-in-the-loop : résolution manuelle)."""
 

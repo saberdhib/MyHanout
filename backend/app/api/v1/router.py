@@ -25,8 +25,10 @@ from app.api.v1 import (
     onboarding,
     orders,
     pipelines,
+    production,
     promos,
     rag,
+    recipes,
     recommendations,
     signals,
     slack,
@@ -61,6 +63,8 @@ api_router.include_router(mlops.router)
 api_router.include_router(pipelines.router)
 api_router.include_router(recommendations.router)
 api_router.include_router(markdown.router)
+api_router.include_router(recipes.router)
+api_router.include_router(production.router)
 api_router.include_router(alerts.router)
 api_router.include_router(stream.router)
 api_router.include_router(whatsapp.router)

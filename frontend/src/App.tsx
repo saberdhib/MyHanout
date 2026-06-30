@@ -21,6 +21,7 @@ import DataOps from "./pages/DataOps";
 import Catalog from "./pages/Catalog";
 import Connectors from "./pages/Connectors";
 import Markdown from "./pages/Markdown";
+import Production from "./pages/Production";
 
 export default function App() {
   return (
@@ -35,6 +36,7 @@ export default function App() {
         <Route path="chat" element={<Chat />} />
         <Route path="promos" element={<Promos />} />
         <Route path="markdown" element={<Markdown />} />
+        <Route path="production" element={<Production />} />
         <Route path="finance" element={<Finance />} />
         <Route path="catalog" element={<Catalog />} />
         <Route path="stocks" element={<Stocks />} />

@@ -79,7 +79,7 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   daily_entry, forecast_evaluation, customer, promo_campaign, agent_memory, document_chunk,
   expense_classification_feedback, equipment, temperature_reading, price_history,
   meat_lot, meat_cut, **pipeline_run, inventory_snapshot, external_signal, recommendation,
-  alert, markdown_suggestion**). **Exceptions voulues** (référentiels **globaux**, non tenant, non
+  alert, markdown_suggestion, recipe, recipe_item, production_plan**). **Exceptions voulues** (référentiels **globaux**, non tenant, non
   filtrés par le garde-fou) : `expense_category`, `signal_definition`, `signal_observation`
   (signaux externes = données publiques alignées aux ventes par date).
 - **Limite** : le SQL brut (hors ORM) n'est PAS filtré → filtrer l'org explicitement
@@ -184,3 +184,9 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   `services/markdown_service.py`, `api/v1/markdown.py` (`/markdown`, `/scan`,
   `/{id}/apply|reject`), modèle `markdown_suggestion`, page front `Markdown.tsx`
   (module `markdown`). Réglages : `markdown_*` dans `config.py`.
+- **Production & recettes** : agent Production — nomenclature (`recipe`/`recipe_item`),
+  moteur pur `intelligence/production/engine.py` (besoin net arrondi au rendement),
+  `services/recipe_service.py` (CRUD) + `services/production_service.py` (plan + besoins
+  ingrédients agrégés), `api/v1/recipes.py` & `api/v1/production.py` (`/recipes`,
+  `/production/plan`, `/scan`, `/{id}/confirm|dismiss`), modèle `production_plan`,
+  page front `Production.tsx` (module `production`).
