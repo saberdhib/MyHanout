@@ -6,6 +6,7 @@ from app.models.agent_memory import AgentMemory
 from app.models.alert import Alert
 from app.models.api_key import ApiKey
 from app.models.audit_log import AuditLog
+from app.models.briefing import BriefingItem, DailyBriefing
 from app.models.conversation import Conversation
 from app.models.customer import Customer
 from app.models.daily_entry import DailyEntry
@@ -39,7 +40,9 @@ __all__ = [
     "Alert",
     "ApiKey",
     "AuditLog",
+    "BriefingItem",
     "Conversation",
+    "DailyBriefing",
     "Customer",
     "DailyEntry",
     "Equipment",

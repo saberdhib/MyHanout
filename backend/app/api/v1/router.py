@@ -9,6 +9,7 @@ from app.api.v1 import (
     alerts,
     api_keys,
     auth,
+    briefing,
     catalog,
     chat,
     config,
@@ -65,6 +66,7 @@ api_router.include_router(recommendations.router)
 api_router.include_router(markdown.router)
 api_router.include_router(recipes.router)
 api_router.include_router(production.router)
+api_router.include_router(briefing.router)
 api_router.include_router(alerts.router)
 api_router.include_router(stream.router)
 api_router.include_router(whatsapp.router)

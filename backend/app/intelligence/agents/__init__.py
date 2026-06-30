@@ -1,5 +1,6 @@
 """Registre des agents IA."""
 
+from app.intelligence.agents.agent_briefing import BriefingAgent
 from app.intelligence.agents.agent_finance import FinanceAgent
 from app.intelligence.agents.agent_governance import GovernanceAgent
 from app.intelligence.agents.agent_markdown import MarkdownAgent
@@ -21,6 +22,7 @@ AGENT_CLASSES: list[type[BaseAgent]] = [
     StockAgent,
     MarkdownAgent,
     ProductionAgent,
+    BriefingAgent,
     FinanceAgent,
     MarketingAgent,
     GovernanceAgent,
@@ -32,6 +34,7 @@ __all__ = [
     "AgentContext",
     "AgentResult",
     "BaseAgent",
+    "BriefingAgent",
     "FinanceAgent",
     "GovernanceAgent",
     "MarkdownAgent",

@@ -93,8 +93,11 @@ auto que des actions whitelistées à faible risque. Chaque étape est **tracée
    `recipe_service` + `production_service` (plan + besoins ingrédients agrégés/coût), agent
    `agent_production`, endpoints `/recipes` & `/production/*`, page `Production.tsx`, tests
    (`test_production.py`). Module `production`.
-3. **Agent Tâches du jour** : agrégation des recos en checklist priorisée + cycle proactif
-   (PipelineRun) + Briefing du matin (WhatsApp/Slack).
+3. **Agent Tâches du jour** — ✅ **fait** : `services/briefing_service.py` consolide
+   alertes + réassort + démarque + production en tâches priorisées (`daily_briefing`/
+   `briefing_item`), agent `agent_briefing`, endpoints `/briefing/*`, page `Briefing.tsx`,
+   **câblé dans le cycle quotidien** (job `daily` → asset briefing), envoi WhatsApp/Slack.
+   Tests `test_briefing.py`. Module `briefing`.
 4. **Effectifs**, **Prix**, **agentification Froid/Qualité** : ensuite.
 5. **Vitrine** : reformuler le positionnement « votre équipe d'agents IA » (page dédiée).
 

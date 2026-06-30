@@ -45,6 +45,11 @@ _INTENT_KEYWORDS: dict[str, str] = {
     "fournee": "production",
     "produire": "production",
     "recette": "production",
+    "briefing": "briefing",
+    "tâches": "briefing",
+    "taches": "briefing",
+    "journée": "briefing",
+    "journee": "briefing",
 }
 
 

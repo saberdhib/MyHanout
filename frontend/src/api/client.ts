@@ -763,6 +763,38 @@ export const confirmProduction = (id: number) =>
 export const dismissProduction = (id: number) =>
   api.post<ProductionPlan>(`/production/${id}/dismiss`).then((r) => r.data);
 
+// --- Briefing du matin (agent Tâches du jour) ---
+export interface BriefingItem {
+  id: number;
+  category: string;
+  priority: number;
+  title: string;
+  detail: string | null;
+  action: string | null;
+  value: number;
+  entity_type: string | null;
+  entity_id: number | null;
+  done: boolean;
+}
+export interface Briefing {
+  id: number;
+  briefing_date: string | null;
+  summary: string;
+  total_items: number;
+  total_value: number;
+  status: string;
+  items: BriefingItem[];
+}
+
+export const getBriefing = () =>
+  api.get<Briefing | null>("/briefing").then((r) => r.data);
+export const generateBriefing = () =>
+  api.post<Briefing>("/briefing/generate").then((r) => r.data);
+export const sendBriefing = (id: number) =>
+  api.post<Briefing>(`/briefing/${id}/send`).then((r) => r.data);
+export const completeBriefingItem = (id: number, done = true) =>
+  api.post(`/briefing/items/${id}/done`, null, { params: { done } }).then((r) => r.data);
+
 // Jeton courant (pour le flux SSE qui passe par fetch, pas axios).
 export const currentToken = () => localStorage.getItem("token");
 export const apiBaseUrl = baseURL;

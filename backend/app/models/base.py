@@ -187,6 +187,13 @@ class ProductionStatus(enum.StrEnum):
     DISMISSED = "dismissed"  # écarté par le commerçant
 
 
+class BriefingStatus(enum.StrEnum):
+    """État du briefing du matin (consolidation des agents)."""
+
+    DRAFT = "draft"  # généré, pas encore envoyé
+    SENT = "sent"  # poussé au commerçant (WhatsApp/Slack)
+
+
 class AlertStatus(enum.StrEnum):
     """État d'une alerte (human-in-the-loop : résolution manuelle)."""
 

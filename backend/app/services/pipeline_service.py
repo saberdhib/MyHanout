@@ -32,6 +32,7 @@ from app.models.pipeline import PipelineRun
 from app.models.product import Product
 from app.repositories.stock import StockRepository
 from app.services.alert_service import scan_alerts
+from app.services.briefing_service import compute_briefing
 from app.services.recommendation_service import compute_recommendations
 
 log = get_logger(__name__)
@@ -119,17 +120,28 @@ async def _asset_scan_alerts(session: AsyncSession, run: PipelineRun, today: dat
     return len(created)
 
 
+async def _asset_briefing(session: AsyncSession, run: PipelineRun, today: date) -> int:
+    # Consolide les sorties des agents (démarque/production rafraîchies au passage)
+    # en un briefing du jour. C'est l'étape « Tâches du jour » du cycle.
+    briefing = await compute_briefing(
+        session, persist=True, pipeline_run_id=run.id, today=today, refresh_agents=True
+    )
+    return briefing.total_items
+
+
 # Registre des jobs : un job = une suite d'assets exécutés sous un même run.
 JOBS: dict[str, list[Asset]] = {
     "snapshot_inventory": [_asset_snapshot_inventory],
     "ingest_signals": [_asset_ingest_signals],
     "recommend": [_asset_recommend],
     "scan_alerts": [_asset_scan_alerts],
+    "briefing": [_asset_briefing],
     "daily": [
         _asset_snapshot_inventory,
         _asset_ingest_signals,
         _asset_recommend,
         _asset_scan_alerts,
+        _asset_briefing,
     ],
 }
 

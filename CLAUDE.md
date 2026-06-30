@@ -79,7 +79,8 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   daily_entry, forecast_evaluation, customer, promo_campaign, agent_memory, document_chunk,
   expense_classification_feedback, equipment, temperature_reading, price_history,
   meat_lot, meat_cut, **pipeline_run, inventory_snapshot, external_signal, recommendation,
-  alert, markdown_suggestion, recipe, recipe_item, production_plan**). **Exceptions voulues** (référentiels **globaux**, non tenant, non
+  alert, markdown_suggestion, recipe, recipe_item, production_plan, daily_briefing,
+  briefing_item**). **Exceptions voulues** (référentiels **globaux**, non tenant, non
   filtrés par le garde-fou) : `expense_category`, `signal_definition`, `signal_observation`
   (signaux externes = données publiques alignées aux ventes par date).
 - **Limite** : le SQL brut (hors ORM) n'est PAS filtré → filtrer l'org explicitement
@@ -190,3 +191,10 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   ingrédients agrégés), `api/v1/recipes.py` & `api/v1/production.py` (`/recipes`,
   `/production/plan`, `/scan`, `/{id}/confirm|dismiss`), modèle `production_plan`,
   page front `Production.tsx` (module `production`).
+- **Briefing du matin** (orchestration proactive) : agent « Tâches du jour »
+  (`agent_briefing`) + `services/briefing_service.py` qui **consolide** alertes +
+  réassort + démarque + production en tâches priorisées (modèles `daily_briefing`/
+  `briefing_item`). `api/v1/briefing.py` (`/briefing`, `/generate`, `/{id}/send`,
+  `/items/{id}/done`). Câblé dans le **cycle quotidien** (`pipeline_service` job
+  `daily` → asset `_asset_briefing`). Envoi WhatsApp/Slack (mock). Page `Briefing.tsx`
+  (module `briefing`). Blueprint complet : `docs/multi-agent-system.md`.
