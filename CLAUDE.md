@@ -147,8 +147,15 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   vertical). Registry `app/core/modules.py` + `GET /config/modules` ; la nav
   frontend se filtre par module actif selon le `business_type` du commerce.
 - **Boucherie** : `services/meat_service.py` (lot→coupes, rendement, coût/kg,
-  traçabilité), `api/v1/meat.py`. **Catalogue/prix** : `api/v1/catalog.py`,
-  `services/price_service.py`. Familles produit : `PRODUCT_FAMILIES` (base.py).
+  traçabilité), `api/v1/meat.py`. **Catalogue/prix** : `api/v1/catalog.py`
+  (gestion produits : `GET/POST /catalog/products`, `PATCH /catalog/products/{id}`,
+  familles), `services/price_service.py`, `schemas/catalog.py`. Page front `Catalog.tsx`.
+  Familles produit : `PRODUCT_FAMILIES` (base.py).
+- **Conversationnel & connecteurs** : WhatsApp (`messaging/whatsapp/`), Telegram
+  (`messaging/telegram.py`), **Slack** (`messaging/slack.py` + `api/v1/slack.py`),
+  chat web (`api/v1/chat.py`) + **fenêtre de chat flottante** front (`components/ChatWidget.tsx`,
+  montée dans `Layout`). État des connecteurs **sans secret** : `GET /config/connectors`
+  (page front `Connectors.tsx`). Assets de marque à fournir : `docs/brand-assets.md`.
 - **Forecasting avancé** : signaux externes (`ingestion/signals_ext/` + tables globales
   `signal_definition`/`signal_observation`, `services/signals_service.py`,
   `api/v1/signals.py` : definitions/observations/ingest) et analyse

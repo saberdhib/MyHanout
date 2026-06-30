@@ -23,6 +23,10 @@ et **répond/agit** par messagerie — toujours sous contrôle humain.
   <img src="website/public/shots/finance.png" alt="Couche financière (pré-compta)" width="49%" />
 </p>
 <p align="center">
+  <img src="website/public/shots/recommendations.png" alt="Recommandations de réassort explicables" width="49%" />
+  <img src="website/public/shots/data-ops.png" alt="Data Ops — orchestration des pipelines" width="49%" />
+</p>
+<p align="center">
   <img src="website/public/shots/promos.png" alt="Promo anti-gaspillage + affiche générée" width="49%" />
   <img src="website/public/shots/invoices.png" alt="Factures (OCR + import email)" width="49%" />
 </p>
@@ -56,12 +60,13 @@ simulés tant qu'aucune clé n'est fournie. Scénario pas-à-pas : **[`docs/DEMO
 | 📥 Ingestion factures | OCR (Mistral + fallback PDF), drag & drop / photo WhatsApp/Telegram, **import email (IMAP)**, validation humaine, suivi **payé/non payé**, édition pré-remplie |
 | 📊 Forecasting | Prévision de demande (naïf par défaut, Prophet/LightGBM en option) + saisonnalité/fêtes + **signaux externes** (météo, vacances scolaires, carburant, foot…) et **effets entre produits** (substituts/compléments) — voir ci-dessous |
 | 🛒 Réassort | Suggestions **explicables** (demande + stock + délai + signaux), 3 modes d'envoi fournisseur |
+| 🗂️ Catalogue | **Gestion produits** (créer/éditer) + **rangement par famille** (rayon), recherche/filtre |
 | 🔔 Promos flash | Détection fin de vie → promo IA → **affiche générée (text-to-image)** → publication **réseaux + clients opt-in (RGPD)** |
 | 💶 Gestion financière | **OPEX/CAPEX** (tagging IA explicable, validé humain), **trésorerie** (alerte cash), **valorisation stock**, **marges réelles** + alertes (doublon, prix, marge, échéance) — pré-compta |
 | 🌡️ Chaîne du froid | Suivi **température** des machines (HACCP) via capteurs (mock keyless ou thermomètres connectés), **alertes explicables** anti-gaspillage |
-| 🔌 Intégrations | **Import JSON** + **sync DWH** + **connecteur caisse (POS)** (ingestion ventes idempotente) |
+| 🔌 Intégrations | **Import JSON** + **sync DWH** + **connecteur caisse (POS)** (ingestion ventes idempotente) + page **Connecteurs** (statut messagerie/data/IoT, sans secret) |
 | 🛰️ Data platform | **Orchestration** de pipelines tracés (`PipelineRun`), **service ML isolé** (fallback in-process), **recos explicites** (substituts/signaux métier), **alertes** & **temps réel SSE**, page **Data Ops** — voir ci-dessous |
-| 📱 Omni-accès | Web responsive + **PWA installable** (PC / téléphone / tablette de caisse) + WhatsApp/Telegram |
+| 📱 Omni-accès | Web responsive + **PWA installable** (PC / téléphone / tablette de caisse) + WhatsApp/Telegram/Slack |
 | 💬 Conversationnel | **WhatsApp, Telegram & Slack** (texte + photo→OCR) + **fenêtre de chat web flottante** (depuis n'importe quelle page), même cerveau d'agents |
 | 🤖 Agents IA | order, stock, finance, marketing, support, governance + **mémoire** + **éval routage** |
 | 🧠 RAG | Q&A citée sur ses propres factures (pgvector) |
