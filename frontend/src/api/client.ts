@@ -488,6 +488,104 @@ export interface MeatCutIn {
   is_waste?: boolean;
 }
 
+// --- Socle data platform : pipelines, recommandations, alertes, temps réel ---
+
+export interface PipelineRun {
+  id: number;
+  job_name: string;
+  status: string;
+  trigger: string;
+  started_at: string | null;
+  finished_at: string | null;
+  data_freshness_at: string | null;
+  rows_processed: number;
+  error: string | null;
+  duration_ms: number | null;
+}
+
+export interface PipelineJobHealth {
+  job_name: string;
+  last_status: string | null;
+  last_run_at: string | null;
+  data_freshness_at: string | null;
+  last_error: string | null;
+}
+
+export interface PipelineHealth {
+  jobs: PipelineJobHealth[];
+  explanation: string;
+}
+
+export interface Recommendation {
+  id: number;
+  product_id: number;
+  product_name: string | null;
+  action: string;
+  suggested_quantity: number;
+  horizon_days: number;
+  confidence: number;
+  risk_factor: number;
+  score: number;
+  status: string;
+  model_version: string;
+  pipeline_run_id: number | null;
+  explanation: string;
+}
+
+export interface SimulateResult {
+  product_id: number;
+  ordered_quantity: number;
+  horizon_days: number;
+  forecast_demand: number;
+  current_stock: number;
+  projected_stock: number;
+  stockout_risk: number;
+  overstock_days: number;
+  explanation: string;
+}
+
+export interface Alert {
+  id: number;
+  kind: string;
+  priority: string;
+  status: string;
+  title: string;
+  message: string | null;
+  rule: string | null;
+  threshold: number | null;
+  observed_value: number | null;
+  recommended_action: string | null;
+  explanation: string | null;
+  entity_type: string | null;
+  entity_id: number | null;
+  created_at: string | null;
+}
+
+export const getPipelineRuns = (params?: { job?: string; status?: string }) =>
+  api.get<ListResponse<PipelineRun>>("/pipelines/runs", { params }).then((r) => r.data);
+export const getPipelineHealth = () =>
+  api.get<PipelineHealth>("/pipelines/health").then((r) => r.data);
+export const triggerPipeline = (job: string) =>
+  api.post<PipelineRun>(`/pipelines/${job}/trigger`).then((r) => r.data);
+export const recomputeForecasts = () =>
+  api.post<PipelineRun>("/forecasts/recompute").then((r) => r.data);
+
+export const getRecommendations = (params?: { status?: string; live?: boolean }) =>
+  api.get<ListResponse<Recommendation>>("/recommendations", { params }).then((r) => r.data);
+export const simulateOrder = (product_id: number, quantity: number, horizon_days?: number) =>
+  api
+    .post<SimulateResult>("/recommendations/simulate", { product_id, quantity, horizon_days })
+    .then((r) => r.data);
+
+export const getAlerts = (status?: string) =>
+  api.get<ListResponse<Alert>>("/alerts", { params: status ? { status } : {} }).then((r) => r.data);
+export const resolveAlert = (id: number, note?: string, dismiss = false) =>
+  api.post<Alert>(`/alerts/${id}/resolve`, { note, dismiss }).then((r) => r.data);
+
+// Jeton courant (pour le flux SSE qui passe par fetch, pas axios).
+export const currentToken = () => localStorage.getItem("token");
+export const apiBaseUrl = baseURL;
+
 export const getMeatLots = () => api.get<MeatLotRow[]>("/meat/lots").then((r) => r.data);
 export const getMeatLot = (id: number) =>
   api.get<MeatLotSummary>(`/meat/lots/${id}`).then((r) => r.data);

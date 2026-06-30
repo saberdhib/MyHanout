@@ -20,6 +20,13 @@ const groups: { title: string; items: Item[] }[] = [
     title: "Pilotage",
     items: [
       { to: "/", label: "Dashboard", icon: "dashboard", end: true, module: "dashboard" },
+      {
+        to: "/recommendations",
+        label: "Recommandations",
+        icon: "suggest",
+        module: "recommendations",
+      },
+      { to: "/alerts", label: "Alertes", icon: "quality", module: "alerts" },
       { to: "/chat", label: "Assistant", icon: "chat", module: "chat" },
       { to: "/finance", label: "Finance", icon: "finance", module: "finance" },
     ],
@@ -46,6 +53,7 @@ const groups: { title: string; items: Item[] }[] = [
   {
     title: "Données",
     items: [
+      { to: "/data-ops", label: "Data Ops", icon: "plug", module: "dataops" },
       { to: "/integrations", label: "Intégrations", icon: "plug", module: "integrations" },
       { to: "/suppliers", label: "Fournisseurs", icon: "supplier", module: "suppliers" },
     ],
