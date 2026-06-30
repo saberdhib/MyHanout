@@ -1,3 +1,7 @@
+<p align="center">
+  <img alt="MyHanout AI" src="docs/assets/banner.png" width="100%" />
+</p>
+
 # 🏪 MyHanout AI — l'IA qui vous facilite la gestion de votre commerce
 
 > Copilot IA pour les commerces de proximité (boucherie, épicerie, boulangerie, primeur…),
