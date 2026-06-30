@@ -52,6 +52,9 @@ API REST FastAPI, versionnée sous `/api/v1`. Doc interactive : `/docs` (Swagger
 | POST    | `/api/v1/import/pos/sync`     | Ingestion ventes caisse (POS), idempotent       | stocks    |
 | GET     | `/api/v1/config/modules`      | Modules actifs selon le type de commerce        | (auth)    |
 | GET     | `/api/v1/catalog/families`    | Familles produit suggérées                      | stocks    |
+| GET     | `/api/v1/catalog/products`    | Liste produits (filtre `?family=`/`?search=`)   | stocks    |
+| POST    | `/api/v1/catalog/products`    | Crée un produit (SKU unique)                    | stocks    |
+| PATCH   | `/api/v1/catalog/products/{id}`| Édite un produit (nom, famille, prix, péremption) | stocks  |
 | GET/POST| `/api/v1/catalog/products/{id}/prices`| Historique des prix (lecture / ajout)   | stocks    |
 | GET/POST| `/api/v1/meat/lots`           | Lots boucherie (liste / réception bête)         | stocks    |
 | PUT     | `/api/v1/meat/lots/{id}/breakdown`| Décomposition (coupes prévu/réel)           | stocks    |

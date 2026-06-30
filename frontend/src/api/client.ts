@@ -444,6 +444,32 @@ export interface ModulesConfig {
 export const getModules = () =>
   api.get<ModulesConfig>("/config/modules").then((r) => r.data);
 
+// --- Catalogue : gestion produits + familles -------------------------------
+export interface CatalogProduct {
+  id: number;
+  sku: string;
+  name: string;
+  category: string | null;
+  family: string | null;
+  unit: string;
+  unit_price: number | null;
+  perishable: boolean;
+  shelf_life_days: number | null;
+  supplier_id: number | null;
+}
+
+export const getFamilies = () =>
+  api.get<string[]>("/catalog/families").then((r) => r.data);
+
+export const getProducts = (params?: { family?: string; search?: string }) =>
+  api.get<ListResponse<CatalogProduct>>("/catalog/products", { params }).then((r) => r.data);
+
+export const createProduct = (body: Partial<CatalogProduct> & { sku: string; name: string }) =>
+  api.post<CatalogProduct>("/catalog/products", body).then((r) => r.data);
+
+export const updateProduct = (id: number, body: Partial<CatalogProduct>) =>
+  api.patch<CatalogProduct>(`/catalog/products/${id}`, body).then((r) => r.data);
+
 // --- Boucherie (lots / décomposition / traçabilité) ------------------------
 export interface MeatLotRow {
   id: number;

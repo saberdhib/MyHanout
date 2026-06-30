@@ -18,6 +18,7 @@ import Integrations from "./pages/Integrations";
 import Recommendations from "./pages/Recommendations";
 import Alerts from "./pages/Alerts";
 import DataOps from "./pages/DataOps";
+import Catalog from "./pages/Catalog";
 
 export default function App() {
   return (
@@ -32,6 +33,7 @@ export default function App() {
         <Route path="chat" element={<Chat />} />
         <Route path="promos" element={<Promos />} />
         <Route path="finance" element={<Finance />} />
+        <Route path="catalog" element={<Catalog />} />
         <Route path="stocks" element={<Stocks />} />
         <Route path="forecasts" element={<Forecasts />} />
         <Route path="suggestions" element={<Suggestions />} />

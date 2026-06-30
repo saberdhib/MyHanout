@@ -36,6 +36,7 @@ const groups: { title: string; items: Item[] }[] = [
     items: [
       { to: "/promos", label: "Promos flash", icon: "promo", module: "promos" },
       { to: "/boucherie", label: "Boucherie", icon: "supplier", module: "meat" },
+      { to: "/catalog", label: "Catalogue", icon: "stocks", module: "catalog" },
       { to: "/stocks", label: "Stocks", icon: "stocks", module: "stocks" },
       { to: "/forecasts", label: "Prévisions", icon: "forecast", module: "forecasts" },
       { to: "/suggestions", label: "Suggestions", icon: "suggest", module: "suggestions" },
