@@ -35,6 +35,10 @@ _INTENT_KEYWORDS: dict[str, str] = {
     "promo": "marketing",
     "marketing": "marketing",
     "annonce": "marketing",
+    "démarque": "markdown",
+    "demarque": "markdown",
+    "gaspillage": "markdown",
+    "gaspi": "markdown",
 }
 
 

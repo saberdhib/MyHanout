@@ -2,6 +2,7 @@
 
 from app.intelligence.agents.agent_finance import FinanceAgent
 from app.intelligence.agents.agent_governance import GovernanceAgent
+from app.intelligence.agents.agent_markdown import MarkdownAgent
 from app.intelligence.agents.agent_marketing import MarketingAgent
 from app.intelligence.agents.agent_order import OrderAgent
 from app.intelligence.agents.agent_stock import StockAgent
@@ -17,6 +18,7 @@ from app.intelligence.agents.base_agent import (
 AGENT_CLASSES: list[type[BaseAgent]] = [
     OrderAgent,
     StockAgent,
+    MarkdownAgent,
     FinanceAgent,
     MarketingAgent,
     GovernanceAgent,
@@ -30,6 +32,7 @@ __all__ = [
     "BaseAgent",
     "FinanceAgent",
     "GovernanceAgent",
+    "MarkdownAgent",
     "MarketingAgent",
     "OrderAgent",
     "StockAgent",

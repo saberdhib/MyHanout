@@ -16,6 +16,7 @@ from app.models.external_signal import ExternalSignal
 from app.models.forecast_evaluation import ForecastEvaluation
 from app.models.inventory import InventorySnapshot
 from app.models.invoice import Invoice, InvoiceLine
+from app.models.markdown import MarkdownSuggestion
 from app.models.meat import MeatCut, MeatLot
 from app.models.order import Order, OrderLine
 from app.models.organization import Invitation, Membership, MembershipRole, Organization
@@ -51,6 +52,7 @@ __all__ = [
     "Invitation",
     "Invoice",
     "InvoiceLine",
+    "MarkdownSuggestion",
     "MeatCut",
     "MeatLot",
     "Membership",

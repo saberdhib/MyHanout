@@ -84,8 +84,10 @@ auto que des actions whitelistées à faible risque. Chaque étape est **tracée
 - **Spécifique client = `.env` + données tenant**, jamais en dur dans `backend/app/`.
 
 ## 7. Feuille de route d'implémentation
-1. **Agent Démarque** (⭐) : modèle `markdown_suggestion` + moteur (règles : marge récupérée
-   vs risque de perte selon DLC & écoulement prévu) + agent + endpoint + page + tests.
+1. **Agent Démarque** (⭐) — ✅ **fait** : modèle `markdown_suggestion` + moteur pur
+   (`intelligence/markdown/engine.py` : cash récupéré vs perte selon DLC & écoulement) +
+   agent (`agent_markdown`) + endpoints (`/markdown`, `/scan`, `/apply|reject`) + page
+   `Markdown.tsx` + tests (`test_markdown.py`). Module `markdown`.
 2. **Agent Production + Recettes** (⭐) : `recipe`/`recipe_item` (nomenclature) +
    plan de production dérivé du forecast + conso matière/coût + agent + endpoint + front + tests.
 3. **Agent Tâches du jour** : agrégation des recos en checklist priorisée + cycle proactif

@@ -79,7 +79,7 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   daily_entry, forecast_evaluation, customer, promo_campaign, agent_memory, document_chunk,
   expense_classification_feedback, equipment, temperature_reading, price_history,
   meat_lot, meat_cut, **pipeline_run, inventory_snapshot, external_signal, recommendation,
-  alert**). **Exceptions voulues** (référentiels **globaux**, non tenant, non
+  alert, markdown_suggestion**). **Exceptions voulues** (référentiels **globaux**, non tenant, non
   filtrés par le garde-fou) : `expense_category`, `signal_definition`, `signal_observation`
   (signaux externes = données publiques alignées aux ventes par date).
 - **Limite** : le SQL brut (hors ORM) n'est PAS filtré → filtrer l'org explicitement
@@ -176,3 +176,11 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   `api/v1/alerts.py`), temps réel **SSE** filtré tenant (`core/events.py`, `api/v1/stream.py`).
   Schéma dev/E2E sqlite : `app/db/create_all.py`. E2E Playwright : `e2e/`. Doc :
   `docs/data-engineering.md`.
+- **Système multi-agents** : blueprint `docs/multi-agent-system.md` (équipe d'agents
+  spécialisés + orchestration human-in-command, adapté proximité alimentaire). Agents :
+  `intelligence/agents/` (registre `AGENT_CLASSES`, orchestrateur `intelligence/llm/orchestrator.py`).
+- **Démarque (anti-gaspi frais)** : agent Démarque — moteur de règles pur
+  `intelligence/markdown/engine.py` (perte évitée vs cash récupéré selon DLC & écoulement),
+  `services/markdown_service.py`, `api/v1/markdown.py` (`/markdown`, `/scan`,
+  `/{id}/apply|reject`), modèle `markdown_suggestion`, page front `Markdown.tsx`
+  (module `markdown`). Réglages : `markdown_*` dans `config.py`.

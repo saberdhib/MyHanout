@@ -198,11 +198,12 @@ async def _seed_business_data(session: AsyncSession, seeds: Path) -> None:
         ]
     )
 
-    # Démo : un périssable en fin de vie (déclenche la promo flash) + clients opt-in.
+    # Démo : un périssable en fin de vie (déclenche promo flash + démarque anti-gaspi)
+    # avec un lot volontairement surdimensionné (invendu prévu) + clients opt-in.
     soon = date.today() + timedelta(days=2)
     for product in products.values():
         if product.perishable:
-            session.add(Stock(product=product, quantity=4, reorder_threshold=10, expiry_date=soon))
+            session.add(Stock(product=product, quantity=15, reorder_threshold=10, expiry_date=soon))
             break
     session.add_all(
         [

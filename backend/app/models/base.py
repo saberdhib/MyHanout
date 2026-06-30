@@ -171,6 +171,14 @@ class RecommendationStatus(enum.StrEnum):
     DISMISSED = "dismissed"  # écartée par le commerçant
 
 
+class MarkdownStatus(enum.StrEnum):
+    """Cycle de vie d'une suggestion de démarque (anti-gaspillage, human-in-the-loop)."""
+
+    SUGGESTED = "suggested"  # proposée par l'agent Démarque (à valider)
+    APPLIED = "applied"  # démarque appliquée par le commerçant
+    REJECTED = "rejected"  # écartée par le commerçant
+
+
 class AlertStatus(enum.StrEnum):
     """État d'une alerte (human-in-the-loop : résolution manuelle)."""
 

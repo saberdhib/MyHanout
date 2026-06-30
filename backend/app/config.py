@@ -137,6 +137,16 @@ class Settings(BaseSettings):
     reco_stockout_risk_threshold: float = 0.5  # au-delà → proposer une commande
     reco_overstock_days: int = 21  # stock couvrant plus de N jours → réduire
 
+    # --- Démarque (anti-gaspillage frais, agent Démarque) ---
+    # Horizon de scan : on n'examine que les lots périssables périmant sous N jours.
+    markdown_horizon_days: int = 5
+    # Paliers de démarque proposés (du plus doux au plus fort).
+    markdown_tiers: list[int] = [10, 20, 30, 40, 50]
+    # Élasticité-prix simplifiée : +1 % de remise → +élasticité % de demande journalière.
+    markdown_elasticity: float = 1.5
+    # Marge brute par défaut quand le coût d'achat est inconnu (coût = prix × (1 - marge)).
+    markdown_default_margin_ratio: float = 0.30
+
     # --- Seeds ---
     # Répertoire des données de seed. /data en docker (volume monté),
     # sinon résolu relativement à la racine du repo.

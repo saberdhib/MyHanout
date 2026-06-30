@@ -661,6 +661,39 @@ export const getAlerts = (status?: string) =>
 export const resolveAlert = (id: number, note?: string, dismiss = false) =>
   api.post<Alert>(`/alerts/${id}/resolve`, { note, dismiss }).then((r) => r.data);
 
+export interface MarkdownSuggestion {
+  id: number;
+  product_id: number;
+  product_name: string | null;
+  quantity_at_risk: number;
+  expiry_date: string | null;
+  days_to_expiry: number;
+  current_price: number;
+  suggested_price: number;
+  discount_pct: number;
+  expected_units_cleared: number;
+  recovered_value: number;
+  avoided_loss: number;
+  baseline_loss: number;
+  confidence: number;
+  score: number;
+  status: string;
+  model_version: string;
+  pipeline_run_id: number | null;
+  explanation: string;
+}
+
+export const getMarkdowns = (status?: string) =>
+  api
+    .get<ListResponse<MarkdownSuggestion>>("/markdown", { params: status ? { status } : {} })
+    .then((r) => r.data);
+export const scanMarkdowns = () =>
+  api.post<ListResponse<MarkdownSuggestion>>("/markdown/scan").then((r) => r.data);
+export const applyMarkdown = (id: number) =>
+  api.post<MarkdownSuggestion>(`/markdown/${id}/apply`).then((r) => r.data);
+export const rejectMarkdown = (id: number) =>
+  api.post<MarkdownSuggestion>(`/markdown/${id}/reject`).then((r) => r.data);
+
 // Jeton courant (pour le flux SSE qui passe par fetch, pas axios).
 export const currentToken = () => localStorage.getItem("token");
 export const apiBaseUrl = baseURL;
