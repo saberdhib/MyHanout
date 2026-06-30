@@ -156,6 +156,12 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   chat web (`api/v1/chat.py`) + **fenêtre de chat flottante** front (`components/ChatWidget.tsx`,
   montée dans `Layout`). État des connecteurs **sans secret** : `GET /config/connectors`
   (page front `Connectors.tsx`). Assets de marque à fournir : `docs/brand-assets.md`.
+- **Ouverture / interopérabilité** : **clés API** (`X-API-Key`, table `api_key` hashée +
+  préfixe, scopes RBAC ; `core/security.generate_api_key`, résolution dans `core/deps`,
+  endpoints `api/v1/api_keys.py` owner-only) et **webhooks sortants** signés HMAC
+  (`webhook_endpoint`, `services/webhook_service.py`, `api/v1/webhooks.py`) — déclenchés sur
+  `alert_created` & `pipeline_finished` (n8n/Make/Zapier). Front : `components/ApiAccess.tsx`.
+  ⚠️ `webhook_service.deliver` filtre l'org **explicitement** (pas seulement via le garde-fou).
 - **Forecasting avancé** : signaux externes (`ingestion/signals_ext/` + tables globales
   `signal_definition`/`signal_observation`, `services/signals_service.py`,
   `api/v1/signals.py` : definitions/observations/ingest) et analyse

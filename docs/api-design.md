@@ -10,6 +10,10 @@ API REST FastAPI, versionnée sous `/api/v1`. Doc interactive : `/docs` (Swagger
 - **Auth/RBAC** : JWT Bearer. `POST /auth/login` renvoie access + refresh tokens ;
   `get_current_user` résout l'utilisateur depuis le token ; `require_permission(scope)`
   applique le RBAC (scopes du rôle, `*` = tous). Sans token → 401, scope manquant → 403.
+- **Accès programmatique** : header `X-API-Key: <clé>` (n8n/Make/Zapier/scripts) en
+  alternative au Bearer — résout l'org + ses scopes, même garde-fou tenant. Clés gérées
+  par le propriétaire (`/api-keys`), hashées en base. **Webhooks sortants** signés HMAC
+  (`/webhooks`) pour pousser les événements vers ces plateformes.
 - **Audit** : middleware trace toutes les requêtes mutantes ; actions sensibles
   persistées dans `audit_log`.
 
@@ -90,6 +94,9 @@ API REST FastAPI, versionnée sous `/api/v1`. Doc interactive : `/docs` (Swagger
 | GET     | `/api/v1/whatsapp/webhook`    | Handshake de vérification Meta                | —         |
 | POST    | `/api/v1/whatsapp/webhook`    | Réception message → orchestrateur d'agents    | —         |
 | POST    | `/api/v1/slack/webhook`       | Slack Events API (challenge + message → agents) | —       |
+| GET     | `/api/v1/config/connectors`   | État des connecteurs (sans secret)            | (auth)    |
+| GET/POST/DELETE | `/api/v1/api-keys`    | Clés API (accès programmatique) — **owner**   | owner     |
+| GET/POST/DELETE | `/api/v1/webhooks`    | Webhooks sortants signés HMAC — **owner**     | owner     |
 
 ## Exemple — prévision
 

@@ -4,6 +4,7 @@
 from app.db.base import Base
 from app.models.agent_memory import AgentMemory
 from app.models.alert import Alert
+from app.models.api_key import ApiKey
 from app.models.audit_log import AuditLog
 from app.models.conversation import Conversation
 from app.models.customer import Customer
@@ -28,11 +29,13 @@ from app.models.signal import SignalDefinition, SignalObservation
 from app.models.stock import Stock
 from app.models.supplier import Supplier
 from app.models.user import Role, User
+from app.models.webhook import WebhookEndpoint
 
 __all__ = [
     "Base",
     "AgentMemory",
     "Alert",
+    "ApiKey",
     "AuditLog",
     "Conversation",
     "Customer",
@@ -67,4 +70,5 @@ __all__ = [
     "Supplier",
     "Role",
     "User",
+    "WebhookEndpoint",
 ]

@@ -89,15 +89,20 @@ async def scan_alerts(
         )
 
     if created:
+        from app.services import webhook_service
+
         session.add_all(created)
         await session.flush()
         org_id = get_current_org()
         for a in created:
-            publish_event(
-                org_id,
-                "alert_created",
-                {"id": a.id, "kind": str(a.kind), "priority": str(a.priority), "title": a.title},
-            )
+            payload = {
+                "id": a.id,
+                "kind": str(a.kind),
+                "priority": str(a.priority),
+                "title": a.title,
+            }
+            publish_event(org_id, "alert_created", payload)  # temps réel (SSE)
+            await webhook_service.deliver(session, org_id, "alert_created", payload)  # n8n/Make/…
     return created
 
 

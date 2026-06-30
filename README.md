@@ -224,7 +224,11 @@ approve, reject, **PATCH** édition + payé, **import/email**) · `/forecasts/{i
 `/signals` (definitions, observations, **ingest**) · `/pipelines/*` (runs, trigger, health) ·
 `/recommendations` (+ simulate) · `/alerts` (+ resolve) · `/stream/events` (SSE) ·
 `/chat` · `/rag/*` · `/agents/eval` · `/whatsapp/webhook` ·
-`/telegram/webhook` · `/slack/webhook`. Détail : [`docs/api-design.md`](docs/api-design.md).
+`/telegram/webhook` · `/slack/webhook` · `/api-keys` · `/webhooks` · `/config/connectors`.
+Détail : [`docs/api-design.md`](docs/api-design.md).
+
+> **Ouvert & interopérable** : API REST + **clés API** (`X-API-Key`) + **webhooks sortants**
+> signés HMAC → branchez **n8n / Make / Zapier** (un MCP pour agents IA est au programme).
 
 ---
 

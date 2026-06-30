@@ -184,10 +184,12 @@ async def run_job(
         PIPELINE_RUNS.labels(job=job_name, status=str(run.status)).inc()
         PIPELINE_DURATION.labels(job=job_name).observe((finished - now).total_seconds())
 
-    publish_event(
-        get_current_org(),
-        "pipeline_finished",
-        {"id": run.id, "job": job_name, "status": str(run.status), "rows": total},
+    from app.services import webhook_service
+
+    finished_payload = {"id": run.id, "job": job_name, "status": str(run.status), "rows": total}
+    publish_event(get_current_org(), "pipeline_finished", finished_payload)  # temps réel (SSE)
+    await webhook_service.deliver(  # n8n / Make / Zapier
+        session, get_current_org(), "pipeline_finished", finished_payload
     )
     log.info(
         "pipeline.run",

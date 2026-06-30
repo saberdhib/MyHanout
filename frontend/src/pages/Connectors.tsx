@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Card } from "../components/Card";
+import ApiAccess from "../components/ApiAccess";
 import {
   getConnectors,
   importInvoicesFromEmail,
@@ -93,6 +94,8 @@ export default function Connectors() {
           </Card>
         );
       })}
+
+      <ApiAccess />
 
       <Card title="Tester maintenant (mock keyless)" subtitle="Déclenche les connecteurs data existants">
         <div className="flex flex-wrap gap-2">

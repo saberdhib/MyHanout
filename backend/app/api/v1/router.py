@@ -7,6 +7,7 @@ from fastapi import APIRouter
 from app.api.v1 import (
     agents,
     alerts,
+    api_keys,
     auth,
     catalog,
     chat,
@@ -31,6 +32,7 @@ from app.api.v1 import (
     stocks,
     stream,
     telegram,
+    webhooks,
     whatsapp,
 )
 
@@ -62,3 +64,5 @@ api_router.include_router(stream.router)
 api_router.include_router(whatsapp.router)
 api_router.include_router(telegram.router)
 api_router.include_router(slack.router)
+api_router.include_router(api_keys.router)
+api_router.include_router(webhooks.router)

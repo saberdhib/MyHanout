@@ -4,18 +4,51 @@ from __future__ import annotations
 
 from collections.abc import AsyncGenerator
 
-from fastapi import Depends
+from fastapi import Depends, Header
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import AuthError, PermissionDeniedError
-from app.core.security import CurrentUser, JWTError, decode_token
+from app.core.security import CurrentUser, JWTError, decode_token, hash_api_key
 from app.core.tenancy import set_current_org
 from app.db.session import get_session
 from app.repositories.user import UserRepository
 from app.services.auth_service import resolve_membership, to_current_user
 
 _bearer = HTTPBearer(auto_error=False)
+
+
+async def _user_from_api_key(session: AsyncSession, api_key: str) -> CurrentUser:
+    """Résout un commerce + ses scopes depuis une clé API (X-API-Key)."""
+    from datetime import UTC, datetime
+
+    from app.core.tenancy import tenant_context
+    from app.models.api_key import ApiKey
+
+    # Lookup par hash, hors garde-fou tenant (on ne connaît pas encore l'org).
+    with tenant_context(None):
+        key = await session.scalar(
+            select(ApiKey).where(
+                ApiKey.key_hash == hash_api_key(api_key), ApiKey.revoked.is_(False)
+            )
+        )
+    if key is None:
+        raise AuthError("Clé API invalide ou révoquée")
+    key.last_used_at = datetime.now(UTC)
+    scopes = (
+        ["*"]
+        if key.scopes.strip() == "*"
+        else [s.strip() for s in key.scopes.split(",") if s.strip()]
+    )
+    set_current_org(key.organization_id)
+    return CurrentUser(
+        id=key.created_by_user_id or 0,
+        email=f"apikey:{key.prefix}",
+        role="api",
+        permissions=scopes,
+        organization_id=key.organization_id,
+    )
 
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
@@ -25,14 +58,19 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials | None = Depends(_bearer),
+    x_api_key: str | None = Header(default=None, alias="X-API-Key"),
     session: AsyncSession = Depends(get_db),
 ) -> CurrentUser:
-    """Résout l'utilisateur + l'organisation courante depuis le Bearer token.
+    """Résout l'utilisateur + l'organisation courante depuis le Bearer token
+    OU une clé API (`X-API-Key`, pour n8n/Make/Zapier/scripts).
 
-    Le tenant courant (organization_id) provient EXCLUSIVEMENT du token, puis est
-    posé dans le garde-fou central (`set_current_org`) qui filtre toutes les
+    Le tenant courant (organization_id) provient EXCLUSIVEMENT du token / de la clé,
+    puis est posé dans le garde-fou central (`set_current_org`) qui filtre toutes les
     requêtes ORM. Le client ne peut pas le falsifier.
     """
+    # Accès programmatique par clé API (si pas de Bearer).
+    if credentials is None and x_api_key:
+        return await _user_from_api_key(session, x_api_key)
     if credentials is None:
         raise AuthError("Authentification requise")
     try:

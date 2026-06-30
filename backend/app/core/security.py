@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import secrets
 from datetime import UTC, datetime, timedelta
 
 from jose import JWTError, jwt
@@ -80,6 +82,24 @@ def create_refresh_token(subject: str) -> str:
 def decode_token(token: str) -> dict:
     """Décode et valide un JWT. Lève JWTError si invalide/expiré."""
     return jwt.decode(token, settings.secret_key, algorithms=[settings.jwt_algorithm])
+
+
+# --- Clés API (accès programmatique : n8n / Make / Zapier / scripts) ----------
+_API_KEY_PREFIX = "mh_"
+
+
+def generate_api_key() -> tuple[str, str, str]:
+    """Génère une clé API → (clé_complète, préfixe_visible, hash_sha256).
+
+    La clé complète n'est montrée qu'une fois (création) ; on ne stocke que le hash.
+    """
+    full = f"{_API_KEY_PREFIX}{secrets.token_urlsafe(32)}"
+    return full, full[:12], hash_api_key(full)
+
+
+def hash_api_key(full: str) -> str:
+    """Hash SHA-256 (hex) d'une clé API."""
+    return hashlib.sha256(full.encode()).hexdigest()
 
 
 __all__ = [

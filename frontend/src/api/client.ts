@@ -461,6 +461,42 @@ export interface ConnectorsConfig {
 export const getConnectors = () =>
   api.get<ConnectorsConfig>("/config/connectors").then((r) => r.data);
 
+// --- Ouverture : clés API + webhooks (n8n / Make / Zapier) -----------------
+export interface ApiKey {
+  id: number;
+  name: string;
+  prefix: string;
+  scopes: string;
+  revoked: boolean;
+  last_used_at: string | null;
+}
+export interface ApiKeyCreated extends ApiKey {
+  key: string;
+}
+export interface Webhook {
+  id: number;
+  url: string;
+  events: string;
+  active: boolean;
+  last_status: number | null;
+  failures: number;
+}
+export interface WebhookCreated extends Webhook {
+  secret: string;
+}
+
+export const listApiKeys = () =>
+  api.get<ListResponse<ApiKey>>("/api-keys").then((r) => r.data);
+export const createApiKey = (name: string, scopes = "*") =>
+  api.post<ApiKeyCreated>("/api-keys", { name, scopes }).then((r) => r.data);
+export const revokeApiKey = (id: number) => api.delete(`/api-keys/${id}`).then((r) => r.data);
+
+export const listWebhooks = () =>
+  api.get<ListResponse<Webhook>>("/webhooks").then((r) => r.data);
+export const createWebhook = (url: string, events = "*") =>
+  api.post<WebhookCreated>("/webhooks", { url, events }).then((r) => r.data);
+export const deleteWebhook = (id: number) => api.delete(`/webhooks/${id}`).then((r) => r.data);
+
 // --- Catalogue : gestion produits + familles -------------------------------
 export interface CatalogProduct {
   id: number;
