@@ -15,13 +15,15 @@ from __future__ import annotations
 import json
 from datetime import date, timedelta
 
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.config import settings
+from app.core.tenancy import get_current_org
 from app.intelligence.forecasting.service_client import get_forecast_service_client
 from app.intelligence.recommendation.engine import decide
+from app.models.base import RecommendationStatus
 from app.models.external_signal import ExternalSignal
 from app.models.product import Product
 from app.models.recommendation import Recommendation
@@ -112,6 +114,19 @@ async def compute_recommendations(
     products = list((await session.scalars(query)).all())
 
     boost = await _merchant_boost(session, horizon_days=horizon, today=today)
+
+    if persist:
+        # On remplace le jeu de recos "suggested" précédent (on garde l'historique
+        # accepted/dismissed). NB : un DELETE ORM n'est PAS filtré par le garde-fou
+        # (event SELECT only) → on filtre l'organisation EXPLICITEMENT (sécurité).
+        org_id = get_current_org()
+        if org_id is not None:
+            await session.execute(
+                delete(Recommendation).where(
+                    Recommendation.organization_id == org_id,
+                    Recommendation.status == RecommendationStatus.SUGGESTED,
+                )
+            )
 
     decisions: list[RecoDecision] = []
     for product in products:
