@@ -17,15 +17,21 @@ const features = [
     span: "lg:col-span-3",
   },
   {
-    title: "Promos anti-gaspillage",
-    body: "Produit en fin de vie ? L'IA propose une promo ciblée, génère l'affiche, et la publie après votre validation — réseaux + clients opt-in.",
-    icon: "spark",
+    title: "Communication depuis votre téléphone",
+    body: "Répondez, animez votre clientèle et publiez vos offres depuis WhatsApp, Telegram & Slack. L'IA rédige, génère l'affiche, et publie après votre validation.",
+    icon: "chat",
     span: "lg:col-span-2",
   },
   {
-    title: "Prévision de la demande",
-    body: "Anticipez les pics (week-end, fêtes, météo). Modèles naïf → Prophet/LightGBM, suivi de l'écart prévu/réel.",
+    title: "Demande client & approvisionnement",
+    body: "Anticipez les pics (week-end, fêtes, météo) ET ce qu'il faut commander. Modèles naïf → Prophet/LightGBM, écart prévu/réel suivi.",
     icon: "chart",
+    span: "lg:col-span-2",
+  },
+  {
+    title: "Dépendances entre produits",
+    body: "Comprenez ce qui se vend ensemble (compléments) ou se reporte en cas de rupture (substituts) — pour prévoir juste, pas produit par produit.",
+    icon: "spark",
     span: "lg:col-span-2",
   },
   {
@@ -51,7 +57,7 @@ const steps = [
   {
     n: "02",
     title: "Laissez l'IA travailler",
-    body: "Factures lues, demande prévue, réassort suggéré, fins de vie repérées. Chaque proposition est expliquée.",
+    body: "Factures lues, demande et approvisionnement prévus, dépendances entre produits détectées, messages prêts. Chaque proposition est expliquée.",
   },
   {
     n: "03",
@@ -99,8 +105,10 @@ function icon(name: string) {
         </span>
       </h1>
       <p class="reveal mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-night-700">
-        Factures lues automatiquement, réassort suggéré et expliqué, promos anti-gaspillage
-        prêtes à publier. Le tout depuis WhatsApp — sans saisie, sans jargon, sans boîte noire.
+        Anticipez votre <strong>demande client</strong> et votre <strong>approvisionnement</strong>,
+        comprenez les <strong>dépendances entre vos produits</strong>, et
+        <strong>pilotez &amp; communiquez depuis votre téléphone</strong> (WhatsApp, Telegram, Slack).
+        Vos factures sont lues automatiquement — sans saisie, sans jargon, sans boîte noire.
       </p>
       <div class="reveal mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
         <a href={`${SITE.appUrl}/signup`} class="btn-primary px-6 py-3.5 text-base">
@@ -174,20 +182,20 @@ function icon(name: string) {
   <section class="bg-night text-surface">
     <div class="container-x grid items-center gap-12 py-24 lg:grid-cols-2">
       <div>
-        <span class="eyebrow reveal border-white/15 bg-white/5 text-brand-light">Anti-gaspillage</span>
+        <span class="eyebrow reveal border-white/15 bg-white/5 text-brand-light">Communication</span>
         <h2 class="reveal mt-5 text-3xl font-extrabold tracking-tight sm:text-4xl">
-          Transformez les fins de vie en chiffre d'affaires
+          Gardez la relation client dans votre poche
         </h2>
         <p class="reveal mt-4 text-lg leading-relaxed text-white/70">
-          L'IA repère les produits proches de la péremption, rédige un message chaleureux,
-          <strong class="text-white"> génère l'affiche</strong> et la publie après votre validation —
-          sur vos réseaux et auprès des clients qui ont consenti (RGPD).
+          L'IA rédige vos messages et vos offres, <strong class="text-white">génère l'affiche</strong>
+          et publie après votre validation — sur <strong class="text-white">WhatsApp, Telegram &amp; Slack</strong>,
+          vos réseaux et vos clients consentants (RGPD). Vous animez votre commerce depuis votre téléphone.
         </p>
         <ul class="reveal mt-7 space-y-3">
           {
             [
-              "Message + affiche générés automatiquement",
-              "Diffusion réseaux + clients opt-in uniquement",
+              "Messages + affiches générés automatiquement",
+              "WhatsApp / Telegram / Slack + réseaux + clients opt-in",
               "Publication validée par vous, tracée (audit)",
             ].map((t) => (
               <li class="flex items-start gap-3 text-white/80">

@@ -3,8 +3,9 @@ export const SITE = {
   name: "MyHanout AI",
   title: "MyHanout AI — Le copilote IA des commerces de proximité",
   description:
-    "OCR de factures, prévision de la demande, réassort explicable et promos anti-gaspillage. " +
-    "Piloté depuis WhatsApp/Telegram. Multi-tenant, RGPD, human-in-the-loop.",
+    "Prévoyez votre demande client et votre approvisionnement, comprenez les dépendances " +
+    "entre vos produits, et communiquez depuis votre téléphone (WhatsApp/Telegram/Slack). " +
+    "OCR de factures inclus. Multi-tenant, RGPD, human-in-the-loop.",
   // URL de l'app (dashboard). Surchargée par PUBLIC_APP_URL au build si besoin.
   appUrl: import.meta.env.PUBLIC_APP_URL || "http://localhost:5173",
 };

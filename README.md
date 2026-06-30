@@ -1,7 +1,7 @@
 # 🏪 MyHanout AI — l'IA qui vous facilite la gestion de votre commerce
 
 > Copilot IA pour les commerces de proximité (boucherie, épicerie, boulangerie, primeur…),
-> piloté depuis **WhatsApp / Telegram** + un dashboard léger.
+> piloté depuis **WhatsApp / Telegram / Slack** + un dashboard léger.
 > Principe directeur : **human-in-the-loop · explicable · auditable · RGPD · multi-commerces.**
 
 <p>
@@ -13,10 +13,11 @@
   <img alt="status" src="https://img.shields.io/badge/statut-démo%20fonctionnelle-success.svg" />
 </p>
 
-MyHanout AI ingère le passif documentaire du commerçant (factures PDF/photo via OCR),
-structure les données, **prévoit la demande**, **alerte** sur ruptures et péremptions,
-propose des **commandes de réassort explicables**, déclenche des **promos anti-gaspillage**,
-et **répond/agit** par messagerie — toujours sous contrôle humain.
+MyHanout AI **prévoit la demande client et l'approvisionnement**, **comprend les dépendances
+entre produits** (compléments / substituts), propose des **commandes de réassort explicables**,
+**alerte** sur les ruptures, et vous laisse **communiquer & piloter votre commerce depuis votre
+téléphone** (WhatsApp / Telegram / Slack). Il ingère aussi le passif documentaire (factures
+PDF/photo via OCR) pour nourrir le tout — toujours sous contrôle humain.
 
 <p align="center">
   <img src="website/public/shots/dashboard.png" alt="Dashboard MyHanout AI" width="49%" />
@@ -27,7 +28,7 @@ et **répond/agit** par messagerie — toujours sous contrôle humain.
   <img src="website/public/shots/data-ops.png" alt="Data Ops — orchestration des pipelines" width="49%" />
 </p>
 <p align="center">
-  <img src="website/public/shots/promos.png" alt="Promo anti-gaspillage + affiche générée" width="49%" />
+  <img src="website/public/shots/promos.png" alt="Promo & communication client + affiche générée" width="49%" />
   <img src="website/public/shots/invoices.png" alt="Factures (OCR + import email)" width="49%" />
 </p>
 
@@ -61,7 +62,7 @@ simulés tant qu'aucune clé n'est fournie. Scénario pas-à-pas : **[`docs/DEMO
 | 📊 Forecasting | Prévision de demande (naïf par défaut, Prophet/LightGBM en option) + saisonnalité/fêtes + **signaux externes** (météo, vacances scolaires, carburant, foot…) et **effets entre produits** (substituts/compléments) — voir ci-dessous |
 | 🛒 Réassort | Suggestions **explicables** (demande + stock + délai + signaux), 3 modes d'envoi fournisseur |
 | 🗂️ Catalogue | **Gestion produits** (créer/éditer) + **rangement par famille** (rayon), recherche/filtre |
-| 🔔 Promos flash | Détection fin de vie → promo IA → **affiche générée (text-to-image)** → publication **réseaux + clients opt-in (RGPD)** |
+| 📣 Communication & promos | Messages/offres rédigés par l'IA → **affiche générée (text-to-image)** → publication validée **WhatsApp/Telegram/Slack + réseaux + clients opt-in (RGPD)** |
 | 💶 Gestion financière | **OPEX/CAPEX** (tagging IA explicable, validé humain), **trésorerie** (alerte cash), **valorisation stock**, **marges réelles** + alertes (doublon, prix, marge, échéance) — pré-compta |
 | 🌡️ Chaîne du froid | Suivi **température** des machines (HACCP) via capteurs (mock keyless ou thermomètres connectés), **alertes explicables** anti-gaspillage |
 | 🔌 Intégrations | **Import JSON** + **sync DWH** + **connecteur caisse (POS)** (ingestion ventes idempotente) + page **Connecteurs** (statut messagerie/data/IoT, sans secret) |
