@@ -41,24 +41,27 @@
   }
 }
 
-/* Révélation au scroll (progressive enhancement ; sans JS tout reste visible). */
-.reveal {
-  opacity: 0;
-  transform: translateY(20px);
-  transition:
-    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: opacity, transform;
+/* Entrée animée robuste : le contenu finit TOUJOURS visible (anim `both`), sans
+   dépendre du JS ni d'un IntersectionObserver. Le JS de Base.astro ne fait
+   qu'accélérer l'effet au scroll (classe `.in`), mais n'est plus requis. */
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
-.reveal.in {
-  opacity: 1;
-  transform: none;
+.reveal {
+  animation: reveal-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 @media (prefers-reduced-motion: reduce) {
   .reveal {
+    animation: none;
     opacity: 1;
     transform: none;
-    transition: none;
   }
   html {
     scroll-behavior: auto;
