@@ -15,6 +15,7 @@ import Finance from "./pages/Finance";
 import Equipment from "./pages/Equipment";
 import Boucherie from "./pages/Boucherie";
 import Integrations from "./pages/Integrations";
+import Catalog from "./pages/Catalog";
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
         <Route path="chat" element={<Chat />} />
         <Route path="promos" element={<Promos />} />
         <Route path="finance" element={<Finance />} />
+        <Route path="catalog" element={<Catalog />} />
         <Route path="stocks" element={<Stocks />} />
         <Route path="forecasts" element={<Forecasts />} />
         <Route path="suggestions" element={<Suggestions />} />
