@@ -7,6 +7,9 @@ __pycache__/
 venv/
 env/
 .python-version
+# Artefacts de build (pip install d'un projet local → backend/build/)
+build/
+dist/
 
 # Test / coverage
 .pytest_cache/
