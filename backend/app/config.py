@@ -102,6 +102,13 @@ class Settings(BaseSettings):
     pos_connector: str = "mock"  # mock | http
     pos_url: str = ""
 
+    # --- Signaux externes (météo histo, vacances, carburant, foot…) ---
+    signals_provider: str = "mock"  # mock | http
+    signals_http_url: str = ""
+    signals_api_key: str = ""
+    # Région par défaut pour les signaux régionalisés (météo/vacances).
+    signals_region: str = "FR"
+
     # --- Telegram (Bot API) ---
     telegram_provider: str = "mock"  # mock | bot
     telegram_bot_token: str = ""

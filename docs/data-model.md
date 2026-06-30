@@ -75,6 +75,19 @@ les tests d'intégration et les migrations tournent sur **PostgreSQL 16 + pgvect
 > `invoice`, `invoice_line`, `stock`) → isolation garantie. Positionnement :
 > **pilotage / pré-compta**, pas de comptabilité certifiée.
 
+## Signaux externes (features du forecast)
+
+| Table | Tenant | Rôle |
+|-------|--------|------|
+| `signal_definition` | **Non** (référentiel global) | Registre des séries disponibles (`key`, `label`, `kind` weather/holiday/fuel/sports/economic/custom, `unit`, `provider`, `source`). Point d'extension : ajouter une source. |
+| `signal_observation` | **Non** (donnée publique) | Valeur d'un signal par date (`signal_key`, `region`, `obs_date`, `value`, `value_text`). Unicité `(signal_key, region, obs_date)`. |
+
+> Les signaux sont des **données publiques** (météo, vacances, carburant, foot…), non
+> propres à un commerce → globaux (pas `TenantMixin`), comme `expense_category`. Ils sont
+> alignés aux ventes **par date** pour mesurer la corrélation (`/forecasts/{id}/factors`).
+> Côté ventes, l'analyse reste **tenant-scopée** par le garde-fou ORM. Ingestion idempotente
+> via `POST /signals/ingest` (mock keyless ou provider HTTP). Voir `docs/ai-models.md` §5.
+
 ## Données de seed
 
 `data/seeds/` : `suppliers.csv`, `products.csv`, `sales.csv` (~720 lignes,

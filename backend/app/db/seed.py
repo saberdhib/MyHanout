@@ -237,6 +237,17 @@ async def seed() -> None:
 
         await seed_expense_categories(session)
 
+        # Signaux externes (global) : registre + historique (mock) pour la corrélation.
+        from datetime import date as _date
+        from datetime import timedelta as _td
+
+        from app.ingestion.signals_ext import seed_signal_definitions
+        from app.services.signals_service import ingest_signals
+
+        await seed_signal_definitions(session)
+        _today = _date.today()
+        await ingest_signals(session, date_from=_today - _td(days=200), date_to=_today)
+
         # Organisation de démo (tenant).
         org = Organization(name="Commerce Démo", slug="demo", business_type="epicerie")
         session.add(org)

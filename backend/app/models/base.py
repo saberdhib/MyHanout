@@ -126,3 +126,21 @@ class MeatLotStatus(enum.StrEnum):
     RECEIVED = "received"  # bête reçue, pas encore travaillée
     BREAKING = "breaking"  # en cours de découpe/désossage
     DONE = "done"  # décomposition terminée (réel saisi)
+
+
+class SignalKind(enum.StrEnum):
+    """Nature d'un signal externe pouvant influencer la demande."""
+
+    WEATHER = "weather"  # météo (température, pluie…)
+    HOLIDAY = "holiday"  # vacances scolaires / jours fériés
+    FUEL = "fuel"  # prix du carburant
+    SPORTS = "sports"  # événements sportifs (matchs)
+    ECONOMIC = "economic"  # indices éco (inflation, pouvoir d'achat)
+    CUSTOM = "custom"  # source ajoutée par le commerçant
+
+
+class RelationKind(enum.StrEnum):
+    """Relation statistique entre deux produits."""
+
+    SUBSTITUTE = "substitute"  # l'un remplace l'autre (rupture → report)
+    COMPLEMENT = "complement"  # se vendent ensemble (halo)

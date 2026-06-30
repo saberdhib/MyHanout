@@ -68,6 +68,11 @@ API REST FastAPI, versionnée sous `/api/v1`. Doc interactive : `/docs` (Swagger
 | GET     | `/api/v1/stocks/alerts`       | Stocks sous le seuil de réassort              | stocks    |
 | GET     | `/api/v1/invoices`            | Factures + lignes                             | invoices  |
 | GET     | `/api/v1/forecasts/{id}`      | Prévision de demande d'un produit             | forecasts |
+| GET     | `/api/v1/forecasts/{id}/factors` | Facteurs externes corrélés (météo, vacances, carburant, foot…) + verdict | forecasts |
+| GET     | `/api/v1/forecasts/{id}/cross-product` | Produits substituts / compléments (effets croisés) | forecasts |
+| GET     | `/api/v1/signals/definitions` | Registre des séries de signaux externes       | forecasts |
+| GET     | `/api/v1/signals/observations`| Valeurs historiques d'une série (`?signal_key=`) | forecasts |
+| POST    | `/api/v1/signals/ingest`      | Tire l'historique des signaux (idempotent)    | forecasts |
 | POST    | `/api/v1/orders/{id}/approve` | Validation humaine d'une commande (auditée)   | orders    |
 | GET     | `/api/v1/whatsapp/webhook`    | Handshake de vérification Meta                | —         |
 | POST    | `/api/v1/whatsapp/webhook`    | Réception message → orchestrateur d'agents    | —         |
@@ -83,6 +88,26 @@ API REST FastAPI, versionnée sous `/api/v1`. Doc interactive : `/docs` (Swagger
   "horizon_days": 7,
   "points": [{ "ds": "2026-07-01", "yhat": 19.5, "yhat_lower": 15.6, "yhat_upper": 23.4 }],
   "explanation": "Moyenne mobile 28j ajustée par saisonnalité hebdo, jours fériés et fêtes."
+}
+```
+
+## Exemple — facteurs de demande (corrélation, pas causalité)
+
+`GET /api/v1/forecasts/1/factors`
+
+```json
+{
+  "product_id": 1,
+  "period_from": "2026-01-01",
+  "period_to": "2026-06-30",
+  "factors": [
+    { "signal_key": "weather_temp_c", "label": "Température (°C)", "kind": "weather",
+      "correlation": 0.62, "n": 120, "direction": "positive", "strength": "forte",
+      "verdict": "corrélation probable (confirmer la causalité)",
+      "explanation": "Température (°C) : corrélation positive r=0.62 sur 120 jours (...)." }
+  ],
+  "caveat": "Corrélation ≠ causalité : à confirmer par un test (A/B, hold-out) avant d'agir.",
+  "explanation": "1 facteur(s) évalué(s) ... classés par force de corrélation."
 }
 ```
 

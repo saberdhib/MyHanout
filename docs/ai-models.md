@@ -17,6 +17,7 @@
 | **Images** (affiches promo) | `IMAGE_PROVIDER`, `HF_IMAGE_MODEL` | `mock` \| `huggingface` | `mock` / `stabilityai/stable-diffusion-xl-base-1.0` | Génération d'affiches anti-gaspillage (text-to-image) |
 | **OCR** (factures) | `OCR_PROVIDER`, `MISTRAL_API_KEY` | `mock` \| `mistral` \| `pdf_fallback` | `mock` | Lecture des factures (photo/PDF) |
 | **Prévision demande** | `FORECAST_MODEL`, `FORECAST_HORIZON_DAYS` | `naive` \| `prophet` \| `lgbm` | `naive` / `14` | Prévision de ventes (réassort) |
+| **Signaux externes** | `SIGNALS_PROVIDER`, `SIGNALS_HTTP_URL`, `SIGNALS_API_KEY`, `SIGNALS_REGION` | `mock` \| `http` | `mock` / — / — / `FR` | Données historiques (météo, vacances, carburant, foot…) pour le forecasting |
 | **Classifieur charges** | `FINANCE_CLASSIFIER` | `mock` \| `llm` | `mock` | Tagging OPEX/CAPEX des factures |
 
 > Les autres providers (capteurs, caisse, email, DWH, WhatsApp, Telegram) suivent la
@@ -81,6 +82,43 @@ Bonnes pratiques en place : modèles **abstraits + mock** (test sans dépendance
 métriques persistées (suivi dans le temps), réentraînement **déclenché par l'humain**
 (pas de drift silencieux), signal d'apprentissage des **corrections** (ex. OPEX/CAPEX
 dans `expense_classification_feedback`).
+
+## 5. Signaux externes & facteurs de demande (features du forecast)
+
+Pour aller au-delà de la saisonnalité, on **branche des données externes** et on **mesure
+leur impact** sur les ventes — en distinguant honnêtement corrélation, coïncidence et causalité.
+
+### 5.1 Ajouter une source de données (provider + table)
+
+Deux points d'extension, génériques :
+
+1. **Provider** — `ingestion/signals_ext/` : une ABC `ExternalSignalProvider` avec
+   `MockSignalProvider` (séries déterministes, keyless, par défaut) et `HttpSignalProvider`
+   (env-driven : `SIGNALS_HTTP_URL`, `SIGNALS_API_KEY`). Pour une nouvelle API, ajouter une
+   impl derrière l'ABC + le branchement dans `get_signal_provider()`.
+2. **Déclaration en base** — table `signal_definition` (registre : `key`, `label`, `kind`,
+   `unit`, `provider`, `source`). Les valeurs vont dans `signal_observation`
+   (`signal_key`, `region`, `obs_date`, `value`, `value_text`) — **globales** (données
+   publiques, non tenant), alignées aux ventes par date (+ région).
+
+Séries livrées par défaut : `weather_temp_c`, `weather_rain`, `school_holiday`,
+`public_holiday`, `fuel_price_eur_l`, `football_match`. `POST /signals/ingest` tire
+l'historique (idempotent par clé+région+date) ; `GET /signals/definitions` et
+`GET /signals/observations` exposent registre et valeurs.
+
+### 5.2 Évaluer l'impact : corrélation ≠ causalité
+
+| Endpoint | Ce qu'il calcule |
+|----------|------------------|
+| `GET /forecasts/{id}/factors` | Pearson ventes×signal, **classé par force**, verdict (forte/modérée/faible, *données insuffisantes* < 14 pts) + caveat causalité |
+| `GET /forecasts/{id}/cross-product` | Pearson **co-ventes** entre produits : positif → complément, négatif → substitut |
+
+Le verdict est volontairement prudent : un coefficient fort **signale** une piste de feature,
+il ne **prouve** pas un lien — à confirmer par un test (A/B, hold-out) avant d'agir. Les
+facteurs retenus deviennent des **features** du modèle de prévision (Prophet regressors / LGBM).
+
+> Implémentation : `intelligence/forecasting/correlation.py` (Pearson via numpy, seuils,
+> verdicts) ; `services/signals_service.py` (ingestion). Tout reste tenant-scopé côté ventes.
 
 Roadmap MLOps (proposé) : registre de modèles (versions + métriques attachées),
 détection de drift automatique, A/B des modèles de forecast, scheduling via Airflow.

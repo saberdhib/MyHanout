@@ -54,7 +54,7 @@ simulés tant qu'aucune clé n'est fournie. Scénario pas-à-pas : **[`docs/DEMO
 | Domaine | Détail |
 |---------|--------|
 | 📥 Ingestion factures | OCR (Mistral + fallback PDF), drag & drop / photo WhatsApp/Telegram, **import email (IMAP)**, validation humaine, suivi **payé/non payé**, édition pré-remplie |
-| 📊 Forecasting | Prévision de demande (naïf par défaut, Prophet/LightGBM en option) + saisonnalité/fêtes |
+| 📊 Forecasting | Prévision de demande (naïf par défaut, Prophet/LightGBM en option) + saisonnalité/fêtes + **signaux externes** (météo, vacances scolaires, carburant, foot…) et **effets entre produits** (substituts/compléments) — voir ci-dessous |
 | 🛒 Réassort | Suggestions **explicables** (demande + stock + délai + signaux), 3 modes d'envoi fournisseur |
 | 🔔 Promos flash | Détection fin de vie → promo IA → **affiche générée (text-to-image)** → publication **réseaux + clients opt-in (RGPD)** |
 | 💶 Gestion financière | **OPEX/CAPEX** (tagging IA explicable, validé humain), **trésorerie** (alerte cash), **valorisation stock**, **marges réelles** + alertes (doublon, prix, marge, échéance) — pré-compta |
@@ -112,6 +112,47 @@ Détails : [`docs/delivery/03-solution-architecture.md`](docs/delivery/03-soluti
 
 ---
 
+## 📊 Forecasting — au-delà du MAE/MAPE
+
+L'objectif n'est pas juste « prédire une courbe », mais **comprendre ce qui fait vendre**
+et le mesurer honnêtement. Trois briques, toutes branchables et explicables :
+
+**1. Signaux externes historiques (mets un maximum de data, vois ce qui pèse).**
+Chaque source de données est un *provider* derrière une ABC (mock keyless par défaut,
+HTTP réel via `.env`) et une **série déclarée** en base — donc on en ajoute autant qu'on veut :
+
+| Série (clé) | Type | Hypothèse métier |
+|-------------|------|------------------|
+| `weather_temp_c`, `weather_rain` | météo | chaleur → boissons/glaces ; pluie → moins de passage |
+| `school_holiday` | vacances scolaires | familles présentes → paniers différents |
+| `public_holiday` | jours fériés | pics / fermetures |
+| `fuel_price_eur_l` | prix carburant | pouvoir d'achat, mobilité |
+| `football_match` | matchs de foot | snacks/boissons les soirs de match |
+
+→ **Où mettre une nouvelle source / API** : déclarer une `SignalDefinition` (clé, libellé,
+type, provider/source) + une impl de `ExternalSignalProvider` ; l'ingestion et la
+corrélation sont génériques. Tables : `signal_definition` (registre) et `signal_observation`
+(valeur par date + région). `POST /signals/ingest` tire l'historique (idempotent).
+
+**2. Évaluer corrélation / coïncidence — et NE PAS confondre avec la causalité.**
+`GET /forecasts/{id}/factors` aligne les ventes journalières du produit avec chaque signal,
+calcule un **coefficient de Pearson**, classe les facteurs par force et rend un **verdict
+honnête** (forte / modérée / faible, ou *données insuffisantes* sous 14 points) — avec
+l'avertissement explicite **« corrélation ≠ causalité : à confirmer par un test (A/B, hold-out) avant d'agir »**.
+
+**3. Effets entre produits (substituts / compléments).**
+`GET /forecasts/{id}/cross-product` corrèle les co-ventes journalières : corrélation **positive
+→ complément** (se vendent ensemble), **négative → substitut** (l'un monte quand l'autre manque
+en rayon). De quoi anticiper le report de demande en cas de rupture.
+
+> Tout est **tenant-scopé** côté ventes (garde-fou central) ; les signaux sont des **données
+> publiques globales** (comme `expense_category`). Boucle MLOps inchangée : prévision → écart
+> réel → MAE/MAPE → réentraînement versionné, désormais **nourrie par les facteurs retenus**.
+
+Détails : [`docs/ai-models.md`](docs/ai-models.md), [`docs/api-design.md`](docs/api-design.md).
+
+---
+
 ## 🚀 Quickstart (démo, 100 % mock, sans aucune clé)
 
 ```bash
@@ -144,10 +185,11 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 
 `/auth/*` · `/onboarding/*` (signup, invitations) · `/stocks` · `/invoices` (upload,
 approve, reject, **PATCH** édition + payé, **import/email**) · `/forecasts/{id}` ·
+`/forecasts/{id}/factors` · `/forecasts/{id}/cross-product` ·
 `/orders` (suggest, confirm 3 modes) · `/daily-entries` · `/mlops/*` ·
 `/promos` (scan, **visual**, publish) · `/import` (json, dwh/sync) ·
 `/finance` (treasury, inventory-value, margins, categories, expenses, classify, alerts) · `/customers` ·
-`/signals` · `/chat` · `/rag/*` · `/agents/eval` · `/whatsapp/webhook` ·
+`/signals` (definitions, observations, **ingest**) · `/chat` · `/rag/*` · `/agents/eval` · `/whatsapp/webhook` ·
 `/telegram/webhook`. Détail : [`docs/api-design.md`](docs/api-design.md).
 
 ---

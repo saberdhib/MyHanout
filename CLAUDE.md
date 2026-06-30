@@ -52,6 +52,10 @@ Chaque intégration externe a une interface ABC + une impl **mock par défaut, k
 - `TelegramClient` (mock | bot) — `messaging/telegram.py`
 - `PublishChannel` (social | customers) — `messaging/publish.py`
 - `ForecastModel` (naive | prophet | lgbm) — `intelligence/forecasting/`
+- `ExternalSignalProvider` (mock | http) — `ingestion/signals_ext/` : **signaux externes
+  historiques** (météo, vacances scolaires, prix carburant, matchs de foot…) pour le
+  forecasting. Mock = séries déterministes keyless. Point d'extension : déclarer une
+  `SignalDefinition` + une impl ; ingestion/corrélation génériques.
 
 **Sans clé → fallback mock.** Le défaut local/CI ne nécessite AUCUNE clé. Pour activer
 le réel : variables d'env (cf. `docs/DEPLOY.md`). Quand tu ajoutes un provider : nouvelle
@@ -67,8 +71,9 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
 - Modèles métier héritent de `TenantMixin` (product, stock, sale, supplier, invoice, order,
   daily_entry, forecast_evaluation, customer, promo_campaign, agent_memory, document_chunk,
   expense_classification_feedback, equipment, temperature_reading, price_history,
-  meat_lot, meat_cut). **Exception voulue** : `expense_category` est un référentiel
-  **global** (lookup, non tenant) → non filtré par le garde-fou.
+  meat_lot, meat_cut). **Exceptions voulues** (référentiels **globaux**, non tenant, non
+  filtrés par le garde-fou) : `expense_category`, `signal_definition`, `signal_observation`
+  (signaux externes = données publiques alignées aux ventes par date).
 - **Limite** : le SQL brut (hors ORM) n'est PAS filtré → filtrer l'org explicitement
   (cf. `PgVectorStore`). Test d'isolation : `tests/test_tenancy.py` (A ≠ B).
 
@@ -134,3 +139,9 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
 - **Boucherie** : `services/meat_service.py` (lot→coupes, rendement, coût/kg,
   traçabilité), `api/v1/meat.py`. **Catalogue/prix** : `api/v1/catalog.py`,
   `services/price_service.py`. Familles produit : `PRODUCT_FAMILIES` (base.py).
+- **Forecasting avancé** : signaux externes (`ingestion/signals_ext/` + tables globales
+  `signal_definition`/`signal_observation`, `services/signals_service.py`,
+  `api/v1/signals.py` : definitions/observations/ingest) et analyse
+  (`intelligence/forecasting/correlation.py` : Pearson, verdict, cross-product).
+  Endpoints `GET /forecasts/{id}/factors` et `/cross-product`. Corrélation ≠ causalité
+  (verdict prudent). Doc : `docs/ai-models.md` §5.

@@ -19,6 +19,7 @@ from app.models.pricing import PriceHistory
 from app.models.product import Product
 from app.models.promo import PromoCampaign
 from app.models.sale import Sale
+from app.models.signal import SignalDefinition, SignalObservation
 from app.models.stock import Stock
 from app.models.supplier import Supplier
 from app.models.user import Role, User
@@ -46,6 +47,8 @@ __all__ = [
     "Order",
     "OrderLine",
     "PriceHistory",
+    "SignalDefinition",
+    "SignalObservation",
     "Organization",
     "Product",
     "PromoCampaign",
