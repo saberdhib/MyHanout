@@ -21,6 +21,18 @@ REQUEST_LATENCY = Histogram(
     ["method", "path"],
 )
 
+# --- Pipelines data (orchestration observable) ---
+PIPELINE_RUNS = Counter(
+    "myhanout_pipeline_runs_total",
+    "Nombre de runs de pipeline data",
+    ["job", "status"],
+)
+PIPELINE_DURATION = Histogram(
+    "myhanout_pipeline_duration_seconds",
+    "Durée des runs de pipeline data",
+    ["job"],
+)
+
 
 def setup_metrics(app: FastAPI) -> None:
     @app.get("/metrics", include_in_schema=False)

@@ -13,6 +13,8 @@ class HealthResponse(BaseModel):
     status: str = "ok"
     service: str = "myhanout-api"
     version: str
+    # État des dépendances (db, redis, ml_service) — best-effort.
+    components: dict[str, str] = {}
 
 
 class ListResponse(BaseModel, Generic[T]):

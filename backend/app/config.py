@@ -108,6 +108,8 @@ class Settings(BaseSettings):
     signals_api_key: str = ""
     # Région par défaut pour les signaux régionalisés (météo/vacances).
     signals_region: str = "FR"
+    # Signaux métier propres au commerçant (match local, jour de paie…).
+    merchant_signals_source: str = "mock"  # mock (keyless) | … (à brancher)
 
     # --- Telegram (Bot API) ---
     telegram_provider: str = "mock"  # mock | bot
@@ -117,6 +119,17 @@ class Settings(BaseSettings):
     # --- Forecasting ---
     forecast_model: str = "naive"
     forecast_horizon_days: int = 14
+    # Service ML isolé : inprocess (défaut keyless) | http (ml-service/ via docker).
+    forecast_service_client: str = "inprocess"  # inprocess | http
+    ml_service_url: str = "http://ml-service:8001"
+    # Version de modèle exposée par défaut (traçabilité MLOps quand inprocess).
+    model_version: str = "v1"
+
+    # --- Recommandations (réassort explicable) ---
+    # Tampon de sécurité (fraction de la demande prévue) et seuils des règles.
+    reco_safety_buffer_ratio: float = 0.15
+    reco_stockout_risk_threshold: float = 0.5  # au-delà → proposer une commande
+    reco_overstock_days: int = 21  # stock couvrant plus de N jours → réduire
 
     # --- Seeds ---
     # Répertoire des données de seed. /data en docker (volume monté),

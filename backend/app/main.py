@@ -45,7 +45,12 @@ def create_app() -> FastAPI:
 
     @app.get("/health", response_model=HealthResponse, tags=["health"])
     async def health() -> HealthResponse:
-        return HealthResponse(version=__version__)
+        from app.core.health import check_components
+
+        components = await check_components()
+        # Liveness reste "ok" tant que la DB répond ; les dépendances sont indicatives.
+        status = "ok" if components.get("database") == "ok" else "degraded"
+        return HealthResponse(version=__version__, status=status, components=components)
 
     app.include_router(api_router, prefix=settings.api_v1_prefix)
 

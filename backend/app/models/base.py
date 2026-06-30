@@ -144,3 +144,55 @@ class RelationKind(enum.StrEnum):
 
     SUBSTITUTE = "substitute"  # l'un remplace l'autre (rupture → report)
     COMPLEMENT = "complement"  # se vendent ensemble (halo)
+
+
+class PipelineStatus(enum.StrEnum):
+    """État d'un run de pipeline data (orchestration traçable)."""
+
+    PENDING = "pending"  # créé, pas encore démarré
+    RUNNING = "running"  # en cours
+    SUCCESS = "success"  # terminé sans erreur
+    FAILED = "failed"  # terminé en erreur (champ error renseigné)
+
+
+class PipelineTrigger(enum.StrEnum):
+    """Origine du déclenchement d'un run (traçabilité)."""
+
+    SCHEDULE = "schedule"  # planifié (Celery beat)
+    MANUAL = "manual"  # déclenché par un opérateur (Data Ops)
+    MERCHANT = "merchant"  # déclenché par le commerçant (human-in-the-loop)
+
+
+class RecommendationStatus(enum.StrEnum):
+    """Cycle de vie d'une recommandation (aide à la décision, pas action auto)."""
+
+    SUGGESTED = "suggested"  # proposée par le moteur (à valider)
+    ACCEPTED = "accepted"  # retenue par le commerçant
+    DISMISSED = "dismissed"  # écartée par le commerçant
+
+
+class AlertStatus(enum.StrEnum):
+    """État d'une alerte (human-in-the-loop : résolution manuelle)."""
+
+    OPEN = "open"  # active, non traitée
+    ACKNOWLEDGED = "acknowledged"  # vue, en cours de traitement
+    RESOLVED = "resolved"  # résolue par un humain (auditée)
+    DISMISSED = "dismissed"  # écartée (faux positif)
+
+
+class AlertPriority(enum.StrEnum):
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    CRITICAL = "critical"
+
+
+class AlertKind(enum.StrEnum):
+    """Type d'alerte (règle déclencheuse, lisible/auditable)."""
+
+    STOCK_OUT = "stock_out"  # risque de rupture
+    OVERSTOCK = "overstock"  # surstock / risque de démarque
+    EXPIRY = "expiry"  # péremption proche (périssable)
+    FORECAST_DRIFT = "forecast_drift"  # dérive de la précision (MAPE)
+    DATA_STALE = "data_stale"  # données plus fraîches (pipeline en retard)
+    CASH = "cash"  # tension de trésorerie

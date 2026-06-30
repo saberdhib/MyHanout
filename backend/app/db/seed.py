@@ -291,6 +291,11 @@ async def seed() -> None:
         # Le commit DOIT rester dans le contexte pour stamper les inserts différés.
         with tenant_context(org.id):
             await _seed_business_data(session, seeds)
+            # Socle data platform : ingestion signaux métier + snapshots + reco + alertes,
+            # tracés par un run de pipeline (le dashboard décisionnel a des données).
+            from app.services.pipeline_service import run_job
+
+            await run_job(session, "daily")
             await session.commit()
         log.info("seed.done", organization=org.slug)
 

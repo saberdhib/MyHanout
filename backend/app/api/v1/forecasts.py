@@ -8,12 +8,30 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_db, require_permission
+from app.core.security import CurrentUser
 from app.intelligence.forecasting.correlation import analyze_factors, cross_product
+from app.models.base import PipelineTrigger
+from app.schemas.dataplatform import PipelineRunOut
 from app.schemas.forecast import ForecastOut
 from app.schemas.insights import CrossProductReport, FactorReport
+from app.services import pipeline_service
 from app.services.forecast_service import forecast_product
 
 router = APIRouter(prefix="/forecasts", tags=["forecasts"])
+
+
+@router.post("/recompute", response_model=PipelineRunOut)
+async def recompute(
+    session: AsyncSession = Depends(get_db),
+    user: CurrentUser = Depends(require_permission("forecasts")),
+) -> PipelineRunOut:
+    """Relance le calcul des prévisions + recommandations (job `recommend` tracé)."""
+    run = await pipeline_service.run_job(
+        session, "recommend", trigger=PipelineTrigger.MERCHANT, user_id=user.id
+    )
+    from app.api.v1.pipelines import _out
+
+    return _out(run)
 
 
 @router.get("/{product_id}/factors", response_model=FactorReport)

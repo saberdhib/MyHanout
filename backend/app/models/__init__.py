@@ -3,6 +3,7 @@
 
 from app.db.base import Base
 from app.models.agent_memory import AgentMemory
+from app.models.alert import Alert
 from app.models.audit_log import AuditLog
 from app.models.conversation import Conversation
 from app.models.customer import Customer
@@ -10,14 +11,18 @@ from app.models.daily_entry import DailyEntry
 from app.models.equipment import Equipment, TemperatureReading
 from app.models.event import Event
 from app.models.expense import ExpenseCategory, ExpenseClassificationFeedback
+from app.models.external_signal import ExternalSignal
 from app.models.forecast_evaluation import ForecastEvaluation
+from app.models.inventory import InventorySnapshot
 from app.models.invoice import Invoice, InvoiceLine
 from app.models.meat import MeatCut, MeatLot
 from app.models.order import Order, OrderLine
 from app.models.organization import Invitation, Membership, MembershipRole, Organization
+from app.models.pipeline import PipelineRun
 from app.models.pricing import PriceHistory
 from app.models.product import Product
 from app.models.promo import PromoCampaign
+from app.models.recommendation import Recommendation
 from app.models.sale import Sale
 from app.models.signal import SignalDefinition, SignalObservation
 from app.models.stock import Stock
@@ -27,6 +32,7 @@ from app.models.user import Role, User
 __all__ = [
     "Base",
     "AgentMemory",
+    "Alert",
     "AuditLog",
     "Conversation",
     "Customer",
@@ -35,8 +41,10 @@ __all__ = [
     "Event",
     "ExpenseCategory",
     "ExpenseClassificationFeedback",
+    "ExternalSignal",
     "TemperatureReading",
     "ForecastEvaluation",
+    "InventorySnapshot",
     "Invitation",
     "Invoice",
     "InvoiceLine",
@@ -46,7 +54,9 @@ __all__ = [
     "MembershipRole",
     "Order",
     "OrderLine",
+    "PipelineRun",
     "PriceHistory",
+    "Recommendation",
     "SignalDefinition",
     "SignalObservation",
     "Organization",

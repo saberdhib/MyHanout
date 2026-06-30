@@ -1,6 +1,7 @@
 # =============================================================================
 # Stack locale complète MyHanout AI. Lancer : `docker compose up -d --build`.
-# Services : postgres (pgvector), redis, api (FastAPI), worker (Celery), frontend.
+# Services : postgres (pgvector), redis, api (FastAPI), worker (Celery),
+#            ml-service (forecast isolé), frontend.
 # =============================================================================
 services:
   postgres:
@@ -37,6 +38,7 @@ services:
     environment:
       POSTGRES_HOST: postgres
       REDIS_URL: redis://redis:6379/0
+      ML_SERVICE_URL: ${ML_SERVICE_URL:-http://ml-service:8001}
     ports:
       - "8000:8000"
     volumes:
@@ -72,6 +74,21 @@ services:
       postgres:
         condition: service_healthy
     command: celery -A app.workers.celery_app.celery_app worker --loglevel=info
+
+  # Service ML isolé : démarre sans aucune clé. L'API l'utilise si
+  # FORECAST_SERVICE_CLIENT=http, sinon elle calcule le forecast in-process.
+  ml-service:
+    build:
+      context: ./ml-service
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0) if urllib.request.urlopen('http://localhost:8001/health').status==200 else sys.exit(1)"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
   frontend:
     build:

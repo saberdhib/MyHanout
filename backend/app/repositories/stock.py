@@ -21,6 +21,11 @@ class StockRepository(BaseRepository[Stock]):
         )
         return float(value or 0)
 
+    async def list_for_product(self, product_id: int) -> list[Stock]:
+        """Tous les lots de stock d'un produit (pour agrégation reco/snapshot)."""
+        result = await self.session.scalars(select(Stock).where(Stock.product_id == product_id))
+        return list(result.all())
+
     async def list_with_product(self, *, limit: int = 100, offset: int = 0) -> list[Stock]:
         result = await self.session.scalars(
             select(Stock).options(joinedload(Stock.product)).limit(limit).offset(offset)

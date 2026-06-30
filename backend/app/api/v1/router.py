@@ -6,6 +6,7 @@ from fastapi import APIRouter
 
 from app.api.v1 import (
     agents,
+    alerts,
     auth,
     catalog,
     chat,
@@ -21,10 +22,13 @@ from app.api.v1 import (
     mlops,
     onboarding,
     orders,
+    pipelines,
     promos,
     rag,
+    recommendations,
     signals,
     stocks,
+    stream,
     telegram,
     whatsapp,
 )
@@ -50,5 +54,9 @@ api_router.include_router(forecasts.router)
 api_router.include_router(orders.router)
 api_router.include_router(daily_entries.router)
 api_router.include_router(mlops.router)
+api_router.include_router(pipelines.router)
+api_router.include_router(recommendations.router)
+api_router.include_router(alerts.router)
+api_router.include_router(stream.router)
 api_router.include_router(whatsapp.router)
 api_router.include_router(telegram.router)
