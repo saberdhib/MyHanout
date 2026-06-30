@@ -1,13 +1,51 @@
-# 🏪 MyHanout AI
+# 🏪 MyHanout AI — l'IA qui vous facilite la gestion de votre commerce
 
-> Le copilot IA des commerces de proximité — bouchers, boulangers, épiceries, artisans.
-> Sur **WhatsApp / Telegram** et un dashboard léger. Principe directeur :
-> **human-in-the-loop, explicable, auditable, RGPD, multi-commerces.**
+> Copilot IA pour les commerces de proximité (boucherie, épicerie, boulangerie, primeur…),
+> piloté depuis **WhatsApp / Telegram** + un dashboard léger.
+> Principe directeur : **human-in-the-loop · explicable · auditable · RGPD · multi-commerces.**
+
+<p>
+  <img alt="CI" src="https://github.com/saberdhib/MyHanout/actions/workflows/ci.yml/badge.svg" />
+  <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-12B76A.svg" />
+  <img alt="Python 3.11" src="https://img.shields.io/badge/python-3.11-blue.svg" />
+  <img alt="FastAPI" src="https://img.shields.io/badge/FastAPI-async-009688.svg" />
+  <img alt="React + Vite" src="https://img.shields.io/badge/React-Vite%20%2B%20TS-61DAFB.svg" />
+  <img alt="status" src="https://img.shields.io/badge/statut-démo%20fonctionnelle-success.svg" />
+</p>
 
 MyHanout AI ingère le passif documentaire du commerçant (factures PDF/photo via OCR),
 structure les données, **prévoit la demande**, **alerte** sur ruptures et péremptions,
 propose des **commandes de réassort explicables**, déclenche des **promos anti-gaspillage**,
 et **répond/agit** par messagerie — toujours sous contrôle humain.
+
+<p align="center">
+  <img src="website/public/shots/dashboard.png" alt="Dashboard MyHanout AI" width="49%" />
+  <img src="website/public/shots/finance.png" alt="Couche financière (pré-compta)" width="49%" />
+</p>
+<p align="center">
+  <img src="website/public/shots/promos.png" alt="Promo anti-gaspillage + affiche générée" width="49%" />
+  <img src="website/public/shots/invoices.png" alt="Factures (OCR + import email)" width="49%" />
+</p>
+
+## ⚡ Démo en 1 minute (sans aucune clé API)
+
+```bash
+cp .env.example .env          # placeholders uniquement — aucune vraie clé requise
+docker compose up -d --build  # postgres+pgvector, redis, api, worker, frontend
+make seed                     # org démo + produits + 1 périssable en fin de vie + clients opt-in
+# Dashboard : http://localhost:5173   ·   API : http://localhost:8000/docs   ·   login démo : admin / admin
+```
+
+Tout tourne **en mode mock par défaut** : OCR, LLM, images, WhatsApp, capteurs, caisse sont
+simulés tant qu'aucune clé n'est fournie. Scénario pas-à-pas : **[`docs/DEMO.md`](docs/DEMO.md)**.
+
+## 🎯 Ce que ce repo démontre
+
+- **Architecture multi-tenant sécurisée** : garde-fou central (isolation par commerce), RBAC, audit — testé (A ≠ B).
+- **Mock-first / keyless** : abstractions `Provider` partout → la démo tourne sans secret ; le réel s'active par `.env`.
+- **Human-in-the-loop & explicabilité** : aucune action sortante sans validation ; chaque chiffre/suggestion porte sa raison.
+- **MLOps pragmatique** : prévision → écart réel → MAE/MAPE → réentraînement versionné.
+- **RGPD & socle générique** : consentement opt-in, données fictives, modules activables par type de commerce.
 
 ---
 
@@ -121,6 +159,8 @@ approve, reject, **PATCH** édition + payé, **import/email**) · `/forecasts/{i
 - **Human-in-the-loop** : aucune action sortante sans validation ; tout est audité.
 - **Pricing humain** : pas de coupure brutale (grâce, rétrogradation). Cf.
   [`docs/delivery/privacy-pricing.md`](docs/delivery/privacy-pricing.md).
+- **Aucun secret en repo** : tout via `.env` (non suivi) ; `.env.example` = placeholders.
+  Signaler une faille : [`SECURITY.md`](SECURITY.md).
 
 ---
 
@@ -160,3 +200,9 @@ WhatsApp+Telegram, boucle quotidienne, suggestions, promos RGPD + **affiches gé
 RAG, MLOps, rate limiting, tracing, dark mode.
 Prochaines briques : Prophet/LGBM en prod, connecteurs réseaux réels,
 voice WhatsApp, billing enforcement. Détail : [`docs/roadmap.md`](docs/roadmap.md).
+
+---
+
+## 📜 Licence
+
+[MIT](LICENSE) — librement réutilisable. Sécurité : [`SECURITY.md`](SECURITY.md).
