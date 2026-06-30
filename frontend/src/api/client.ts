@@ -444,6 +444,23 @@ export interface ModulesConfig {
 export const getModules = () =>
   api.get<ModulesConfig>("/config/modules").then((r) => r.data);
 
+// --- Connecteurs : état (sans secret) --------------------------------------
+export interface Connector {
+  key: string;
+  label: string;
+  category: string; // messaging | data | iot | ai
+  provider: string;
+  status: string; // mock | live | needs_config
+  configured: boolean;
+  hint: string;
+}
+export interface ConnectorsConfig {
+  items: Connector[];
+  explanation: string;
+}
+export const getConnectors = () =>
+  api.get<ConnectorsConfig>("/config/connectors").then((r) => r.data);
+
 // --- Catalogue : gestion produits + familles -------------------------------
 export interface CatalogProduct {
   id: number;

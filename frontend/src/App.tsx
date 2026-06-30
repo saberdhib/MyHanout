@@ -19,6 +19,7 @@ import Recommendations from "./pages/Recommendations";
 import Alerts from "./pages/Alerts";
 import DataOps from "./pages/DataOps";
 import Catalog from "./pages/Catalog";
+import Connectors from "./pages/Connectors";
 
 export default function App() {
   return (
@@ -42,6 +43,7 @@ export default function App() {
         <Route path="boucherie" element={<Boucherie />} />
         <Route path="quality" element={<Quality />} />
         <Route path="invoices" element={<Invoices />} />
+        <Route path="connectors" element={<Connectors />} />
         <Route path="integrations" element={<Integrations />} />
         <Route path="suppliers" element={<Suppliers />} />
       </Route>

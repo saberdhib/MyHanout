@@ -56,6 +56,7 @@ const groups: { title: string; items: Item[] }[] = [
     title: "Données",
     items: [
       { to: "/data-ops", label: "Data Ops", icon: "plug", module: "dataops" },
+      { to: "/connectors", label: "Connecteurs", icon: "plug", module: "integrations" },
       { to: "/integrations", label: "Intégrations", icon: "plug", module: "integrations" },
       { to: "/suppliers", label: "Fournisseurs", icon: "supplier", module: "suppliers" },
     ],

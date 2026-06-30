@@ -10,6 +10,15 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
+  /* Responsive : les tableaux deviennent scrollables horizontalement sur petit
+     écran au lieu de déborder (mobile / tablette de caisse). Sans effet visible
+     sur desktop quand le contenu tient. */
+  main table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
   body {
     @apply bg-surface text-night font-sans antialiased;
   }
