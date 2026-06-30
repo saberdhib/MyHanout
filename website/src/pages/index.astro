@@ -275,8 +275,94 @@ function icon(name: string) {
     </div>
   </section>
 
+  <!-- ===================== COMMENT ON OPÈRE (archi + accompagnement) ===================== -->
+  <section class="bg-night text-surface">
+    <div class="container-x py-24">
+      <div class="mx-auto max-w-2xl text-center">
+        <span class="eyebrow reveal border-white/15 bg-white/5 text-brand-light">Comment on opère</span>
+        <h2 class="reveal mt-5 text-3xl font-extrabold tracking-tight sm:text-4xl">
+          On se plugge, on lance la machine, vous validez
+        </h2>
+        <p class="reveal mt-4 text-lg leading-relaxed text-white/70">
+          Vos données entrent telles quelles, notre moteur travaille, les décisions
+          reviennent sur vos canaux du quotidien. Vous gardez la main de bout en bout.
+        </p>
+      </div>
+
+      <!-- Schéma d'architecture (léger, sobre) -->
+      <div class="reveal mt-14 flex flex-col items-stretch gap-4 lg:flex-row lg:items-center">
+        <div class="flex-1 rounded-xl2 border border-white/10 bg-white/5 p-5">
+          <div class="text-xs font-semibold uppercase tracking-wide text-brand-light">Vos sources</div>
+          <ul class="mt-3 space-y-2 text-sm text-white/85">
+            <li>Caisse (POS)</li>
+            <li>Factures (photo / email)</li>
+            <li>Stock &amp; ventes</li>
+            <li>Signaux (météo, événements…)</li>
+          </ul>
+        </div>
+
+        <div class="self-center text-2xl text-brand-light rotate-90 lg:rotate-0" aria-hidden="true">→</div>
+
+        <div class="flex-1 rounded-xl2 border border-brand/40 bg-brand/10 p-5 shadow-card">
+          <div class="text-xs font-semibold uppercase tracking-wide text-brand-light">
+            Le moteur MyHanout <span class="text-accent">✦</span>
+          </div>
+          <ul class="mt-3 space-y-2 text-sm text-white">
+            <li>Prévision demande &amp; approvisionnement</li>
+            <li>Dépendances entre produits</li>
+            <li>Alertes intelligentes</li>
+            <li>Messages &amp; offres prêts</li>
+          </ul>
+        </div>
+
+        <div class="self-center text-2xl text-brand-light rotate-90 lg:rotate-0" aria-hidden="true">→</div>
+
+        <div class="flex-1 rounded-xl2 border border-white/10 bg-white/5 p-5">
+          <div class="text-xs font-semibold uppercase tracking-wide text-brand-light">Vos canaux</div>
+          <ul class="mt-3 space-y-2 text-sm text-white/85">
+            <li>Dashboard web / mobile</li>
+            <li>WhatsApp</li>
+            <li>Telegram</li>
+            <li>Slack</li>
+          </ul>
+        </div>
+      </div>
+      <p class="reveal mt-4 text-center text-xs text-white/50">
+        Multi-tenant, RGPD, human-in-the-loop · aucune action sortante sans votre validation.
+      </p>
+
+      <!-- Ouvert & interopérable -->
+      <div class="reveal mt-8 flex flex-wrap items-center justify-center gap-2 text-sm">
+        <span class="text-white/60">Ouvert &amp; interopérable :</span>
+        {
+          ["API ouverte (REST)", "Webhooks", "n8n", "Make", "Zapier", "MCP (agents IA)"].map((t) => (
+            <span class="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-white/85">{t}</span>
+          ))
+        }
+      </div>
+
+      <!-- Accompagnement (done-for-you) -->
+      <div class="mt-16 grid gap-6 md:grid-cols-4">
+        {
+          [
+            { n: "01", t: "Audit & conseil", b: "On analyse votre commerce, vos données et vos enjeux. Stratégie claire, sans jargon." },
+            { n: "02", t: "On se plugge", b: "Caisse, factures, messagerie : branchés en douceur, sans changer vos habitudes." },
+            { n: "03", t: "On lance la machine", b: "Prévisions, réassort, dépendances, alertes, communication : l'IA fait le travail." },
+            { n: "04", t: "Vous payez aux résultats", b: "Rien ne part sans votre accord. Vous gardez la main, vous mesurez la valeur." },
+          ].map((s) => (
+            <div class="reveal rounded-xl2 border border-white/10 bg-white/5 p-5">
+              <span class="text-sm font-extrabold text-brand-light">{s.n}</span>
+              <h3 class="mt-2 text-base font-bold text-white">{s.t}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-white/70">{s.b}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
   <!-- ===================== CONFIANCE TEASER ===================== -->
-  <section class="container-x pb-24">
+  <section class="container-x pb-24 pt-24">
     <div class="reveal overflow-hidden rounded-xl2 border border-night/[0.06] bg-gradient-to-br from-surface to-brand-50 p-10 sm:p-14">
       <div class="grid gap-10 lg:grid-cols-3">
         <div class="lg:col-span-1">
