@@ -17,7 +17,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.tenancy import get_current_org
-from app.messaging.whatsapp import get_whatsapp_client
+from app.messaging.resolver import resolve_whatsapp_client
 from app.models.alert import Alert
 from app.models.base import (
     AlertStatus,
@@ -282,7 +282,7 @@ async def send_briefing(
     ).first()
     if briefing is None:
         return None
-    client = get_whatsapp_client()
+    client = await resolve_whatsapp_client(session)
     await client.send_text(to, format_briefing_text(briefing))
     briefing.status = BriefingStatus.SENT
     await session.flush()

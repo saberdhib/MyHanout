@@ -80,7 +80,7 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   expense_classification_feedback, equipment, temperature_reading, price_history,
   meat_lot, meat_cut, **pipeline_run, inventory_snapshot, external_signal, recommendation,
   alert, markdown_suggestion, recipe, recipe_item, production_plan, daily_briefing,
-  briefing_item**). **Exceptions voulues** (référentiels **globaux**, non tenant, non
+  briefing_item, tenant_connector**). **Exceptions voulues** (référentiels **globaux**, non tenant, non
   filtrés par le garde-fou) : `expense_category`, `signal_definition`, `signal_observation`
   (signaux externes = données publiques alignées aux ventes par date).
 - **Limite** : le SQL brut (hors ORM) n'est PAS filtré → filtrer l'org explicitement
@@ -157,6 +157,12 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   chat web (`api/v1/chat.py`) + **fenêtre de chat flottante** front (`components/ChatWidget.tsx`,
   montée dans `Layout`). État des connecteurs **sans secret** : `GET /config/connectors`
   (page front `Connectors.tsx`). Assets de marque à fournir : `docs/brand-assets.md`.
+  **Connecteurs par commerce (self-service, modèle B)** : `tenant_connector` (secrets
+  **chiffrés** via `core/crypto.py`, clé dérivée de `SECRET_KEY` → **à changer en prod**),
+  `services/connector_service.py` (split public/secret, `get_credentials`/`status`),
+  résolveurs tenant-aware `messaging/resolver.py` (config du tenant → sinon `.env` → mock),
+  API owner-only `api/v1/connectors.py` (`/connectors/manage`), composant front
+  `ConnectorSettings.tsx`. Le briefing envoie via le résolveur (numéro du commerce).
 - **Ouverture / interopérabilité** : **clés API** (`X-API-Key`, table `api_key` hashée +
   préfixe, scopes RBAC ; `core/security.generate_api_key`, résolution dans `core/deps`,
   endpoints `api/v1/api_keys.py` owner-only) et **webhooks sortants** signés HMAC

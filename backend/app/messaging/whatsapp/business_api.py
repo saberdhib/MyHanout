@@ -23,9 +23,17 @@ _MAX_RETRIES = 3
 class BusinessWhatsAppClient(WhatsAppClient):
     name = "business"
 
-    def __init__(self, http_client: httpx.AsyncClient | None = None) -> None:
-        self.token = settings.whatsapp_access_token
-        self.phone_id = settings.whatsapp_phone_number_id
+    def __init__(
+        self,
+        http_client: httpx.AsyncClient | None = None,
+        *,
+        token: str | None = None,
+        phone_id: str | None = None,
+    ) -> None:
+        # `token`/`phone_id` permettent une config **par commerce** (modèle B) ;
+        # sinon on retombe sur la config globale (.env).
+        self.token = token or settings.whatsapp_access_token
+        self.phone_id = phone_id or settings.whatsapp_phone_number_id
         self.base_url = f"https://graph.facebook.com/{settings.graph_api_version}"
         self._http_client = http_client
 

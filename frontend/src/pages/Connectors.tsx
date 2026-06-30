@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Card } from "../components/Card";
 import ApiAccess from "../components/ApiAccess";
+import ConnectorSettings from "../components/ConnectorSettings";
 import {
   getConnectors,
   importInvoicesFromEmail,
@@ -94,6 +95,8 @@ export default function Connectors() {
           </Card>
         );
       })}
+
+      <ConnectorSettings />
 
       <ApiAccess />
 

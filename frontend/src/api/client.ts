@@ -461,6 +461,21 @@ export interface ConnectorsConfig {
 export const getConnectors = () =>
   api.get<ConnectorsConfig>("/config/connectors").then((r) => r.data);
 
+// --- Connecteurs par commerce (modèle B, self-service, owner) ---
+export interface ConnectorStatus {
+  kind: string; // whatsapp | slack | telegram
+  configured: boolean;
+  active: boolean;
+  public: Record<string, string>;
+  has_secret: boolean;
+}
+export const getConnectorSettings = () =>
+  api.get<ConnectorStatus[]>("/connectors/manage").then((r) => r.data);
+export const saveConnector = (kind: string, fields: Record<string, string>, active = true) =>
+  api.put<ConnectorStatus>(`/connectors/manage/${kind}`, { fields, active }).then((r) => r.data);
+export const deleteConnector = (kind: string) =>
+  api.delete(`/connectors/manage/${kind}`).then((r) => r.data);
+
 // --- Ouverture : clés API + webhooks (n8n / Make / Zapier) -----------------
 export interface ApiKey {
   id: number;
