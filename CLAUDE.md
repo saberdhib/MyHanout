@@ -56,6 +56,12 @@ Chaque intégration externe a une interface ABC + une impl **mock par défaut, k
   historiques** (météo, vacances scolaires, prix carburant, matchs de foot…) pour le
   forecasting. Mock = séries déterministes keyless. Point d'extension : déclarer une
   `SignalDefinition` + une impl ; ingestion/corrélation génériques.
+- `SignalSource` (mock | …) — `ingestion/merchant_signals/` : **signaux métier du
+  commerçant** (match local, jour de paie, braderie…), tenant (`external_signal`),
+  croisés avec les séries publiques par le moteur de reco. Mock keyless.
+- `ForecastServiceClient` (inprocess | http) — `intelligence/forecasting/service_client.py` :
+  forecast in-process (défaut keyless) ou via le **service ML isolé** (`ml-service/`),
+  avec **fallback in-process** si le service HTTP est down. `model_version` partout.
 
 **Sans clé → fallback mock.** Le défaut local/CI ne nécessite AUCUNE clé. Pour activer
 le réel : variables d'env (cf. `docs/DEPLOY.md`). Quand tu ajoutes un provider : nouvelle
@@ -71,10 +77,13 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
 - Modèles métier héritent de `TenantMixin` (product, stock, sale, supplier, invoice, order,
   daily_entry, forecast_evaluation, customer, promo_campaign, agent_memory, document_chunk,
   expense_classification_feedback, equipment, temperature_reading, price_history,
-  meat_lot, meat_cut). **Exceptions voulues** (référentiels **globaux**, non tenant, non
+  meat_lot, meat_cut, **pipeline_run, inventory_snapshot, external_signal, recommendation,
+  alert**). **Exceptions voulues** (référentiels **globaux**, non tenant, non
   filtrés par le garde-fou) : `expense_category`, `signal_definition`, `signal_observation`
   (signaux externes = données publiques alignées aux ventes par date).
 - **Limite** : le SQL brut (hors ORM) n'est PAS filtré → filtrer l'org explicitement
+  **— idem pour un `DELETE`/`UPDATE` ORM en masse** (l'event ne couvre que les SELECT) :
+  filtrer `organization_id` à la main (cf. remplacement des recos dans `recommendation_service`).
   (cf. `PgVectorStore`). Test d'isolation : `tests/test_tenancy.py` (A ≠ B).
 
 ## 6. Pièges réels (déjà rencontrés — évite-les)
@@ -145,3 +154,11 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   (`intelligence/forecasting/correlation.py` : Pearson, verdict, cross-product).
   Endpoints `GET /forecasts/{id}/factors` et `/cross-product`. Corrélation ≠ causalité
   (verdict prudent). Doc : `docs/ai-models.md` §5.
+- **Socle data platform** : orchestration (`services/pipeline_service.py` : jobs =
+  suites d'assets sous un `PipelineRun` tracé, Celery, pas Dagster ; `api/v1/pipelines.py`),
+  service ML isolé (`ml-service/` + `intelligence/forecasting/service_client.py`, fallback
+  in-process), moteur de reco explicite (`intelligence/recommendation/engine.py` règles
+  pures + `services/recommendation_service.py`), alertes (`services/alert_service.py`,
+  `api/v1/alerts.py`), temps réel **SSE** filtré tenant (`core/events.py`, `api/v1/stream.py`).
+  Schéma dev/E2E sqlite : `app/db/create_all.py`. E2E Playwright : `e2e/`. Doc :
+  `docs/data-engineering.md`.

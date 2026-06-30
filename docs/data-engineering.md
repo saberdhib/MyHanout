@@ -6,6 +6,28 @@
 > rien n'exige de service externe pour tourner en local/CI ; on branche les vraies
 > briques (MinIO, dbt, Airflow, Grafana) par configuration quand on est prêt.
 
+## 0. Orchestration applicative tracée (`PipelineRun`)
+
+En complément de l'orchestration « entrepôt » (Airflow/dbt ci-dessous, optionnelle),
+le **socle applicatif** orchestre ses propres traitements de façon tracée et testable :
+
+- **Choix techno** : **Celery (déjà présent) + un modèle `PipelineRun`**, plutôt que
+  Dagster. Justification : zéro infra neuve, exécutable **in-process** (donc testable sur
+  sqlite, keyless), et suffisant pour le besoin (jobs courts, déclenchement manuel/planifié).
+- Un **job** = une suite d'**assets** sous un même run : `snapshot_inventory` →
+  `ingest_signals` (signaux métier) → `recommend` (forecast + reco) → `scan_alerts`.
+  Le job `daily` enchaîne les quatre.
+- **Traçabilité** : chaque donnée produite (reco, snapshot, alerte) porte le
+  `pipeline_run_id` qui l'a générée ; le run agrège `rows_processed` + `data_freshness_at`.
+- **Service ML isolé** : le forecast s'appelle via `ForecastServiceClient` (`inprocess` |
+  `http` → `ml-service/`) avec **fallback in-process**. `model_version` propagé aux recos.
+- **Observabilité** : métriques Prometheus (`myhanout_pipeline_runs_total`,
+  `…_duration_seconds`), `/health` étendu, page **Data Ops** (`/pipelines/health`).
+- **Temps réel** : chaque fin d'asset publie un event sur le bus SSE (filtré tenant).
+
+Endpoints : `GET /pipelines/runs`, `POST /pipelines/{job}/trigger`, `GET /pipelines/health`.
+Code : `app/services/pipeline_service.py`. Schéma dev/E2E sqlite : `app/db/create_all.py`.
+
 ## 1. Vue d'ensemble (du terrain au modèle)
 
 ```mermaid

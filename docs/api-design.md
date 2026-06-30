@@ -73,6 +73,16 @@ API REST FastAPI, versionnée sous `/api/v1`. Doc interactive : `/docs` (Swagger
 | GET     | `/api/v1/signals/definitions` | Registre des séries de signaux externes       | forecasts |
 | GET     | `/api/v1/signals/observations`| Valeurs historiques d'une série (`?signal_key=`) | forecasts |
 | POST    | `/api/v1/signals/ingest`      | Tire l'historique des signaux (idempotent)    | forecasts |
+| POST    | `/api/v1/forecasts/recompute` | Relance prévisions + recos (job `recommend` tracé) | forecasts |
+| GET     | `/api/v1/pipelines/runs`      | Runs de pipeline (filtrable job/statut)       | forecasts |
+| GET     | `/api/v1/pipelines/runs/{id}` | Détail d'un run                               | forecasts |
+| POST    | `/api/v1/pipelines/{job}/trigger` | Déclenche un job (manuel, human-in-the-loop) | forecasts |
+| GET     | `/api/v1/pipelines/health`    | Fraîcheur + dernier run par job (Data Ops)    | forecasts |
+| GET     | `/api/v1/recommendations`     | Recommandations explicables (persistées ou `?live=true`) | forecasts |
+| POST    | `/api/v1/recommendations/simulate` | « Et si je commande X ? » (impact projeté) | forecasts |
+| GET     | `/api/v1/alerts`              | Alertes décisionnelles (filtrable `?status=`) | forecasts |
+| POST    | `/api/v1/alerts/{id}/resolve` | Résolution humaine (resolved/dismissed, auditée) | orders |
+| GET     | `/api/v1/stream/events`       | Flux **SSE** temps réel, filtré par tenant    | (auth)    |
 | POST    | `/api/v1/orders/{id}/approve` | Validation humaine d'une commande (auditée)   | orders    |
 | GET     | `/api/v1/whatsapp/webhook`    | Handshake de vérification Meta                | —         |
 | POST    | `/api/v1/whatsapp/webhook`    | Réception message → orchestrateur d'agents    | —         |

@@ -88,6 +88,21 @@ les tests d'intégration et les migrations tournent sur **PostgreSQL 16 + pgvect
 > Côté ventes, l'analyse reste **tenant-scopée** par le garde-fou ORM. Ingestion idempotente
 > via `POST /signals/ingest` (mock keyless ou provider HTTP). Voir `docs/ai-models.md` §5.
 
+## Socle data platform (orchestration, reco, alertes)
+
+| Table | Tenant | Rôle |
+|-------|--------|------|
+| `pipeline_run` | Oui | Run de pipeline tracé : `job_name`, `status`, `trigger`, `started_at`/`finished_at`, `rows_processed`, `data_freshness_at`, `error`. Chaque donnée produite le référence. |
+| `inventory_snapshot` | Oui | État du stock daté (point-in-time) par produit (`snapshot_date`, `quantity`) — fraîcheur Data Ops + historique. |
+| `external_signal` | Oui | Signaux **métier du commerçant** (match local, paie du 5, braderie…) : `key`, `kind`, `signal_date`, `value`, `scope`. Croisés avec les séries publiques globales. |
+| `recommendation` | Oui | Reco de réassort explicable : `action`, `suggested_quantity`, `confidence`, `risk_factor`, `score`, `explanation`, `data_used` (JSON), + `pipeline_run_id` & `model_version` (traçabilité). Statut `suggested`→`accepted`/`dismissed`. |
+| `alert` | Oui | Alerte décisionnelle : `kind`, `priority`, `status`, `rule`, `threshold`, `observed_value`, `recommended_action`, résolution humaine auditée (`resolved_by_user_id`, `resolved_at`). |
+
+> Toutes **tenant** (héritent de `TenantMixin`) → isolées par le garde-fou central.
+> ⚠️ Un `DELETE` ORM n'est PAS filtré par le garde-fou (event sur les SELECT
+> seulement) : le remplacement du jeu de recos filtre `organization_id`
+> **explicitement** (cf. `recommendation_service`). Orchestration : `docs/data-engineering.md`.
+
 ## Données de seed
 
 `data/seeds/` : `suppliers.csv`, `products.csv`, `sales.csv` (~720 lignes,

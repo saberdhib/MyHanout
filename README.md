@@ -60,6 +60,7 @@ simulés tant qu'aucune clé n'est fournie. Scénario pas-à-pas : **[`docs/DEMO
 | 💶 Gestion financière | **OPEX/CAPEX** (tagging IA explicable, validé humain), **trésorerie** (alerte cash), **valorisation stock**, **marges réelles** + alertes (doublon, prix, marge, échéance) — pré-compta |
 | 🌡️ Chaîne du froid | Suivi **température** des machines (HACCP) via capteurs (mock keyless ou thermomètres connectés), **alertes explicables** anti-gaspillage |
 | 🔌 Intégrations | **Import JSON** + **sync DWH** + **connecteur caisse (POS)** (ingestion ventes idempotente) |
+| 🛰️ Data platform | **Orchestration** de pipelines tracés (`PipelineRun`), **service ML isolé** (fallback in-process), **recos explicites** (substituts/signaux métier), **alertes** & **temps réel SSE**, page **Data Ops** — voir ci-dessous |
 | 📱 Omni-accès | Web responsive + **PWA installable** (PC / téléphone / tablette de caisse) + WhatsApp/Telegram |
 | 💬 Conversationnel | **WhatsApp & Telegram** (texte + photo→OCR) + **chat web**, même cerveau d'agents |
 | 🤖 Agents IA | order, stock, finance, marketing, support, governance + **mémoire** + **éval routage** |
@@ -153,6 +154,31 @@ Détails : [`docs/ai-models.md`](docs/ai-models.md), [`docs/api-design.md`](docs
 
 ---
 
+## 🛰️ Socle data platform (orchestration → décision → temps réel)
+
+Au-delà des fonctions métier, MyHanout pose un socle « supply-chain frais » sérieux,
+**intégré** à l'archi (multi-tenant, mock-first, human-in-the-loop, explicable) :
+
+- **Orchestration tracée** — chaque traitement (snapshot stock, ingestion signaux,
+  recommandations, alertes) tourne sous un `PipelineRun` (statut, lignes, fraîcheur,
+  erreur). Toute donnée produite référence le **run** qui l'a générée. Choix assumé :
+  **Celery + `PipelineRun`** (pas de Dagster) — zéro infra neuve, testable in-process.
+  Endpoints `/pipelines/*`, page **Data Ops** (santé, fraîcheur, déclenchement manuel).
+- **Service ML isolé** — le forecast peut tourner dans un service dédié (`ml-service/`,
+  scalable à part) derrière `ForecastServiceClient` (`inprocess` | `http`) avec
+  **fallback in-process** si le service est down. `model_version` partout (MLOps).
+- **Recommandations explicites** — règles lisibles/auditables (rupture, surstock,
+  saisonnalité, **signal métier du commerçant** : match/paie/braderie, périssable,
+  fallback) ; chaque reco porte quantité, confiance, risque, score, **explication** et
+  données utilisées. **Simulation** « et si je commande X ? ».
+- **Alertes & temps réel** — alertes décisionnelles (règle → priorité → **résolution
+  humaine** auditée) et flux **SSE** `/stream/events` **filtré par tenant** (un commerce
+  ne reçoit jamais les events d'un autre) ; le dashboard se met à jour sans refresh.
+- **Observabilité** — `/health` étendu (db/redis/ml-service), métriques Prometheus des runs.
+- **Tests E2E** — Playwright sur les parcours critiques (`e2e/`), stack keyless bootée.
+
+Détails : [`docs/data-engineering.md`](docs/data-engineering.md), [`ml-service/README.md`](ml-service/README.md).
+
 ## 🚀 Quickstart (démo, 100 % mock, sans aucune clé)
 
 ```bash
@@ -189,7 +215,9 @@ approve, reject, **PATCH** édition + payé, **import/email**) · `/forecasts/{i
 `/orders` (suggest, confirm 3 modes) · `/daily-entries` · `/mlops/*` ·
 `/promos` (scan, **visual**, publish) · `/import` (json, dwh/sync) ·
 `/finance` (treasury, inventory-value, margins, categories, expenses, classify, alerts) · `/customers` ·
-`/signals` (definitions, observations, **ingest**) · `/chat` · `/rag/*` · `/agents/eval` · `/whatsapp/webhook` ·
+`/signals` (definitions, observations, **ingest**) · `/pipelines/*` (runs, trigger, health) ·
+`/recommendations` (+ simulate) · `/alerts` (+ resolve) · `/stream/events` (SSE) ·
+`/chat` · `/rag/*` · `/agents/eval` · `/whatsapp/webhook` ·
 `/telegram/webhook`. Détail : [`docs/api-design.md`](docs/api-design.md).
 
 ---
