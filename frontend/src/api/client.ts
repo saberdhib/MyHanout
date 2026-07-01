@@ -908,6 +908,55 @@ export interface ShrinkageReport {
   products_checked: number;
   explanation: string;
 }
+// --- Carnet HACCP (hygiène + conformité froid) ---
+export interface HygieneTask {
+  id: number;
+  name: string;
+  frequency: string;
+  active: boolean;
+  notes: string | null;
+  due: boolean;
+  last_done_at: string | null;
+  last_done_by: string | null;
+}
+export interface EquipmentCompliance {
+  equipment_id: number;
+  equipment_name: string;
+  min_temp_c: number;
+  max_temp_c: number;
+  readings: number;
+  in_range: number;
+  compliance_pct: number;
+  last_temp_c: number | null;
+  last_at: string | null;
+  breaches: string[];
+}
+export interface HaccpRegister {
+  period_days: number;
+  generated_at: string;
+  temperature: EquipmentCompliance[];
+  hygiene: {
+    id: number;
+    task_id: number;
+    task_name: string | null;
+    done_at: string;
+    done_by: string | null;
+    note: string | null;
+  }[];
+  tasks_due: number;
+  explanation: string;
+}
+export const getHygieneTasks = () =>
+  api.get<ListResponse<HygieneTask>>("/haccp/tasks").then((r) => r.data);
+export const createHygieneTask = (name: string, frequency: string) =>
+  api.post<HygieneTask>("/haccp/tasks", { name, frequency }).then((r) => r.data);
+export const deleteHygieneTask = (id: number) =>
+  api.delete(`/haccp/tasks/${id}`).then((r) => r.data);
+export const completeHygieneTask = (id: number, note?: string) =>
+  api.post(`/haccp/tasks/${id}/complete`, { note }).then((r) => r.data);
+export const getHaccpRegister = (days = 14) =>
+  api.get<HaccpRegister>("/haccp/register", { params: { days } }).then((r) => r.data);
+
 export const getInvoiceControls = () =>
   api.get<InvoiceControlReport>("/controls/invoices").then((r) => r.data);
 export const getShrinkage = () =>

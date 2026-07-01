@@ -38,6 +38,7 @@ const EN: Record<string, string> = {
   "Contrôles & pertes": "Controls & losses",
   "Fin de journée": "End of day",
   Équipements: "Equipment",
+  "Hygiène (HACCP)": "Hygiene (HACCP)",
   "Qualité (écarts)": "Quality (gaps)",
   Factures: "Invoices",
   "Data Ops": "Data Ops",

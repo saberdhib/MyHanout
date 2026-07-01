@@ -16,6 +16,7 @@ from app.models.event import Event
 from app.models.expense import ExpenseCategory, ExpenseClassificationFeedback
 from app.models.external_signal import ExternalSignal
 from app.models.forecast_evaluation import ForecastEvaluation
+from app.models.haccp import HygieneRecord, HygieneTask
 from app.models.inventory import InventorySnapshot
 from app.models.invoice import Invoice, InvoiceLine
 from app.models.markdown import MarkdownSuggestion
@@ -54,6 +55,8 @@ __all__ = [
     "ExternalSignal",
     "TemperatureReading",
     "ForecastEvaluation",
+    "HygieneRecord",
+    "HygieneTask",
     "InventorySnapshot",
     "Invitation",
     "Invoice",

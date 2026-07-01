@@ -20,6 +20,7 @@ from app.api.v1 import (
     equipment,
     finance,
     forecasts,
+    haccp,
     imports,
     invoices,
     markdown,
@@ -77,6 +78,7 @@ api_router.include_router(pricing.router)
 api_router.include_router(staffing.router)
 api_router.include_router(report.router)
 api_router.include_router(controls.router)
+api_router.include_router(haccp.router)
 api_router.include_router(alerts.router)
 api_router.include_router(stream.router)
 api_router.include_router(whatsapp.router)

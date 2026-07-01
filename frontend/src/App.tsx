@@ -28,6 +28,7 @@ import Staffing from "./pages/Staffing";
 import Report from "./pages/Report";
 import Settings from "./pages/Settings";
 import Controls from "./pages/Controls";
+import Haccp from "./pages/Haccp";
 
 export default function App() {
   return (
@@ -62,6 +63,7 @@ export default function App() {
         <Route path="suppliers" element={<Suppliers />} />
         <Route path="settings" element={<Settings />} />
         <Route path="controls" element={<Controls />} />
+        <Route path="haccp" element={<Haccp />} />
       </Route>
     </Routes>
   );

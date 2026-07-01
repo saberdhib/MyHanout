@@ -57,6 +57,7 @@ const groups: { title: string; items: Item[] }[] = [
       { to: "/controls", label: "Contrôles & pertes", icon: "quality", module: "controls" },
       { to: "/end-of-day", label: "Fin de journée", icon: "calendar", module: "end_of_day" },
       { to: "/equipment", label: "Équipements", icon: "thermometer", module: "cold_chain" },
+      { to: "/haccp", label: "Hygiène (HACCP)", icon: "quality", module: "haccp" },
       { to: "/quality", label: "Qualité (écarts)", icon: "quality", module: "quality" },
       { to: "/invoices", label: "Factures", icon: "invoice", module: "invoices" },
     ],

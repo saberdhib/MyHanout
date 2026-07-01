@@ -38,6 +38,7 @@ MODULES: dict[str, str] = {
     "end_of_day": "Fin de journée",
     "quality": "Qualité (écarts)",
     "cold_chain": "Chaîne du froid",
+    "haccp": "Hygiène (HACCP)",
     "integrations": "Intégrations",
     "meat": "Boucherie (traçabilité)",
 }

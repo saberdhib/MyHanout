@@ -213,6 +213,11 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   + démarque inconnue (snapshot de référence + achats − ventes vs stock réel, valorisée
   au coût, seuil `shrinkage_min_units`). `api/v1/controls.py` (`/controls/invoices`,
   `/controls/shrinkage`), page `Controls.tsx` (module `controls`). Aucune table dédiée.
+- **Hygiène (HACCP)** : carnet sanitaire — plan de nettoyage tracé (`hygiene_task`/
+  `hygiene_record`, plan par défaut bootstrappé au 1er accès) + conformité chaîne du
+  froid (dérivée de `temperature_reading`) + **registre** consolidé prêt pour contrôle.
+  `services/haccp_service.py`, `api/v1/haccp.py` (`/haccp/tasks`, `/tasks/{id}/complete`,
+  `/haccp/register`), page `Haccp.tsx` (module `haccp`), migration `0021_haccp`.
 - **Prix & Effectifs** (agents conseil) : moteurs purs `intelligence/pricing/engine.py`
   (marge cible + arrondi psychologique, jamais sous le coût) et
   `intelligence/staffing/engine.py` (affluence prévue par jour de semaine → renfort).
