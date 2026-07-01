@@ -41,6 +41,7 @@ const groups: { title: string; items: Item[] }[] = [
       { to: "/production", label: "Production", icon: "forecast", module: "production" },
       { to: "/boucherie", label: "Boucherie", icon: "supplier", module: "meat" },
       { to: "/catalog", label: "Catalogue", icon: "stocks", module: "catalog" },
+      { to: "/pricing", label: "Prix conseillés", icon: "finance", module: "pricing" },
       { to: "/stocks", label: "Stocks", icon: "stocks", module: "stocks" },
       { to: "/forecasts", label: "Prévisions", icon: "forecast", module: "forecasts" },
       { to: "/suggestions", label: "Suggestions", icon: "suggest", module: "suggestions" },
@@ -49,6 +50,7 @@ const groups: { title: string; items: Item[] }[] = [
   {
     title: "Quotidien",
     items: [
+      { to: "/staffing", label: "Effectifs", icon: "calendar", module: "staffing" },
       { to: "/end-of-day", label: "Fin de journée", icon: "calendar", module: "end_of_day" },
       { to: "/equipment", label: "Équipements", icon: "thermometer", module: "cold_chain" },
       { to: "/quality", label: "Qualité (écarts)", icon: "quality", module: "quality" },

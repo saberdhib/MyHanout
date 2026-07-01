@@ -810,6 +810,46 @@ export const sendBriefing = (id: number) =>
 export const completeBriefingItem = (id: number, done = true) =>
   api.post(`/briefing/items/${id}/done`, null, { params: { done } }).then((r) => r.data);
 
+// --- Prix conseillés (agent Prix) ---
+export interface PriceSuggestion {
+  product_id: number;
+  product_name: string | null;
+  current_price: number;
+  unit_cost: number;
+  current_margin: number;
+  suggested_price: number;
+  target_margin: number;
+  action: string; // raise | lower | hold
+  delta: number;
+  confidence: number;
+  explanation: string;
+}
+export const getPriceSuggestions = () =>
+  api.get<ListResponse<PriceSuggestion>>("/pricing/suggestions").then((r) => r.data);
+export const applyPrice = (product_id: number, price: number) =>
+  api.post<PriceSuggestion>("/pricing/apply", { product_id, price }).then((r) => r.data);
+
+// --- Effectifs (agent Effectifs) ---
+export interface StaffingDay {
+  date: string;
+  weekday: string;
+  predicted_demand: number;
+  vs_average_pct: number;
+  suggested_staff: number;
+  base_staff: number;
+  delta: number;
+  explanation: string;
+}
+export interface StaffingPlan {
+  days: StaffingDay[];
+  average_demand: number;
+  base_staff: number;
+  units_per_staff: number;
+  explanation: string;
+}
+export const getStaffingPlan = (horizon_days = 7) =>
+  api.get<StaffingPlan>("/staffing/plan", { params: { horizon_days } }).then((r) => r.data);
+
 // Jeton courant (pour le flux SSE qui passe par fetch, pas axios).
 export const currentToken = () => localStorage.getItem("token");
 export const apiBaseUrl = baseURL;

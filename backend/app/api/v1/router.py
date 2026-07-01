@@ -27,6 +27,7 @@ from app.api.v1 import (
     onboarding,
     orders,
     pipelines,
+    pricing,
     production,
     promos,
     rag,
@@ -34,6 +35,7 @@ from app.api.v1 import (
     recommendations,
     signals,
     slack,
+    staffing,
     stocks,
     stream,
     telegram,
@@ -69,6 +71,8 @@ api_router.include_router(markdown.router)
 api_router.include_router(recipes.router)
 api_router.include_router(production.router)
 api_router.include_router(briefing.router)
+api_router.include_router(pricing.router)
+api_router.include_router(staffing.router)
 api_router.include_router(alerts.router)
 api_router.include_router(stream.router)
 api_router.include_router(whatsapp.router)

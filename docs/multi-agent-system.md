@@ -98,7 +98,12 @@ auto que des actions whitelistées à faible risque. Chaque étape est **tracée
    `briefing_item`), agent `agent_briefing`, endpoints `/briefing/*`, page `Briefing.tsx`,
    **câblé dans le cycle quotidien** (job `daily` → asset briefing), envoi WhatsApp/Slack.
    Tests `test_briefing.py`. Module `briefing`.
-4. **Effectifs**, **Prix**, **agentification Froid/Qualité** : ensuite.
+4. **Effectifs** + **Prix** — ✅ **fait** : moteurs purs (`intelligence/staffing/engine.py`,
+   `intelligence/pricing/engine.py`), services (`staffing_service` : affluence prévue par
+   jour de semaine → renfort ; `pricing_service` : marge cible + arrondi psychologique),
+   agents `agent_staffing`/`agent_pricing`, endpoints `/staffing/plan` & `/pricing/*`,
+   pages `Staffing.tsx`/`Pricing.tsx`. Modules `staffing`/`pricing`.
+5. **Agentification Froid/Qualité** + **Diagnostic** : ensuite.
 5. **Vitrine** : reformuler le positionnement « votre équipe d'agents IA » (page dédiée).
 
 > Chaque brique suit le même patron : ABC/contrat → impl mock keyless → service → endpoint →

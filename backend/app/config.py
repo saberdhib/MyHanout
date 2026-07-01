@@ -147,6 +147,20 @@ class Settings(BaseSettings):
     # Marge brute par défaut quand le coût d'achat est inconnu (coût = prix × (1 - marge)).
     markdown_default_margin_ratio: float = 0.30
 
+    # --- Effectifs (agent Effectifs) ---
+    # Capacité : nombre d'unités vendues qu'une personne absorbe par jour.
+    staffing_units_per_staff_day: float = 120.0
+    staffing_base_staff: int = 1  # effectif plancher (le commerçant lui-même)
+    staffing_horizon_days: int = 7
+
+    # --- Prix (agent Prix) ---
+    # Marge brute cible (prix conseillé = coût / (1 - marge)).
+    pricing_target_margin_ratio: float = 0.35
+    # Arrondi psychologique (charm pricing : terminaisons en ,90/,95/,99).
+    pricing_charm_pricing: bool = True
+    # Coût par défaut si inconnu (coût = prix × (1 - marge)).
+    pricing_default_margin_ratio: float = 0.30
+
     # --- Seeds ---
     # Répertoire des données de seed. /data en docker (volume monté),
     # sinon résolu relativement à la racine du repo.

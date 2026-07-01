@@ -27,6 +27,8 @@ MODULES: dict[str, str] = {
     "promos": "Promotions",
     "markdown": "Démarque (anti-gaspi)",
     "production": "Production & recettes",
+    "pricing": "Prix conseillés",
+    "staffing": "Effectifs",
     "finance": "Finance",
     "invoices": "Factures",
     "suppliers": "Fournisseurs",

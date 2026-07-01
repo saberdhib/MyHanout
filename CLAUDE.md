@@ -204,3 +204,10 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   `/items/{id}/done`). Câblé dans le **cycle quotidien** (`pipeline_service` job
   `daily` → asset `_asset_briefing`). Envoi WhatsApp/Slack (mock). Page `Briefing.tsx`
   (module `briefing`). Blueprint complet : `docs/multi-agent-system.md`.
+- **Prix & Effectifs** (agents conseil) : moteurs purs `intelligence/pricing/engine.py`
+  (marge cible + arrondi psychologique, jamais sous le coût) et
+  `intelligence/staffing/engine.py` (affluence prévue par jour de semaine → renfort).
+  `services/pricing_service.py` (+ `apply_price` → `price_history`),
+  `services/staffing_service.py`. `api/v1/pricing.py` (`/pricing/suggestions|apply`),
+  `api/v1/staffing.py` (`/staffing/plan`). Pages `Pricing.tsx`/`Staffing.tsx`
+  (modules `pricing`/`staffing`). Réglages : `pricing_*`/`staffing_*` dans `config.py`.
