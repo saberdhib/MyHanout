@@ -161,6 +161,12 @@ class Settings(BaseSettings):
     # Coût par défaut si inconnu (coût = prix × (1 - marge)).
     pricing_default_margin_ratio: float = 0.30
 
+    # --- Contrôles (3-way match factures + démarque inconnue) ---
+    # Tolérance d'écart de prix avant signalement (en %).
+    control_price_tolerance_pct: float = 5.0
+    # Écart de stock minimal (unités) avant de signaler une démarque inconnue.
+    shrinkage_min_units: float = 1.0
+
     # --- Seeds ---
     # Répertoire des données de seed. /data en docker (volume monté),
     # sinon résolu relativement à la racine du repo.

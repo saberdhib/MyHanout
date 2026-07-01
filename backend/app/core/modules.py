@@ -16,6 +16,7 @@ MODULES: dict[str, str] = {
     "dashboard": "Tableau de bord",
     "briefing": "Briefing du matin",
     "report": "Bilan hebdo",
+    "controls": "Contrôles & pertes",
     "recommendations": "Recommandations",
     "alerts": "Alertes",
     "dataops": "Data Ops",

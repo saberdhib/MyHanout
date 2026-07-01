@@ -35,6 +35,7 @@ const EN: Record<string, string> = {
   Prévisions: "Forecasts",
   Suggestions: "Suggestions",
   Effectifs: "Staffing",
+  "Contrôles & pertes": "Controls & losses",
   "Fin de journée": "End of day",
   Équipements: "Equipment",
   "Qualité (écarts)": "Quality (gaps)",

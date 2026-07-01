@@ -208,6 +208,11 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   (CA vs S-1, marge via `finance/margin_service`, top ventes, alertes, démarque récupérée,
   réassort) en points clés + 3 actions. `api/v1/report.py` (`/report/weekly`, `/weekly/send`
   WhatsApp via résolveur). Agent `agent_report`, page `Report.tsx` (module `report`).
+- **Contrôles & pertes** : `services/control_service.py` — 3-way match factures
+  (facturé vs dernier coût connu vs commande fournisseur, tolérance `control_price_tolerance_pct`)
+  + démarque inconnue (snapshot de référence + achats − ventes vs stock réel, valorisée
+  au coût, seuil `shrinkage_min_units`). `api/v1/controls.py` (`/controls/invoices`,
+  `/controls/shrinkage`), page `Controls.tsx` (module `controls`). Aucune table dédiée.
 - **Prix & Effectifs** (agents conseil) : moteurs purs `intelligence/pricing/engine.py`
   (marge cible + arrondi psychologique, jamais sous le coût) et
   `intelligence/staffing/engine.py` (affluence prévue par jour de semaine → renfort).

@@ -873,6 +873,46 @@ export const getWeeklyReport = () =>
 export const sendWeeklyReport = () =>
   api.post<WeeklyReport>("/report/weekly/send").then((r) => r.data);
 
+// --- Contrôles : 3-way match factures + démarque inconnue ---
+export interface InvoiceFinding {
+  invoice_id: number;
+  invoice_number: string;
+  supplier_name: string | null;
+  product_id: number;
+  product_name: string | null;
+  kind: string; // price_drift | price_vs_order | qty_vs_order
+  expected: number;
+  observed: number;
+  overcharge: number;
+  explanation: string;
+}
+export interface InvoiceControlReport {
+  findings: InvoiceFinding[];
+  total_overcharge: number;
+  invoices_checked: number;
+  explanation: string;
+}
+export interface ShrinkageItem {
+  product_id: number;
+  product_name: string | null;
+  baseline_date: string;
+  expected_stock: number;
+  actual_stock: number;
+  missing_units: number;
+  estimated_loss: number;
+  explanation: string;
+}
+export interface ShrinkageReport {
+  items: ShrinkageItem[];
+  total_loss: number;
+  products_checked: number;
+  explanation: string;
+}
+export const getInvoiceControls = () =>
+  api.get<InvoiceControlReport>("/controls/invoices").then((r) => r.data);
+export const getShrinkage = () =>
+  api.get<ShrinkageReport>("/controls/shrinkage").then((r) => r.data);
+
 // Jeton courant (pour le flux SSE qui passe par fetch, pas axios).
 export const currentToken = () => localStorage.getItem("token");
 export const apiBaseUrl = baseURL;

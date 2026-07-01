@@ -14,6 +14,7 @@ from app.api.v1 import (
     chat,
     config,
     connectors,
+    controls,
     customers,
     daily_entries,
     equipment,
@@ -75,6 +76,7 @@ api_router.include_router(briefing.router)
 api_router.include_router(pricing.router)
 api_router.include_router(staffing.router)
 api_router.include_router(report.router)
+api_router.include_router(controls.router)
 api_router.include_router(alerts.router)
 api_router.include_router(stream.router)
 api_router.include_router(whatsapp.router)

@@ -54,6 +54,7 @@ const groups: { title: string; items: Item[] }[] = [
     title: "Quotidien",
     items: [
       { to: "/staffing", label: "Effectifs", icon: "calendar", module: "staffing" },
+      { to: "/controls", label: "Contrôles & pertes", icon: "quality", module: "controls" },
       { to: "/end-of-day", label: "Fin de journée", icon: "calendar", module: "end_of_day" },
       { to: "/equipment", label: "Équipements", icon: "thermometer", module: "cold_chain" },
       { to: "/quality", label: "Qualité (écarts)", icon: "quality", module: "quality" },

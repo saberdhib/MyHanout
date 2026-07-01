@@ -27,6 +27,7 @@ import Pricing from "./pages/Pricing";
 import Staffing from "./pages/Staffing";
 import Report from "./pages/Report";
 import Settings from "./pages/Settings";
+import Controls from "./pages/Controls";
 
 export default function App() {
   return (
@@ -60,6 +61,7 @@ export default function App() {
         <Route path="integrations" element={<Integrations />} />
         <Route path="suppliers" element={<Suppliers />} />
         <Route path="settings" element={<Settings />} />
+        <Route path="controls" element={<Controls />} />
       </Route>
     </Routes>
   );
