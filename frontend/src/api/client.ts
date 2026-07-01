@@ -850,6 +850,29 @@ export interface StaffingPlan {
 export const getStaffingPlan = (horizon_days = 7) =>
   api.get<StaffingPlan>("/staffing/plan", { params: { horizon_days } }).then((r) => r.data);
 
+// --- Bilan hebdomadaire (agent Bilan) ---
+export interface WeeklyReport {
+  period_start: string;
+  period_end: string;
+  revenue: number;
+  revenue_prev: number;
+  revenue_delta_pct: number;
+  units_sold: number;
+  gross_margin: number;
+  gross_margin_pct: number;
+  top_products: { product_id: number; name: string | null; revenue: number }[];
+  alerts_open: number;
+  markdown_recovered: number;
+  orders_suggested: number;
+  highlights: string[];
+  actions: string[];
+  narrative: string;
+}
+export const getWeeklyReport = () =>
+  api.get<WeeklyReport>("/report/weekly").then((r) => r.data);
+export const sendWeeklyReport = () =>
+  api.post<WeeklyReport>("/report/weekly/send").then((r) => r.data);
+
 // Jeton courant (pour le flux SSE qui passe par fetch, pas axios).
 export const currentToken = () => localStorage.getItem("token");
 export const apiBaseUrl = baseURL;

@@ -8,6 +8,7 @@ from app.intelligence.agents.agent_marketing import MarketingAgent
 from app.intelligence.agents.agent_order import OrderAgent
 from app.intelligence.agents.agent_pricing import PricingAgent
 from app.intelligence.agents.agent_production import ProductionAgent
+from app.intelligence.agents.agent_report import ReportAgent
 from app.intelligence.agents.agent_staffing import StaffingAgent
 from app.intelligence.agents.agent_stock import StockAgent
 from app.intelligence.agents.agent_support import SupportAgent
@@ -26,6 +27,7 @@ AGENT_CLASSES: list[type[BaseAgent]] = [
     ProductionAgent,
     PricingAgent,
     StaffingAgent,
+    ReportAgent,
     BriefingAgent,
     FinanceAgent,
     MarketingAgent,
@@ -46,6 +48,7 @@ __all__ = [
     "OrderAgent",
     "PricingAgent",
     "ProductionAgent",
+    "ReportAgent",
     "StaffingAgent",
     "StockAgent",
     "SupportAgent",

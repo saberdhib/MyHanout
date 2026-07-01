@@ -22,6 +22,7 @@ const groups: { title: string; items: Item[] }[] = [
     items: [
       { to: "/", label: "Dashboard", icon: "dashboard", end: true, module: "dashboard" },
       { to: "/briefing", label: "Briefing du matin", icon: "calendar", module: "briefing" },
+      { to: "/report", label: "Bilan hebdo", icon: "finance", module: "report" },
       {
         to: "/recommendations",
         label: "Recommandations",

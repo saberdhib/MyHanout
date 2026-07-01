@@ -25,6 +25,7 @@ import Production from "./pages/Production";
 import Briefing from "./pages/Briefing";
 import Pricing from "./pages/Pricing";
 import Staffing from "./pages/Staffing";
+import Report from "./pages/Report";
 
 export default function App() {
   return (
@@ -34,6 +35,7 @@ export default function App() {
       <Route element={<Layout />}>
         <Route index element={<Dashboard />} />
         <Route path="briefing" element={<Briefing />} />
+        <Route path="report" element={<Report />} />
         <Route path="recommendations" element={<Recommendations />} />
         <Route path="alerts" element={<Alerts />} />
         <Route path="data-ops" element={<DataOps />} />

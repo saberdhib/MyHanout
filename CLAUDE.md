@@ -204,6 +204,10 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   `/items/{id}/done`). Câblé dans le **cycle quotidien** (`pipeline_service` job
   `daily` → asset `_asset_briefing`). Envoi WhatsApp/Slack (mock). Page `Briefing.tsx`
   (module `briefing`). Blueprint complet : `docs/multi-agent-system.md`.
+- **Bilan hebdomadaire** (agent Bilan) : `services/report_service.py` consolide la semaine
+  (CA vs S-1, marge via `finance/margin_service`, top ventes, alertes, démarque récupérée,
+  réassort) en points clés + 3 actions. `api/v1/report.py` (`/report/weekly`, `/weekly/send`
+  WhatsApp via résolveur). Agent `agent_report`, page `Report.tsx` (module `report`).
 - **Prix & Effectifs** (agents conseil) : moteurs purs `intelligence/pricing/engine.py`
   (marge cible + arrondi psychologique, jamais sous le coût) et
   `intelligence/staffing/engine.py` (affluence prévue par jour de semaine → renfort).

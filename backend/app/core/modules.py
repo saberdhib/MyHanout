@@ -15,6 +15,7 @@ from __future__ import annotations
 MODULES: dict[str, str] = {
     "dashboard": "Tableau de bord",
     "briefing": "Briefing du matin",
+    "report": "Bilan hebdo",
     "recommendations": "Recommandations",
     "alerts": "Alertes",
     "dataops": "Data Ops",
