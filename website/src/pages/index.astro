@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import BrowserFrame from "../components/BrowserFrame.astro";
+import ScrollSyncShowcase from "../components/ScrollSyncShowcase.astro";
 import { SITE } from "../consts";
 
 const features = [
@@ -131,6 +132,9 @@ function icon(name: string) {
       </div>
     </div>
   </section>
+
+  <!-- ============ SCROLL-SYNC : ce que MyHanout fait pour vous ============ -->
+  <ScrollSyncShowcase />
 
   <!-- ===================== BANDEAU CONFIANCE ===================== -->
   <section class="border-y border-night/[0.06] bg-surface/60">

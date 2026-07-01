@@ -1,0 +1,325 @@
+---
+/**
+ * ScrollSyncShowcase — liste numérotée (01→05) synchronisée au scroll avec un
+ * visuel sticky qui change en fondu croisé (façon weforum "Create an account").
+ *
+ * - Vanilla TS + IntersectionObserver natif (aucune dépendance externe).
+ * - Progressive enhancement : sans JS → layout empilé lisible (item + visuel).
+ * - Desktop (≥1024px, JS on) → 2 colonnes, visuel sticky, fondu croisé.
+ * - Respecte prefers-reduced-motion (bascule instantanée, pas de fondu).
+ * - Fidèle au produit réel : on ne surpromet pas.
+ */
+type Visual = { type: "img"; src: string; alt: string } | { type: "svg" };
+
+interface Item {
+  n: string;
+  title: string;
+  desc: string;
+  visual: Visual;
+}
+
+const items: Item[] = [
+  {
+    n: "01",
+    title: "Réassort explicable",
+    desc: "L'IA propose une quantité et l'explique (stock, demande prévue, marge de sécurité). Vous validez ou ajustez.",
+    visual: { type: "img", src: "/shots/recommendations.png", alt: "Recommandations de réassort expliquées dans le tableau de bord MyHanout" },
+  },
+  {
+    n: "02",
+    title: "Démarque anti-gaspi",
+    desc: "Alerte avant la perte, pas après. Priorise ce qui périme en premier pour récupérer un maximum de valeur.",
+    visual: { type: "img", src: "/shots/alerts.png", alt: "Alertes de péremption et de stock dans MyHanout" },
+  },
+  {
+    n: "03",
+    title: "Gouvernance human-in-command",
+    desc: "Aucune action automatique sur vos commandes ou votre stock sans votre accord. L'IA propose, vous décidez.",
+    visual: { type: "svg" },
+  },
+  {
+    n: "04",
+    title: "Dashboard temps réel",
+    desc: "Toutes vos données à jour, en un coup d'œil, sans ressaisie : ventes, marges, ruptures évitées, stock à risque.",
+    visual: { type: "img", src: "/shots/dashboard.png", alt: "Tableau de bord temps réel MyHanout" },
+  },
+  {
+    n: "05",
+    title: "Vos données, votre indépendance",
+    desc: "Export à tout moment, aucune dépendance à un groupe ou à un distributeur. Vos données restent les vôtres.",
+    visual: { type: "img", src: "/shots/data-ops.png", alt: "Data Ops et export des données dans MyHanout" },
+  },
+];
+
+/** Visuel on-brand (SVG inline) pour l'item Gouvernance — pas de capture dédiée. */
+function govSvg(): string {
+  return `<svg viewBox="0 0 640 400" role="img" aria-label="L'IA propose une action, le commerçant valide" xmlns="http://www.w3.org/2000/svg">
+    <rect width="640" height="400" rx="16" fill="#0F172A"/>
+    <rect x="40" y="52" width="560" height="120" rx="12" fill="#1E293B"/>
+    <circle cx="84" cy="112" r="20" fill="#12B76A"/>
+    <path d="M76 112l6 6 10-12" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="120" y="92" width="230" height="14" rx="7" fill="#334155"/>
+    <rect x="120" y="120" width="330" height="12" rx="6" fill="#293548"/>
+    <rect x="120" y="140" width="180" height="12" rx="6" fill="#293548"/>
+    <rect x="428" y="208" width="172" height="52" rx="10" fill="#12B76A"/>
+    <text x="514" y="240" font-family="Manrope, sans-serif" font-size="20" font-weight="700" fill="#fff" text-anchor="middle">Valider</text>
+    <rect x="40" y="208" width="172" height="52" rx="10" fill="none" stroke="#475569" stroke-width="1.5"/>
+    <text x="126" y="240" font-family="Manrope, sans-serif" font-size="20" font-weight="600" fill="#94A3B8" text-anchor="middle">Ajuster</text>
+    <text x="40" y="316" font-family="Manrope, sans-serif" font-size="18" fill="#94A3B8">L'IA propose ·</text>
+    <text x="176" y="316" font-family="Manrope, sans-serif" font-size="18" font-weight="700" fill="#12B76A">vous décidez</text>
+    <path d="M470 40l6 16 16 6-16 6-6 16-6-16-16-6 16-6z" fill="#F59E0B"/>
+  </svg>`;
+}
+---
+
+<section class="ss-section reveal" aria-labelledby="ss-title">
+  <div class="ss-head">
+    <p class="ss-eyebrow">Ce que MyHanout fait pour vous</p>
+    <h2 id="ss-title">Une IA qui vous facilite le commerce — jamais qui le pilote.</h2>
+  </div>
+
+  <div class="ss" data-enhanced="false">
+    <!-- Colonne gauche : liste numérotée -->
+    <ol class="ss-list">
+      {
+        items.map((item, i) => (
+          <li class:list={["ss-item", { "is-active": i === 0 }]} data-index={i}>
+            <div class="ss-item-row">
+              <span class="ss-num">{item.n}</span>
+              <div class="ss-body">
+                <h3 class="ss-item-title">{item.title}</h3>
+                <p class="ss-item-desc">{item.desc}</p>
+                {/* Visuel « inline » : affiché en mobile & en fallback sans JS */}
+                <figure class="ss-inline">
+                  {item.visual.type === "img" ? (
+                    <img
+                      src={item.visual.src}
+                      alt={item.visual.alt}
+                      loading={i === 0 ? "eager" : "lazy"}
+                      decoding="async"
+                    />
+                  ) : (
+                    <div class="ss-svg-wrap" set:html={govSvg()} />
+                  )}
+                </figure>
+              </div>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+
+    <!-- Colonne droite : visuel sticky (desktop, JS on) -->
+    <div class="ss-sticky" aria-hidden="true">
+      <div class="ss-stage">
+        {
+          items.map((item, i) => (
+            <figure class:list={["ss-visual", { "is-active": i === 0 }]} data-index={i}>
+              {item.visual.type === "img" ? (
+                <img src={item.visual.src} alt="" loading={i === 0 ? "eager" : "lazy"} decoding="async" />
+              ) : (
+                <div class="ss-svg-wrap" set:html={govSvg()} />
+              )}
+            </figure>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ss-section {
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 5rem 1.25rem;
+  }
+  .ss-head {
+    max-width: 42rem;
+    margin-bottom: 2.5rem;
+  }
+  .ss-eyebrow {
+    color: #12b76a;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin: 0 0 0.5rem;
+  }
+  .ss-head h2 {
+    color: #0f172a;
+    font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+    line-height: 1.15;
+    font-weight: 800;
+    margin: 0;
+  }
+
+  /* Défaut (mobile + fallback sans JS) : une seule colonne, visuel empilé. */
+  .ss {
+    display: block;
+  }
+  .ss-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .ss-item {
+    padding: 1.5rem 0;
+    border-top: 1px solid rgba(15, 23, 42, 0.08);
+  }
+  .ss-item-row {
+    display: flex;
+    gap: 1rem;
+  }
+  .ss-num {
+    font-variant-numeric: tabular-nums;
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: #94a3b8;
+    flex: none;
+    line-height: 1.6;
+  }
+  .ss-item-title {
+    color: #0f172a;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0 0 0.35rem;
+  }
+  .ss-item-desc {
+    /* Muted #64748B ≈ 4.6:1 sur blanc → contraste OK même en état inactif. */
+    color: #64748b;
+    font-size: 0.98rem;
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  figure {
+    margin: 0;
+  }
+  .ss-inline {
+    margin-top: 1rem;
+  }
+  .ss-inline img,
+  .ss-svg-wrap {
+    width: 100%;
+    border-radius: 14px;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    box-shadow: 0 12px 30px -18px rgba(15, 23, 42, 0.35);
+    display: block;
+  }
+
+  .ss-sticky {
+    display: none;
+  }
+  .ss-stage {
+    position: relative;
+    aspect-ratio: 16 / 10;
+  }
+  .ss-visual {
+    position: absolute;
+    inset: 0;
+  }
+  .ss-visual img,
+  .ss-visual .ss-svg-wrap {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 16px;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    box-shadow: 0 24px 60px -30px rgba(15, 23, 42, 0.45);
+  }
+
+  /* Mode « enrichi » (JS actif) sur desktop : 2 colonnes + sticky + fondu. */
+  @media (min-width: 1024px) {
+    .ss[data-enhanced="true"] {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+    .ss[data-enhanced="true"] .ss-inline {
+      display: none; /* le visuel passe dans la colonne sticky */
+    }
+    .ss[data-enhanced="true"] .ss-list {
+      padding: 12vh 0;
+    }
+    .ss[data-enhanced="true"] .ss-item {
+      min-height: 42vh;
+      display: flex;
+      align-items: center;
+      opacity: 0.45;
+      transition: opacity 0.4s ease;
+    }
+    .ss[data-enhanced="true"] .ss-item.is-active {
+      opacity: 1;
+    }
+    .ss[data-enhanced="true"] .ss-item.is-active .ss-num {
+      color: #12b76a;
+    }
+    .ss[data-enhanced="true"] .ss-sticky {
+      display: block;
+      position: sticky;
+      top: 30vh;
+    }
+    .ss[data-enhanced="true"] .ss-visual {
+      opacity: 0;
+      transform: translateY(14px);
+      transition:
+        opacity 0.45s ease-out,
+        transform 0.45s ease-out;
+      pointer-events: none;
+    }
+    .ss[data-enhanced="true"] .ss-visual.is-active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Accessibilité : pas de mouvement si l'utilisateur le refuse. */
+  @media (prefers-reduced-motion: reduce) {
+    .ss[data-enhanced="true"] .ss-item,
+    .ss[data-enhanced="true"] .ss-visual {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  // Scoped au composant : on ne touche qu'à la première instance présente.
+  const root = document.querySelector<HTMLElement>(".ss");
+  if (root) {
+    const items = Array.from(root.querySelectorAll<HTMLElement>(".ss-item"));
+    const visuals = Array.from(root.querySelectorAll<HTMLElement>(".ss-visual"));
+    const isDesktop = window.matchMedia("(min-width: 1024px)");
+
+    const activate = (index: number) => {
+      items.forEach((el, i) => el.classList.toggle("is-active", i === index));
+      visuals.forEach((el, i) => el.classList.toggle("is-active", i === index));
+    };
+
+    const setup = () => {
+      // Enrichissement : bascule vers le layout 2 colonnes + sticky.
+      root.setAttribute("data-enhanced", "true");
+      if (!isDesktop.matches) return; // mobile : layout empilé, pas de scroll-sync
+
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const idx = Number((entry.target as HTMLElement).dataset.index ?? 0);
+              activate(idx);
+            }
+          });
+        },
+        // Zone d'activation centrée sur le viewport (un seul item actif à la fois).
+        { rootMargin: "-45% 0px -45% 0px", threshold: 0 },
+      );
+      items.forEach((el) => io.observe(el));
+      activate(0); // fallback : premier item actif par défaut
+    };
+
+    setup();
+    // Si l'utilisateur passe de mobile à desktop, on (ré)initialise proprement.
+    isDesktop.addEventListener?.("change", () => activate(0));
+  }
+</script>
