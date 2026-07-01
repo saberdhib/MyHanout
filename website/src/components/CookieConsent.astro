@@ -1,0 +1,89 @@
+---
+/**
+ * Bannière de consentement cookies (RGPD) — vitrine uniquement.
+ *
+ * Par défaut le site ne pose AUCUN cookie de mesure : la bannière recueille le
+ * consentement AVANT tout traceur. Le choix est mémorisé (localStorage) ; un futur
+ * outil de mesure d'audience doit vérifier `localStorage.mh_cookie_consent === "granted"`
+ * avant de se charger. « Refuser » est aussi simple qu'« Accepter » (exigence CNIL).
+ */
+---
+
+<div id="cookie-banner" class="cookie-banner" role="dialog" aria-live="polite" aria-label="Consentement aux cookies" hidden>
+  <p class="cookie-text">
+    🍪 Nous aimerions mesurer l'audience de ce site (statistiques anonymes) pour
+    l'améliorer. Aucun cookie n'est déposé sans votre accord.
+    <a href="/confiance">En savoir plus</a>
+  </p>
+  <div class="cookie-actions">
+    <button id="cookie-refuse" class="cookie-btn cookie-btn--ghost">Refuser</button>
+    <button id="cookie-accept" class="cookie-btn cookie-btn--primary">Accepter</button>
+  </div>
+</div>
+
+<style>
+  .cookie-banner {
+    position: fixed;
+    inset-inline: 1rem;
+    bottom: 1rem;
+    z-index: 60;
+    max-width: 40rem;
+    margin-inline: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1rem;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-radius: 14px;
+    background: #0f172a;
+    color: #f1f5f9;
+    box-shadow: 0 20px 50px -20px rgba(15, 23, 42, 0.6);
+  }
+  .cookie-text {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    flex: 1 1 22rem;
+  }
+  .cookie-text a {
+    color: #5eead4;
+    text-decoration: underline;
+  }
+  .cookie-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .cookie-btn {
+    border-radius: 10px;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1px solid transparent;
+  }
+  .cookie-btn--primary {
+    background: #12b76a;
+    color: #fff;
+  }
+  .cookie-btn--ghost {
+    background: transparent;
+    color: #94a3b8;
+    border-color: #334155;
+  }
+</style>
+
+<script>
+  const KEY = "mh_cookie_consent";
+  const banner = document.getElementById("cookie-banner");
+  if (banner && !localStorage.getItem(KEY)) {
+    banner.hidden = false;
+    const close = (value: "granted" | "denied") => {
+      localStorage.setItem(KEY, value);
+      banner.hidden = true;
+      // Point d'extension : charger ici la mesure d'audience si value === "granted".
+    };
+    document.getElementById("cookie-accept")?.addEventListener("click", () => close("granted"));
+    document.getElementById("cookie-refuse")?.addEventListener("click", () => close("denied"));
+  }
+</script>

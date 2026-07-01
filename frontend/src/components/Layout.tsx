@@ -3,6 +3,8 @@ import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { LogoWordmark } from "./Logo";
 import { Icons } from "./icons";
 import ChatWidget from "./ChatWidget";
+import TourGuide from "./TourGuide";
+import { t } from "../i18n";
 import { useTheme } from "../hooks/useTheme";
 import { getModules } from "../api/client";
 
@@ -65,6 +67,7 @@ const groups: { title: string; items: Item[] }[] = [
       { to: "/connectors", label: "Connecteurs", icon: "plug", module: "integrations" },
       { to: "/integrations", label: "Intégrations", icon: "plug", module: "integrations" },
       { to: "/suppliers", label: "Fournisseurs", icon: "supplier", module: "suppliers" },
+      { to: "/settings", label: "Réglages", icon: "plug" },
     ],
   },
 ];
@@ -123,7 +126,7 @@ export default function Layout() {
             .map((g) => (
             <div key={g.title}>
               <div className="px-3 pb-1.5 text-[11px] font-semibold uppercase tracking-wider text-white/35">
-                {g.title}
+                {t(g.title)}
               </div>
               <div className="space-y-0.5">
                 {g.items.map((l) => {
@@ -147,7 +150,7 @@ export default function Layout() {
                             <span className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-brand" />
                           )}
                           <Icon className={isActive ? "text-brand-light" : "text-white/55 group-hover:text-white"} />
-                          <span>{l.label}</span>
+                          <span>{t(l.label)}</span>
                         </>
                       )}
                     </NavLink>
@@ -185,7 +188,7 @@ export default function Layout() {
             </button>
             <span className="hidden sm:inline">MyHanout</span>
             <span className="hidden text-night/25 sm:inline dark:text-surface/25">/</span>
-            <span className="font-semibold text-night dark:text-surface">{current.label}</span>
+            <span className="font-semibold text-night dark:text-surface">{t(current.label)}</span>
           </div>
           <div className="flex items-center gap-3">
             <a
@@ -213,6 +216,7 @@ export default function Layout() {
 
       {/* Fenêtre de chat flottante, disponible partout. */}
       <ChatWidget />
+      <TourGuide />
     </div>
   );
 }

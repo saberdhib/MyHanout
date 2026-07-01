@@ -3,6 +3,7 @@ import "@fontsource-variable/manrope";
 import "../styles/global.css";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
+import CookieConsent from "../components/CookieConsent.astro";
 import { SITE } from "../consts";
 
 interface Props {
@@ -41,6 +42,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       <slot />
     </main>
     <Footer />
+    <CookieConsent />
 
     <!-- Révélation au scroll (progressive enhancement). -->
     <script is:inline>
