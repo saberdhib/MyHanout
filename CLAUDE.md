@@ -266,8 +266,11 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   à `collected` **crédit fidélité** one-shot (`loyalty_credited`) via `loyalty_service.earn`.
   Totaux calculés depuis le catalogue. API `api/v1/reservations.py` (`/reservations` lecture
   scope `stocks`, `POST` + `/{id}/status` scope `orders`). Page `Reservations.tsx` (module
-  `reservations`). ⚠️ Tests : parcours en org dédiée (sans connecteur → résolveur mock, prix
-  produit maîtrisé). Tests `tests/test_reservations.py`.
+  `reservations`). Réservation **via WhatsApp** : « réserver 2 boeuf » dans la machine à
+  états (`conversation_service._handle_reservation`) crée une réservation `pending`
+  rattachée au numéro (intention `_RESERVE_INTENT`, distincte du réassort fournisseur).
+  ⚠️ Tests : parcours en org dédiée (sans connecteur → résolveur mock, prix produit
+  maîtrisé). Tests `tests/test_reservations.py`.
 - **Backoffice plateforme (SaaS, agent-as-a-service)** : plan **cross-tenant** pour
   l'opérateur MyHanout — l'**inverse** du garde-fou (cf. §5). Modèles **globaux** (non
   tenant) `platform_admin` (rôles `superadmin`/`support`/`billing`) + `subscription`

@@ -5,6 +5,7 @@ Parcours type :
   "boeuf 10" / "10"          -> ajustement d'une ligne (reste en attente)
   "oui"                      -> validation -> commande confirmée
   "non"                      -> annulation
+  "réserver 2 boeuf"         -> réservation client (click & collect), rattachée au numéro
   "stock <sku> <restant> <commande>" -> saisie de fin de journée
   photo de facture           -> pipeline OCR (Phase 1)
 Tout autre message -> fallback orchestrateur d'agents.
@@ -38,6 +39,8 @@ STATE_AWAITING = "awaiting_order_confirmation"
 _YES = {"oui", "ok", "valide", "valider", "confirme", "confirmer", "yes"}
 _NO = {"non", "annule", "annuler", "stop", "no"}
 _ORDER_INTENT = ("command", "réassort", "reassort", "demain", "semaine")
+# Intention de RÉSERVATION client (click & collect) — distincte du réassort fournisseur.
+_RESERVE_INTENT = ("réserv", "reserv", "mettre de côté", "mettre de cote", "gardez", "garde-moi")
 
 
 async def _get_conversation(session: AsyncSession, phone: str) -> Conversation:
@@ -133,6 +136,58 @@ async def _confirm_flow(session: AsyncSession, conv: Conversation) -> str:
     )
 
 
+def _match_product(products: list[Product], text: str) -> Product | None:
+    """Repère un produit mentionné en texte libre (par mot du nom ou du SKU)."""
+    text_tokens = set(re.findall(r"[a-zà-ÿ0-9]+", text.lower()))
+    for p in products:
+        keywords = {
+            w
+            for w in re.findall(r"[a-zà-ÿ0-9]+", f"{p.name} {p.sku}".lower())
+            if len(w) > 2 and w != "produit"
+        }
+        if text_tokens & keywords:
+            return p
+    return None
+
+
+async def _handle_reservation(session: AsyncSession, phone: str, text: str) -> str:
+    """Réservation client (click & collect) initiée en conversation.
+
+    « réserver 2 boeuf » -> crée une réservation `pending` rattachée au numéro.
+    Le commerçant la valide au dashboard ; le client est notifié quand elle est prête.
+    """
+    from app.models.customer import Customer
+    from app.services.reservation_service import create_reservation
+
+    products = list(await session.scalars(select(Product)))
+    product = _match_product(products, text)
+    if product is None:
+        return (
+            "Pour réserver, indiquez le produit et la quantité, "
+            "ex : « réserver 2 boeuf haché ». 🙂"
+        )
+    numbers = re.findall(r"\d+(?:[.,]\d+)?", text)
+    qty = float(numbers[-1].replace(",", ".")) if numbers else 1.0
+
+    # Rattache un client connu par son numéro (sinon réservation « de passage »).
+    customer = await session.scalar(select(Customer).where(Customer.phone == phone))
+    from app.schemas.reservation import ReservationLineIn
+
+    res = await create_reservation(
+        session,
+        customer_id=customer.id if customer else None,
+        customer_name=customer.name if customer else None,
+        customer_phone=phone,
+        pickup_date=None,
+        notes="Réservation via WhatsApp",
+        lines=[ReservationLineIn(product_id=product.id, quantity=qty)],
+    )
+    return (
+        f"🛍️ Réservation #{res.id} enregistrée : {qty:g} × {product.name} "
+        f"(~{res.total_amount:.2f} €).\nNous vous préviendrons dès qu'elle est prête !"
+    )
+
+
 async def _handle_stock_entry(session: AsyncSession, text: str) -> str | None:
     """Format : 'stock <sku> <restant> <commande?>' -> saisie de fin de journée."""
     m = re.match(
@@ -186,6 +241,9 @@ async def _dispatch_text(session: AsyncSession, conv: Conversation, text: str) -
     stock_reply = await _handle_stock_entry(session, text)
     if stock_reply is not None:
         return stock_reply
+    # Réservation client (avant le réassort fournisseur : intentions distinctes).
+    if any(k in lowered for k in _RESERVE_INTENT):
+        return await _handle_reservation(session, conv.phone, text)
     if any(k in lowered for k in _ORDER_INTENT):
         return await _start_order_flow(session, conv, lowered)
 

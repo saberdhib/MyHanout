@@ -125,3 +125,18 @@ def test_reservation_isolation(anon_client):
 def test_accountant_cannot_create(accountant_client):
     payload = {"customer_name": "X", "lines": [{"product_id": 1, "quantity": 1}]}
     assert accountant_client.post("/api/v1/reservations", json=payload).status_code == 403
+
+
+def test_reserve_via_whatsapp(anon_client):
+    # Le webhook est public ; il rattache au 1er commerce (org A, produit BOEUF-HACHE).
+    r = anon_client.post(
+        "/api/v1/whatsapp/webhook",
+        json={"from": "+212700700700", "message": "réserver 2 boeuf", "id": "wamid.RESA1"},
+    )
+    reply = r.json()["replies"][0]["reply"]
+    assert "Réservation" in reply
+
+    # La réservation est visible côté commerçant, rattachée au numéro.
+    h = _login(anon_client, "admin@test.local")
+    items = anon_client.get("/api/v1/reservations", headers=h).json()["items"]
+    assert any(it["customer_phone"] == "+212700700700" for it in items)
