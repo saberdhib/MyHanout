@@ -15,7 +15,13 @@ export async function login(email = DEMO_EMAIL, password = DEMO_PASSWORD): Promi
   const { data } = await axios.post(`${baseURL}/auth/login`, { email, password });
   accessToken = data.access_token;
   localStorage.setItem("token", accessToken!);
+  // Rôle plateforme (backoffice MyHanout) — indice UX ; l'accès reste vérifié en base.
+  if (data.platform_role) localStorage.setItem("platform_role", data.platform_role);
+  else localStorage.removeItem("platform_role");
 }
+
+/** Rôle plateforme courant (superadmin | support | billing) ou null. */
+export const platformRole = (): string | null => localStorage.getItem("platform_role");
 
 api.interceptors.request.use(async (config) => {
   if (!accessToken) await login();
@@ -978,3 +984,72 @@ export const createMeatLot = (body: {
 }) => api.post<MeatLotSummary>("/meat/lots", body).then((r) => r.data);
 export const setMeatBreakdown = (id: number, cuts: MeatCutIn[]) =>
   api.put<MeatLotSummary>(`/meat/lots/${id}/breakdown`, { cuts }).then((r) => r.data);
+
+// --- Backoffice plateforme (SaaS : pilotage cross-tenant du parc) -----------
+export interface PlatformOverview {
+  clients_total: number;
+  clients_active: number;
+  clients_trial: number;
+  clients_suspended: number;
+  mrr_total_eur: number;
+  arr_total_eur: number;
+}
+export interface ClientSummary {
+  organization_id: number;
+  name: string;
+  slug: string;
+  business_type: string | null;
+  status: string;
+  plan: string;
+  subscription_status: string | null;
+  mrr_eur: number;
+  users: number;
+  products: number;
+  sales: number;
+  created_at: string | null;
+}
+export interface ClientDetail extends ClientSummary {
+  invoices: number;
+  connectors_configured: number;
+  open_tickets: number;
+  last_sale_at: string | null;
+  trial_ends_on: string | null;
+  started_on: string | null;
+  current_period_end: string | null;
+  notes: string | null;
+}
+export interface ProvisionClientPayload {
+  name: string;
+  slug: string;
+  business_type?: string;
+  owner_email: string;
+  owner_full_name?: string;
+  owner_password: string;
+  plan?: string;
+}
+
+export const getPlatformOverview = () =>
+  api.get<PlatformOverview>("/platform/overview").then((r) => r.data);
+export const getPlatformClients = () =>
+  api.get<ListResponse<ClientSummary>>("/platform/clients").then((r) => r.data);
+export const getPlatformClient = (orgId: number) =>
+  api.get<ClientDetail>(`/platform/clients/${orgId}`).then((r) => r.data);
+export const provisionClient = (payload: ProvisionClientPayload) =>
+  api.post<ClientDetail>("/platform/clients", payload).then((r) => r.data);
+export const setClientStatus = (orgId: number, status: string, reason?: string) =>
+  api
+    .post<ClientDetail>(`/platform/clients/${orgId}/status`, { status, reason })
+    .then((r) => r.data);
+export const setClientPlan = (
+  orgId: number,
+  plan: string,
+  mrr_eur?: number,
+  subscription_status?: string,
+) =>
+  api
+    .post<ClientDetail>(`/platform/clients/${orgId}/plan`, {
+      plan,
+      mrr_eur,
+      subscription_status,
+    })
+    .then((r) => r.data);

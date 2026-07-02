@@ -6,15 +6,17 @@ import ChatWidget from "./ChatWidget";
 import TourGuide from "./TourGuide";
 import { t } from "../i18n";
 import { useTheme } from "../hooks/useTheme";
-import { getModules } from "../api/client";
+import { getModules, platformRole } from "../api/client";
 
 // `module` = clé du socle (cf. backend app/core/modules.py) ; null = toujours visible.
+// `platformOnly` = visible uniquement pour un opérateur MyHanout (backoffice SaaS).
 type Item = {
   to: string;
   label: string;
   icon: keyof typeof Icons;
   end?: boolean;
   module?: string;
+  platformOnly?: boolean;
 };
 
 // Navigation regroupée par intention (lisibilité + repérage).
@@ -72,6 +74,10 @@ const groups: { title: string; items: Item[] }[] = [
       { to: "/settings", label: "Réglages", icon: "plug" },
     ],
   },
+  {
+    title: "MyHanout Ops",
+    items: [{ to: "/admin", label: "Backoffice", icon: "dashboard", platformOnly: true }],
+  },
 ];
 
 const allItems = groups.flatMap((g) => g.items);
@@ -82,6 +88,8 @@ export default function Layout() {
   const [open, setOpen] = useState(false); // sidebar mobile (off-canvas)
   // Modules actifs selon le type de commerce (socle générique configurable).
   const [enabled, setEnabled] = useState<string[] | null>(null);
+  // Opérateur plateforme MyHanout ? (débloque le groupe backoffice).
+  const isPlatform = Boolean(platformRole());
   const current =
     allItems.find((i) => (i.end ? pathname === i.to : pathname.startsWith(i.to) && i.to !== "/")) ??
     allItems[0];
@@ -92,8 +100,11 @@ export default function Layout() {
       .catch(() => setEnabled(null)); // dégradé : on montre tout si l'appel échoue
   }, []);
 
-  // Filtre par module actif (null = pas encore chargé / échec → tout visible).
-  const visible = (i: Item) => !i.module || enabled === null || enabled.includes(i.module);
+  // Filtre par module actif (null = pas encore chargé / échec → tout visible)
+  // + masque le backoffice aux non-opérateurs.
+  const visible = (i: Item) =>
+    (!i.platformOnly || isPlatform) &&
+    (!i.module || enabled === null || enabled.includes(i.module));
 
   // Referme la sidebar à chaque navigation (mobile).
   useEffect(() => {
