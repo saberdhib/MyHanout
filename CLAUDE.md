@@ -193,6 +193,12 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   (`intelligence/forecasting/correlation.py` : Pearson, verdict, cross-product).
   Endpoints `GET /forecasts/{id}/factors` et `/cross-product`. Corrélation ≠ causalité
   (verdict prudent). Doc : `docs/ai-models.md` §5.
+  **Backtest** (`intelligence/forecasting/backtest.py`) : validation walk-forward
+  (MAE/MAPE par modèle) sur l'historique réel — baseline plate vs naïf saisonnier vs
+  Prophet/LGBM (signalés « indisponible » si lib absente, aucune dépendance dure). Verdict
+  honnête : le naïf saisonnier bat la moyenne plate d'~50 % (le harnais discrimine).
+  `services/forecast_service.backtest_product`, `GET /forecasts/{id}/backtest`, affiché
+  dans `Forecasts.tsx`. Tests `tests/test_backtest.py`.
 - **Socle data platform** : orchestration (`services/pipeline_service.py` : jobs =
   suites d'assets sous un `PipelineRun` tracé, Celery, pas Dagster ; `api/v1/pipelines.py`),
   service ML isolé (`ml-service/` + `intelligence/forecasting/service_client.py`, fallback

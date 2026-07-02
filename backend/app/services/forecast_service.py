@@ -38,3 +38,20 @@ async def forecast_product(
         horizon_days=horizon_days or settings.forecast_horizon_days,
         product_id=product_id,
     )
+
+
+async def backtest_product(
+    session: AsyncSession, product_id: int, *, horizon_days: int = 7, folds: int = 3
+):
+    """Backtest walk-forward comparant les modèles sur l'historique réel du produit."""
+    from app.intelligence.forecasting.backtest import backtest_history
+
+    repo = SaleRepository(session)
+    rows = await repo.daily_history(product_id)
+    history = [
+        HistoryPoint(ds=ds if isinstance(ds, date) else date.fromisoformat(str(ds)), y=y)
+        for ds, y in rows
+    ]
+    report = backtest_history(history, horizon_days=horizon_days, folds=folds)
+    report.product_id = product_id
+    return report

@@ -12,10 +12,10 @@ from app.core.security import CurrentUser
 from app.intelligence.forecasting.correlation import analyze_factors, cross_product
 from app.models.base import PipelineTrigger
 from app.schemas.dataplatform import PipelineRunOut
-from app.schemas.forecast import ForecastOut
+from app.schemas.forecast import BacktestModelOut, BacktestOut, ForecastOut
 from app.schemas.insights import CrossProductReport, FactorReport
 from app.services import pipeline_service
-from app.services.forecast_service import forecast_product
+from app.services.forecast_service import backtest_product, forecast_product
 
 router = APIRouter(prefix="/forecasts", tags=["forecasts"])
 
@@ -32,6 +32,41 @@ async def recompute(
     from app.api.v1.pipelines import _out
 
     return _out(run)
+
+
+@router.get("/{product_id}/backtest", response_model=BacktestOut)
+async def product_backtest(
+    product_id: int,
+    horizon_days: int = 7,
+    folds: int = 3,
+    session: AsyncSession = Depends(get_db),
+    _: CurrentUser = Depends(require_permission("forecasts")),
+) -> BacktestOut:
+    """Backtest walk-forward : MAE/MAPE par modèle sur l'historique réel + verdict honnête.
+
+    Compare une baseline plate, le naïf saisonnier, et Prophet/LGBM s'ils sont installés.
+    Montre si un modèle avancé bat vraiment le naïf (ou reste à installer).
+    """
+    report = await backtest_product(session, product_id, horizon_days=horizon_days, folds=folds)
+    return BacktestOut(
+        product_id=report.product_id,
+        horizon_days=report.horizon_days,
+        folds=report.folds,
+        history_points=report.history_points,
+        results=[
+            BacktestModelOut(
+                model=r.model,
+                available=r.available,
+                mae=r.mae,
+                mape=r.mape,
+                n_points=r.n_points,
+                note=r.note,
+            )
+            for r in report.results
+        ],
+        best_model=report.best_model,
+        verdict=report.verdict,
+    )
 
 
 @router.get("/{product_id}/factors", response_model=FactorReport)

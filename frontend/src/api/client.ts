@@ -140,6 +140,30 @@ export const getForecast = (productId: number, horizon = 14) =>
     .get<Forecast>(`/forecasts/${productId}`, { params: { horizon_days: horizon } })
     .then((r) => r.data);
 
+export interface BacktestModel {
+  model: string;
+  available: boolean;
+  mae: number | null;
+  mape: number | null;
+  n_points: number;
+  note: string | null;
+}
+export interface BacktestReport {
+  product_id: number | null;
+  horizon_days: number;
+  folds: number;
+  history_points: number;
+  results: BacktestModel[];
+  best_model: string | null;
+  verdict: string;
+}
+export const getBacktest = (productId: number, horizon = 7, folds = 3) =>
+  api
+    .get<BacktestReport>(`/forecasts/${productId}/backtest`, {
+      params: { horizon_days: horizon, folds },
+    })
+    .then((r) => r.data);
+
 // --- Onboarding self-service -----------------------------------------------
 
 export interface SignupPayload {
