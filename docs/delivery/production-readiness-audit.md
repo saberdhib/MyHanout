@@ -20,10 +20,16 @@
 
 ## 🔴 CRITIQUE — à corriger avant de vendre
 
-### C1. Pas de plan « super-admin / plateforme » (le cœur du SaaS que tu décris)
+### C1. Pas de plan « super-admin / plateforme » (le cœur du SaaS que tu décris) ✅ FAIT (Lot 2)
 Tout est tenant-scopé : **il n'existe aucun moyen pour TOI de gérer l'ensemble des
 clients**. C'est l'architecture inverse du garde-fou tenant, donc à concevoir
 explicitement (cf. §« Plateforme SaaS » plus bas). Sans ça, pas d'« agent-as-a-service ».
+→ Plan plateforme livré : `platform_admin` + `subscription` + `organization.status`
+(migration 0023), auth cross-tenant **vérifiée en base + auditée**
+(`core/platform_auth.py`), service `platform_service.py` (vue 360, provisioning,
+suspension, billing), API owner-only `api/v1/platform.py`. Suspension d'un commerce =
+blocage immédiat de ses utilisateurs (`_ensure_org_active`). Impersonation auditée :
+prévue Lot 3.
 
 ### C2. `SECRET_KEY` par défaut `"change-me"`, sans garde au démarrage ✅ FAIT (Lot 1)
 JWT **et** chiffrement des connecteurs en dépendent. Un déploiement qui oublie de la

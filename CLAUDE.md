@@ -82,7 +82,14 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   alert, markdown_suggestion, recipe, recipe_item, production_plan, daily_briefing,
   briefing_item, tenant_connector**). **Exceptions voulues** (référentiels **globaux**, non tenant, non
   filtrés par le garde-fou) : `expense_category`, `signal_definition`, `signal_observation`
-  (signaux externes = données publiques alignées aux ventes par date).
+  (signaux externes = données publiques alignées aux ventes par date), **`platform_admin`,
+  `subscription`, `organization`** (plan plateforme = l'**inverse** du garde-fou : le
+  backoffice MyHanout gère *tous* les commerces — cf. §9 « Backoffice plateforme »).
+- **Backoffice plateforme (cross-tenant)** : `get_platform_admin` pose `current_org=None`
+  (garde-fou désactivé, accès à tous les commerces). Réservé aux `PlatformAdmin` **vérifiés
+  en base** (pas seulement via claim JWT) et **audité** (`platform_service.platform_audit`).
+  Un commerce `organization.status ∈ {suspended, cancelled}` bloque ses utilisateurs
+  (`core/deps._ensure_org_active`).
 - **Limite** : le SQL brut (hors ORM) n'est PAS filtré → filtrer l'org explicitement
   **— idem pour un `DELETE`/`UPDATE` ORM en masse** (l'event ne couvre que les SELECT) :
   filtrer `organization_id` à la main (cf. remplacement des recos dans `recommendation_service`).
@@ -225,3 +232,15 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   `services/staffing_service.py`. `api/v1/pricing.py` (`/pricing/suggestions|apply`),
   `api/v1/staffing.py` (`/staffing/plan`). Pages `Pricing.tsx`/`Staffing.tsx`
   (modules `pricing`/`staffing`). Réglages : `pricing_*`/`staffing_*` dans `config.py`.
+- **Backoffice plateforme (SaaS, agent-as-a-service)** : plan **cross-tenant** pour
+  l'opérateur MyHanout — l'**inverse** du garde-fou (cf. §5). Modèles **globaux** (non
+  tenant) `platform_admin` (rôles `superadmin`/`support`/`billing`) + `subscription`
+  (plan/MRR) + `organization.status` (cycle de vie : `active`/`trial`/`suspended`/
+  `cancelled`). Auth vérifiée **en base** `core/platform_auth.py` (`get_platform_admin`,
+  `require_platform_scope`) → pose `current_org=None`. Service `services/platform_service.py`
+  (vue 360 clients, `overview`, `provision_client`, `set_org_status`, `set_plan`) — **toute
+  mutation auditée** (`platform_audit`, préfixe `platform.`). API owner-only
+  `api/v1/platform.py` (`/platform/overview|clients|clients/{id}` + `/status` + `/plan`).
+  Suspension d'un commerce → blocage immédiat de ses users (`deps._ensure_org_active`).
+  Le login expose `platform_role` (claim `plat`, indice UX ; l'accès reste vérifié en base).
+  Seed : opérateur `platform@myhanout.example`. Migration `0023`. Tests `tests/test_platform.py`.

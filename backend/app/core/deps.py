@@ -89,7 +89,22 @@ async def get_current_user(
     current = to_current_user(user, membership)
     # Pose le tenant courant pour le garde-fou central (filtre ORM automatique).
     set_current_org(current.organization_id)
+    # Cycle de vie : un commerce suspendu/résilié (impayé, offboarding) bloque l'accès
+    # de ses utilisateurs. Piloté depuis le backoffice plateforme (Lot 2).
+    if current.organization_id is not None:
+        await _ensure_org_active(session, current.organization_id)
     return current
+
+
+async def _ensure_org_active(session: AsyncSession, org_id: int) -> None:
+    """Refuse l'accès si l'organisation est suspendue ou résiliée."""
+    from app.models.organization import Organization, OrgStatus
+
+    org = await session.get(Organization, org_id)
+    if org is not None and org.status in (OrgStatus.SUSPENDED, OrgStatus.CANCELLED):
+        raise PermissionDeniedError(
+            "Accès suspendu : contactez MyHanout pour réactiver votre compte."
+        )
 
 
 def require_permission(scope: str):

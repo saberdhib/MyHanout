@@ -21,6 +21,19 @@ class MembershipRole(enum.StrEnum):
     READ_ONLY = "read_only"  # consultation
 
 
+class OrgStatus(enum.StrEnum):
+    """Cycle de vie d'un commerce — point d'application du contrôle d'accès.
+
+    `suspended`/`cancelled` bloquent l'accès des utilisateurs tenant (impayé,
+    résiliation). Géré depuis le backoffice plateforme (audité).
+    """
+
+    TRIAL = "trial"
+    ACTIVE = "active"
+    SUSPENDED = "suspended"
+    CANCELLED = "cancelled"
+
+
 # Matrice de permissions par rôle (scopes). `*` = tous.
 ROLE_PERMISSIONS: dict[MembershipRole, set[str]] = {
     MembershipRole.OWNER: {"*"},
@@ -38,6 +51,12 @@ class Organization(Base, TimestampMixin):
     slug: Mapped[str] = mapped_column(String(64), unique=True, index=True)
     # Métadonnées commerce (type d'activité) — utile pour la personnalisation.
     business_type: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    # Cycle de vie (contrôle d'accès) — piloté par le backoffice plateforme.
+    status: Mapped[OrgStatus] = mapped_column(
+        Enum(OrgStatus, native_enum=False, values_callable=lambda e: [m.value for m in e]),
+        default=OrgStatus.ACTIVE,
+        server_default=OrgStatus.ACTIVE.value,
+    )
 
 
 class Membership(Base, TimestampMixin):

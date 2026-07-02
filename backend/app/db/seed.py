@@ -330,6 +330,30 @@ async def seed() -> None:
             ]
         )
 
+        # Backoffice plateforme (opérateur MyHanout) + abonnement du commerce démo.
+        from app.models import Plan, PlatformAdmin, PlatformRole, Subscription, SubscriptionStatus
+
+        platform_user = User(
+            email="platform@myhanout.example",
+            full_name="Opérateur MyHanout",
+            hashed_password=hash_password(settings.seed_platform_password),
+            role=roles["owner"],
+        )
+        session.add(platform_user)
+        await session.flush()
+        session.add(
+            PlatformAdmin(user_id=platform_user.id, role=PlatformRole.SUPERADMIN, is_active=True)
+        )
+        session.add(
+            Subscription(
+                organization_id=org.id,
+                plan=Plan.PRO,
+                status=SubscriptionStatus.ACTIVE,
+                mrr_eur=49.0,
+                started_on=date.today().isoformat(),
+            )
+        )
+
         # Estampillage automatique des données métier sur l'org démo.
         # Le commit DOIT rester dans le contexte pour stamper les inserts différés.
         with tenant_context(org.id):

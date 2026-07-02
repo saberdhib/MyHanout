@@ -29,6 +29,7 @@ from app.api.v1 import (
     onboarding,
     orders,
     pipelines,
+    platform,
     pricing,
     production,
     promos,
@@ -86,3 +87,4 @@ api_router.include_router(telegram.router)
 api_router.include_router(slack.router)
 api_router.include_router(api_keys.router)
 api_router.include_router(webhooks.router)
+api_router.include_router(platform.router)

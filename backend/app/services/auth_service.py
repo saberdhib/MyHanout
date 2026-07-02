@@ -65,10 +65,29 @@ async def authenticate(session: AsyncSession, email: str, password: str) -> User
     return user
 
 
-def issue_tokens(user: User, membership: Membership | None) -> dict:
+async def platform_role_for(session: AsyncSession, user_id: int) -> str | None:
+    """Rôle plateforme actif de l'utilisateur (None si pas opérateur MyHanout).
+
+    Indice UX porté dans le claim `plat` (le backoffice vérifie de toute façon en base).
+    """
+    from app.models.platform import PlatformAdmin
+
+    admin = await session.scalar(
+        select(PlatformAdmin).where(
+            PlatformAdmin.user_id == user_id, PlatformAdmin.is_active.is_(True)
+        )
+    )
+    return str(admin.role) if admin else None
+
+
+def issue_tokens(
+    user: User, membership: Membership | None, platform_role: str | None = None
+) -> dict:
     """Génère access + refresh tokens, avec l'organisation active dans le token."""
     org_id = membership.organization_id if membership else None
-    extra = {"email": user.email, "org": org_id}
+    extra: dict = {"email": user.email, "org": org_id}
+    if platform_role:
+        extra["plat"] = platform_role
     return {
         "access_token": create_access_token(str(user.id), extra=extra),
         "refresh_token": create_refresh_token(str(user.id)),

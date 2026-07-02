@@ -10,7 +10,12 @@ from app.core.deps import get_current_user, get_db
 from app.core.exceptions import AuthError
 from app.core.security import CurrentUser, JWTError, create_access_token, decode_token
 from app.repositories.user import UserRepository
-from app.services.auth_service import authenticate, issue_tokens, resolve_membership
+from app.services.auth_service import (
+    authenticate,
+    issue_tokens,
+    platform_role_for,
+    resolve_membership,
+)
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -28,6 +33,8 @@ class TokenResponse(BaseModel):
     refresh_token: str | None = None
     token_type: str = "bearer"
     organization_id: int | None = None
+    # Rôle plateforme (backoffice MyHanout) si l'utilisateur est opérateur — sinon None.
+    platform_role: str | None = None
 
 
 class RefreshRequest(BaseModel):
@@ -43,9 +50,12 @@ async def login(body: LoginRequest, session: AsyncSession = Depends(get_db)) -> 
     membership = await resolve_membership(session, user.id, body.organization_id)
     if body.organization_id is not None and membership is None:
         raise AuthError("Vous n'êtes pas membre de cette organisation")
-    tokens = issue_tokens(user, membership)
+    plat = await platform_role_for(session, user.id)
+    tokens = issue_tokens(user, membership, platform_role=plat)
     return TokenResponse(
-        **tokens, organization_id=membership.organization_id if membership else None
+        **tokens,
+        organization_id=membership.organization_id if membership else None,
+        platform_role=plat,
     )
 
 
@@ -65,9 +75,14 @@ async def refresh(body: RefreshRequest, session: AsyncSession = Depends(get_db))
         raise AuthError("Utilisateur introuvable ou inactif")
     membership = await resolve_membership(session, user_id, body.organization_id)
     org_id = membership.organization_id if membership else None
+    plat = await platform_role_for(session, user_id)
+    extra: dict = {"email": user.email, "org": org_id}
+    if plat:
+        extra["plat"] = plat
     return TokenResponse(
-        access_token=create_access_token(str(user.id), extra={"email": user.email, "org": org_id}),
+        access_token=create_access_token(str(user.id), extra=extra),
         organization_id=org_id,
+        platform_role=plat,
     )
 
 

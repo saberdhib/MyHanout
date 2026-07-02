@@ -22,8 +22,21 @@ from app.models.invoice import Invoice, InvoiceLine
 from app.models.markdown import MarkdownSuggestion
 from app.models.meat import MeatCut, MeatLot
 from app.models.order import Order, OrderLine
-from app.models.organization import Invitation, Membership, MembershipRole, Organization
+from app.models.organization import (
+    Invitation,
+    Membership,
+    MembershipRole,
+    Organization,
+    OrgStatus,
+)
 from app.models.pipeline import PipelineRun
+from app.models.platform import (
+    Plan,
+    PlatformAdmin,
+    PlatformRole,
+    Subscription,
+    SubscriptionStatus,
+)
 from app.models.pricing import PriceHistory
 from app.models.product import Product
 from app.models.promo import PromoCampaign
@@ -77,6 +90,12 @@ __all__ = [
     "SignalDefinition",
     "SignalObservation",
     "Organization",
+    "OrgStatus",
+    "Plan",
+    "PlatformAdmin",
+    "PlatformRole",
+    "Subscription",
+    "SubscriptionStatus",
     "Product",
     "PromoCampaign",
     "Sale",

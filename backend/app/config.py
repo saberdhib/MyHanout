@@ -31,6 +31,8 @@ class Settings(BaseSettings):
     # Mots de passe des comptes de démo (seed). À changer hors local.
     seed_admin_password: str = "admin"
     seed_merchant_password: str = "merchant"
+    # Compte opérateur plateforme (backoffice MyHanout) créé par le seed.
+    seed_platform_password: str = "platform"
 
     # --- API ---
     api_host: str = "0.0.0.0"
