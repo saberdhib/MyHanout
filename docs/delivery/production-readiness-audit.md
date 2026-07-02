@@ -1,0 +1,149 @@
+# Audit « prêt pour la prod & vendable » — MyHanout AI
+
+> Audit basé sur l'inspection du code réel (pas théorique). Gravité :
+> 🔴 critique (bloquant vente/prod) · 🟠 important · 🟡 souhaitable.
+> Chaque point est **corrigeable** ; voir la feuille de route en fin de doc.
+
+## Ce qui est DÉJÀ solide (à valoriser commercialement)
+- **Multi-tenant** : garde-fou central (ContextVar + `with_loader_criteria` sur tous les
+  SELECT ORM + estampillage à l'INSERT). Test d'isolation A≠B.
+- **Sécurité de base** : JWT access/refresh, bcrypt, RBAC par rôle, middleware d'**audit**,
+  **rate limit**, **tracing** (corrélation logs), **métriques** Prometheus, secrets
+  connecteurs **chiffrés** (Fernet).
+- **CI** : 7 jobs (lint/type/tests, intégration pg16+pgvector, front, vitrine, ml-service,
+  E2E Playwright, build images Docker).
+- **MLOps** : `model_version` partout, service ML isolé + **fallback in-process**,
+  `/mlops/metrics`, `forecast_evaluation`, alerte `forecast_drift`.
+- **Providers mock-first keyless** : zéro clé pour démarrer, réel par `.env`.
+
+---
+
+## 🔴 CRITIQUE — à corriger avant de vendre
+
+### C1. Pas de plan « super-admin / plateforme » (le cœur du SaaS que tu décris)
+Tout est tenant-scopé : **il n'existe aucun moyen pour TOI de gérer l'ensemble des
+clients**. C'est l'architecture inverse du garde-fou tenant, donc à concevoir
+explicitement (cf. §« Plateforme SaaS » plus bas). Sans ça, pas d'« agent-as-a-service ».
+
+### C2. `SECRET_KEY` par défaut `"change-me"`, sans garde au démarrage
+JWT **et** chiffrement des connecteurs en dépendent. Un déploiement qui oublie de la
+changer = tokens forgeables + secrets déchiffrables. **Fix** : refuser de démarrer en
+`ENV=production` si `SECRET_KEY` est la valeur par défaut (ou < 32 chars).
+
+### C3. ml-service **sans authentification**
+`ml-service/` expose `/predict` sans aucun contrôle. En interne c'est tolérable, mais
+dès qu'il est déployé (réseau, k8s), n'importe qui peut l'appeler. **Fix** : secret
+partagé `X-Internal-Key` entre backend et ml-service.
+
+### C4. Pas de scan sécurité dans la CI
+Aucun `pip-audit` / `bandit` / `trivy` (images) / `gitleaks` (secrets) / Dependabot.
+Pour un produit qui manipule données commerçants + secrets, c'est un prérequis de
+confiance (et souvent exigé en due diligence). **Fix** : ajouter un job `security`.
+
+## 🟠 IMPORTANT — pour « scalable & pro »
+
+### H1. Pas d'en-têtes de sécurité HTTP
+Manque CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy.
+**Fix** : middleware `SecurityHeaders` (quelques lignes).
+
+### H2. Isolation tenant uniquement applicative (pas de RLS Postgres)
+Le garde-fou ORM est bon mais **une requête SQL brute ou un bug de code contourne
+l'isolation**. Le standard « pro » multi-tenant = **Row-Level Security Postgres**
+(defense-in-depth) : `SET app.current_org` + policies `USING (organization_id = ...)`.
+**Fix** : migration activant RLS + set du GUC par requête. (Gros, mais argument de vente.)
+
+### H3. Index composites tenant manquants
+Le garde-fou filtre par `organization_id` sur **chaque** requête, mais les index sont
+souvent sur la seule FK. **Fix** : index `(organization_id, <colonne chaude>)` sur les
+tables volumineuses (sale, stock, invoice, temperature_reading, recommendation…).
+
+### H4. JWT non révocable
+Refresh tokens stateless, pas de rotation ni de blocklist. Impossible de déconnecter
+un appareil volé ou de couper un client suspendu **immédiatement**. **Fix** : table
+`refresh_session` (jti + révocation) ou short-TTL + rotation.
+
+### H5. CD absent
+La CI **build** les images mais ne les **pousse ni ne déploie** (pas de registry, pas
+de tag versionné, pas de release). **Fix** : job qui tag `ghcr.io/.../backend:{sha}` +
+`:latest` sur `main`, + workflow de release.
+
+### H6. Cohérence doc ↔ réalité (Airflow)
+La doc mentionne **Airflow** ; la réalité = orchestration **Celery + PipelineRun**
+(très bien à cette échelle). À aligner dans la doc pour ne pas survendre / créer
+d'attentes fausses en due diligence.
+
+### H7. ml-service : pas de registry de modèles ni de ré-entraînement planifié
+`prophet`/`lgbm` sont calculés à la volée. Pour du « vrai MLOps » : persister les
+modèles (artefacts versionnés, ex. MinIO déjà présent), ré-entraînement planifié,
+et **retrain déclenché par la dérive** (l'alerte existe déjà, pas l'action).
+
+## 🟡 SOUHAITABLE
+- Backups pg automatisés + test de restore. Pas de politique de rétention documentée.
+- Pas de limite de taille des uploads (OCR/factures) → DoS possible.
+- Pas de pagination stricte partout (certaines listes non bornées).
+- Observabilité : métriques exposées mais pas d'alerting branché (Grafana provisionné,
+  règles à écrire). Sentry/erreurs non centralisées.
+- Idempotence webhooks entrants (WhatsApp/Slack) : vérifier la dédup des events.
+
+---
+
+## 🏢 La plateforme SaaS que tu veux (backoffice + self-service)
+
+Deux plans clairement séparés :
+
+### Plan CLIENT (existe déjà en grande partie ✅)
+Le commerçant gère **son** commerce : ses connexions (WhatsApp/caisse/…, modèle B
+chiffré ✅), ses réglages (thème/langue ✅), ses agents, ses données. Manque côté client :
+- **Support** : ouvrir un ticket depuis l'app.
+- **Facturation/abonnement** : voir son plan, son usage, ses factures.
+- **Nouveautés** : changelog in-app (« quoi de neuf »).
+
+### Plan PLATEFORME (à construire — c'est le gros morceau 🔴)
+Un **espace admin MyHanout** qui opère **au-dessus** des tenants :
+1. **Compte plateforme** : `PlatformAdmin` (utilisateur MyHanout, hors org client) +
+   auth/scope dédié + **garde-fou relâché de façon explicite et auditée** (le seul
+   endroit qui voit tous les tenants).
+2. **Cycle de vie client** : modèle `Subscription`/`Plan` (trial/active/suspended/
+   churned), statut d'org, dates, MRR. Suspendre un client = couper l'accès (lié à H4).
+3. **Vue 360 par client** : santé (pipelines OK ?, dernière activité, erreurs),
+   **usage** (nb produits, ventes ingérées, messages, appels API), conformité clé.
+4. **Tickets & support** : modèle `SupportTicket` (client ↔ MyHanout), statut, priorité,
+   fil de messages. Côté client : bouton « Aide » ; côté plateforme : file de tickets.
+5. **Mises à jour & correctifs** : `ReleaseNote`/changelog versionné, bannière in-app
+   « nouveauté », + le CD (H5) pour livrer les correctifs proprement.
+6. **Provisioning** : créer un nouveau client (org + owner + plan) en 1 clic depuis le
+   backoffice → onboarding automatique.
+7. **Impersonation auditée** : « voir comme ce client » pour le support (trace obligatoire).
+
+> ⚠️ Sécurité : ce plan plateforme est **la** surface la plus sensible. Chaque accès
+> cross-tenant doit être tracé (audit), borné par un rôle plateforme, et idéalement
+> derrière une auth renforcée (2FA). C'est aussi pour ça que **RLS (H2)** devient
+> important : le plan client ne doit JAMAIS pouvoir atteindre un autre tenant, seul le
+> plan plateforme le peut, explicitement.
+
+---
+
+## Feuille de route proposée (ordre de valeur)
+
+**Lot 1 — Durcissement sécurité (rapide, forte confiance) 🔴🟠**
+C2 (garde SECRET_KEY) + C3 (auth ml-service) + C4 (job CI sécurité) + H1 (headers) +
+H3 (index composites). ~1 brique, peu de risque, énorme gain de crédibilité.
+
+**Lot 2 — Fondation plateforme (le backoffice) 🔴**
+Compte `PlatformAdmin` + garde-fou cross-tenant audité + modèles `Subscription`/statut
+d'org + vue 360 clients + provisioning. C'est le socle « agent-as-a-service ».
+
+**Lot 3 — Support & mises à jour 🟠**
+`SupportTicket` (client + backoffice) + `ReleaseNote`/changelog in-app.
+
+**Lot 4 — RLS Postgres (defense-in-depth) 🟠**
+Migration RLS + GUC par requête + tests. Argument de vente « isolation garantie DB ».
+
+**Lot 5 — CD + MLOps avancé 🟠🟡**
+Registry/tags images + release ; registry de modèles + retrain déclenché par dérive.
+
+**Lot 6 — Finitions 🟡**
+Backups/restore, limites d'upload, pagination, alerting Grafana, Sentry.
+
+> Chaque lot garde les règles d'or : mock-first, gate vert, migrations réversibles,
+> tout tracé/expliqué, aucun secret en dur.
