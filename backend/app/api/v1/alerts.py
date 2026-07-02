@@ -36,10 +36,12 @@ def _out(a) -> AlertOut:
 @router.get("", response_model=ListResponse[AlertOut])
 async def get_alerts(
     status: str | None = None,
+    limit: int | None = None,
+    offset: int | None = None,
     session: AsyncSession = Depends(get_db),
     _: CurrentUser = Depends(require_permission("forecasts")),
 ) -> ListResponse[AlertOut]:
-    rows = await list_alerts(session, status=status)
+    rows = await list_alerts(session, status=status, limit=limit, offset=offset)
     items = [_out(a) for a in rows]
     return ListResponse(items=items, total=len(items))
 

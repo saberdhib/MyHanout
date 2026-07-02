@@ -34,6 +34,9 @@ class Settings(BaseSettings):
     # Compte opérateur plateforme (backoffice MyHanout) créé par le seed.
     seed_platform_password: str = "platform"
 
+    # Taille maximale d'un téléversement (OCR/factures) — anti-DoS.
+    max_upload_mb: int = 10
+
     # --- API ---
     api_host: str = "0.0.0.0"
     api_port: int = 8000
@@ -46,6 +49,9 @@ class Settings(BaseSettings):
     # --- Observabilité / tracing ---
     otel_enabled: bool = False  # active l'export OpenTelemetry (console) si dispo
     service_name: str = "myhanout-api"
+    # Sentry (centralisation des erreurs). Vide = désactivé. Activation soft : le SDK
+    # n'est requis QUE si le DSN est fourni ET `sentry-sdk` installé (aucune dépendance dure).
+    sentry_dsn: str = ""
 
     # --- RAG ---
     rag_vector_store: str = "memory"  # memory | pgvector

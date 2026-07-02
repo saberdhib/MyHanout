@@ -150,9 +150,21 @@ async def retrain_on_drift(
 
 
 async def list_models(
-    session: AsyncSession, product_id: int | None = None, *, active_only: bool = False
+    session: AsyncSession,
+    product_id: int | None = None,
+    *,
+    active_only: bool = False,
+    limit: int | None = None,
+    offset: int | None = None,
 ) -> list[ModelArtifact]:
-    stmt = select(ModelArtifact).order_by(ModelArtifact.id.desc())
+    from app.core.pagination import clamp_limit, clamp_offset
+
+    stmt = (
+        select(ModelArtifact)
+        .order_by(ModelArtifact.id.desc())
+        .limit(clamp_limit(limit))
+        .offset(clamp_offset(offset))
+    )
     if product_id is not None:
         stmt = stmt.where(ModelArtifact.product_id == product_id)
     if active_only:

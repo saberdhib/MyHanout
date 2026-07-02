@@ -61,3 +61,20 @@ docker pull ghcr.io/<owner>/myhanout-backend:main   # ou :vX.Y.Z
 Prérequis prod avant rollout : `SECRET_KEY` aléatoire (>=32c, sinon l'API refuse de
 démarrer), `alembic upgrade head` (applique la RLS `0025`), `ML_INTERNAL_KEY` si
 `FORECAST_SERVICE_CLIENT=http`.
+
+## Sauvegardes & restauration (PostgreSQL)
+`scripts/backup_pg.sh` : dump compressé + rétention (à planifier via cron/systemd).
+```bash
+DATABASE_URL=postgresql://user:pass@host:5432/db BACKUP_DIR=/var/backups/myhanout \
+  RETENTION_DAYS=14 ./scripts/backup_pg.sh
+# Restauration : gunzip -c <dump>.sql.gz | psql "$DATABASE_URL"
+```
+**Test de restore** (mensuel recommandé) : restaurer le dernier dump sur une base jetable,
+`alembic upgrade head`, puis un SELECT de contrôle. Un backup non testé n'est pas un backup.
+
+## Robustesse & observabilité (Lot 6)
+- **Uploads bornés** : `MAX_UPLOAD_MB` (défaut 10) → 413 au-delà (anti-DoS mémoire).
+- **Pagination** : `limit`/`offset` plafonnés (`MAX_PAGE_SIZE=500`) sur les listes.
+- **Erreurs centralisées** : `SENTRY_DSN` + `pip install sentry-sdk` (soft, désactivé sinon).
+- **Alerting** : métriques Prometheus exposées (`/metrics`) + règles Grafana à brancher
+  (dérive de prévision déjà remontée en alerte applicative `forecast_drift`).

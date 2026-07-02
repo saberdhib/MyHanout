@@ -41,6 +41,13 @@ class ApprovalRequiredError(AppError):
     code = "approval_required"
 
 
+class PayloadTooLargeError(AppError):
+    """Fichier/téléversement au-dessus de la limite configurée (anti-DoS)."""
+
+    status_code = status.HTTP_413_REQUEST_ENTITY_TOO_LARGE
+    code = "payload_too_large"
+
+
 def register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(AppError)
     async def _handle_app_error(_: Request, exc: AppError) -> JSONResponse:

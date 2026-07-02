@@ -14,11 +14,13 @@ from app.core.logging import configure_logging, get_logger
 from app.core.metrics import setup_metrics
 from app.core.rate_limit import RateLimitMiddleware
 from app.core.security_headers import SecurityHeadersMiddleware
+from app.core.sentry import setup_sentry
 from app.core.tracing import TracingMiddleware, setup_tracing
 from app.schemas.common import HealthResponse
 
 configure_logging()
 setup_tracing()
+setup_sentry()
 log = get_logger(__name__)
 
 

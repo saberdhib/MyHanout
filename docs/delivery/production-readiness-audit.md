@@ -99,13 +99,15 @@ Job pipeline `retrain` (planifié) + alerte `forecast_drift` émise dans `scan_a
 + `retrain_on_drift`. API `/mlops/models`, `/mlops/retrain` (versionne). Front : registre
 dans Data Ops. `artifact_uri` prêt pour la sérialisation MinIO (prophet/lgbm).
 
-## 🟡 SOUHAITABLE
-- Backups pg automatisés + test de restore. Pas de politique de rétention documentée.
-- Pas de limite de taille des uploads (OCR/factures) → DoS possible.
-- Pas de pagination stricte partout (certaines listes non bornées).
-- Observabilité : métriques exposées mais pas d'alerting branché (Grafana provisionné,
-  règles à écrire). Sentry/erreurs non centralisées.
-- Idempotence webhooks entrants (WhatsApp/Slack) : vérifier la dédup des events.
+## 🟡 SOUHAITABLE (Lot 6 — largement traité)
+- ✅ Backups pg : `scripts/backup_pg.sh` (dump + rétention) + procédure de test de restore
+  documentée (`docs/DEPLOY.md`). Planification cron/systemd côté infra.
+- ✅ Limite de taille des uploads (OCR/factures) : `MAX_UPLOAD_MB` → 413 (`core/uploads.py`).
+- ✅ Pagination bornée : `core/pagination.py` (`MAX_PAGE_SIZE`), appliquée aux listes
+  (alerts, registre de modèles…). Reste à étendre au fil de l'eau aux listes restantes.
+- ✅ Erreurs centralisées : Sentry optionnel (`SENTRY_DSN`, soft-import). Alerting Grafana :
+  métriques exposées + alerte applicative `forecast_drift` ; règles Grafana à brancher (infra).
+- ⏳ Idempotence webhooks entrants (WhatsApp/Slack) : dédup des events — reste à faire.
 
 ---
 

@@ -136,9 +136,20 @@ async def scan_alerts(
 
 
 async def list_alerts(
-    session: AsyncSession, *, status: str | None = None, limit: int = 100
+    session: AsyncSession,
+    *,
+    status: str | None = None,
+    limit: int | None = None,
+    offset: int | None = None,
 ) -> list[Alert]:
-    stmt = select(Alert).order_by(Alert.created_at.desc()).limit(limit)
+    from app.core.pagination import clamp_limit, clamp_offset
+
+    stmt = (
+        select(Alert)
+        .order_by(Alert.created_at.desc())
+        .limit(clamp_limit(limit))
+        .offset(clamp_offset(offset))
+    )
     if status:
         stmt = stmt.where(Alert.status == status)
     return list((await session.scalars(stmt)).all())

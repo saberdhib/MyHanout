@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_db, require_permission
 from app.core.security import CurrentUser
+from app.core.uploads import read_bounded
 from app.repositories.invoice import InvoiceRepository
 from app.schemas.common import ListResponse
 from app.schemas.invoice import (
@@ -51,7 +52,7 @@ async def upload_invoice(
     Lance OCR → parsing → validation. N'écrit AUCUNE ligne : un humain doit
     valider via /approve. Idempotent (même fichier → même facture).
     """
-    content = await file.read()
+    content = await read_bounded(file)
     invoice, reasons = await ingest_and_store(
         session,
         content,
