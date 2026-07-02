@@ -1011,6 +1011,54 @@ export const createMeatLot = (body: {
 export const setMeatBreakdown = (id: number, cuts: MeatCutIn[]) =>
   api.put<MeatLotSummary>(`/meat/lots/${id}/breakdown`, { cuts }).then((r) => r.data);
 
+// --- Fidélité client --------------------------------------------------------
+export interface Customer {
+  id: number;
+  name: string | null;
+  phone: string | null;
+  email: string | null;
+  consent_opt_in: boolean;
+}
+export interface LoyaltyTxn {
+  id: number;
+  kind: string; // earn | redeem | adjust
+  points: number;
+  amount: number | null;
+  reason: string;
+  created_at: string | null;
+}
+export interface LoyaltyAccount {
+  customer_id: number;
+  customer_name: string | null;
+  points_balance: number;
+  lifetime_points: number;
+  reward_ready: boolean;
+  points_to_next: number;
+  rewards_available: number;
+  explanation: string;
+}
+export interface LoyaltyDetail extends LoyaltyAccount {
+  transactions: LoyaltyTxn[];
+}
+export interface RedeemResult {
+  customer_id: number;
+  reward_label: string;
+  points_spent: number;
+  points_balance: number;
+  explanation: string;
+}
+
+export const getCustomers = () =>
+  api.get<ListResponse<Customer>>("/customers").then((r) => r.data);
+export const getLoyalty = () =>
+  api.get<ListResponse<LoyaltyAccount>>("/loyalty").then((r) => r.data);
+export const getLoyaltyDetail = (customerId: number) =>
+  api.get<LoyaltyDetail>(`/loyalty/${customerId}`).then((r) => r.data);
+export const earnPoints = (customerId: number, amount: number) =>
+  api.post<LoyaltyAccount>(`/loyalty/${customerId}/earn`, { amount }).then((r) => r.data);
+export const redeemReward = (customerId: number) =>
+  api.post<RedeemResult>(`/loyalty/${customerId}/redeem`).then((r) => r.data);
+
 // --- Backoffice plateforme (SaaS : pilotage cross-tenant du parc) -----------
 export interface PlatformOverview {
   clients_total: number;

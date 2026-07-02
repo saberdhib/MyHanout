@@ -238,6 +238,14 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   `services/staffing_service.py`. `api/v1/pricing.py` (`/pricing/suggestions|apply`),
   `api/v1/staffing.py` (`/staffing/plan`). Pages `Pricing.tsx`/`Staffing.tsx`
   (modules `pricing`/`staffing`). Réglages : `pricing_*`/`staffing_*` dans `config.py`.
+- **Fidélité client** : rétention — compte de points + grand livre explicable
+  (`loyalty_account`/`loyalty_transaction`, TenantMixin, migration `0028` + RLS). Moteur pur
+  `intelligence/loyalty/engine.py` (points = ⌊montant × `loyalty_points_per_euro`⌋, statut
+  récompense au palier `loyalty_reward_threshold`). `services/loyalty_service.py`
+  (`earn`/`redeem`/`list_accounts`/`account_detail`). Attribution **explicite** (les ventes
+  caisse ne sont pas nominatives) — human-in-the-loop. API `api/v1/loyalty.py`
+  (`/loyalty`, `/{cid}/earn` scope `orders`, `/{cid}/redeem`). Page `Loyalty.tsx` (module
+  `loyalty`). Réglages : `loyalty_*` dans `config.py`. Tests `tests/test_loyalty.py`.
 - **Backoffice plateforme (SaaS, agent-as-a-service)** : plan **cross-tenant** pour
   l'opérateur MyHanout — l'**inverse** du garde-fou (cf. §5). Modèles **globaux** (non
   tenant) `platform_admin` (rôles `superadmin`/`support`/`billing`) + `subscription`

@@ -31,6 +31,7 @@ import Controls from "./pages/Controls";
 import Haccp from "./pages/Haccp";
 import Admin from "./pages/Admin";
 import Support from "./pages/Support";
+import Loyalty from "./pages/Loyalty";
 
 export default function App() {
   return (
@@ -47,6 +48,7 @@ export default function App() {
         <Route path="chat" element={<Chat />} />
         <Route path="promos" element={<Promos />} />
         <Route path="markdown" element={<Markdown />} />
+        <Route path="loyalty" element={<Loyalty />} />
         <Route path="production" element={<Production />} />
         <Route path="pricing" element={<Pricing />} />
         <Route path="staffing" element={<Staffing />} />

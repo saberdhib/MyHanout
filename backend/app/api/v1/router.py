@@ -23,6 +23,7 @@ from app.api.v1 import (
     haccp,
     imports,
     invoices,
+    loyalty,
     markdown,
     meat,
     mlops,
@@ -73,6 +74,7 @@ api_router.include_router(mlops.router)
 api_router.include_router(pipelines.router)
 api_router.include_router(recommendations.router)
 api_router.include_router(markdown.router)
+api_router.include_router(loyalty.router)
 api_router.include_router(recipes.router)
 api_router.include_router(production.router)
 api_router.include_router(briefing.router)

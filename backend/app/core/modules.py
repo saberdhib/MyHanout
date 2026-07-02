@@ -27,6 +27,7 @@ MODULES: dict[str, str] = {
     "forecasts": "Prévisions",
     "suggestions": "Réassort",
     "promos": "Promotions",
+    "loyalty": "Fidélité client",
     "markdown": "Démarque (anti-gaspi)",
     "production": "Production & recettes",
     "pricing": "Prix conseillés",

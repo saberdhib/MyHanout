@@ -247,16 +247,30 @@ async def _seed_business_data(session: AsyncSession, seeds: Path) -> None:
         RecipeItem(ingredient_product_id=products["LEVURE-BOUL"].id, quantity=2, unit="unit")
     )
     session.add(recipe)
-    session.add_all(
-        [
-            Customer(
-                name="Amina",
-                phone="+212600000010",
-                consent_opt_in=True,
-                consent_at=datetime.now(UTC),
-            ),
-            Customer(name="Hassan", phone="+212600000011", consent_opt_in=False),
-        ]
+    amina = Customer(
+        name="Amina",
+        phone="+212600000010",
+        consent_opt_in=True,
+        consent_at=datetime.now(UTC),
+    )
+    session.add_all([amina, Customer(name="Hassan", phone="+212600000011", consent_opt_in=False)])
+    await session.flush()
+
+    # Démo fidélité : Amina cumule des points (proche d'une récompense).
+    from app.models.loyalty import LoyaltyAccount, LoyaltyTransaction, LoyaltyTxnKind
+
+    account = LoyaltyAccount(customer_id=amina.id, points_balance=80, lifetime_points=80)
+    session.add(account)
+    await session.flush()
+    session.add(
+        LoyaltyTransaction(
+            account_id=account.id,
+            customer_id=amina.id,
+            kind=LoyaltyTxnKind.EARN,
+            points=80,
+            amount=80.0,
+            reason="Achats cumulés (démo)",
+        )
     )
 
     log.info("seed.business", suppliers=len(suppliers), products=len(products), sales=sales_count)

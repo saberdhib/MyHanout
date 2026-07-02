@@ -155,6 +155,11 @@ class Settings(BaseSettings):
     minio_bucket: str = "myhanout-models"
     minio_secure: bool = False
 
+    # --- Fidélité client ---
+    loyalty_points_per_euro: float = 1.0  # points gagnés par euro dépensé
+    loyalty_reward_threshold: int = 100  # points pour une récompense
+    loyalty_reward_label: str = "Bon de 5 €"  # récompense au palier
+
     # --- Recommandations (réassort explicable) ---
     # Tampon de sécurité (fraction de la demande prévue) et seuils des règles.
     reco_safety_buffer_ratio: float = 0.15

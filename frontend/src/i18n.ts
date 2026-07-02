@@ -49,6 +49,7 @@ const EN: Record<string, string> = {
   "MyHanout Ops": "MyHanout Ops",
   Backoffice: "Backoffice",
   "Aide & support": "Help & support",
+  Fidélité: "Loyalty",
   // Header / commun
   "Assistant WhatsApp": "WhatsApp assistant",
   "Basculer le thème": "Toggle theme",

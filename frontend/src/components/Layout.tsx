@@ -43,6 +43,7 @@ const groups: { title: string; items: Item[] }[] = [
     items: [
       { to: "/promos", label: "Promos flash", icon: "promo", module: "promos" },
       { to: "/markdown", label: "Démarque", icon: "promo", module: "markdown" },
+      { to: "/loyalty", label: "Fidélité", icon: "promo", module: "loyalty" },
       { to: "/production", label: "Production", icon: "forecast", module: "production" },
       { to: "/boucherie", label: "Boucherie", icon: "supplier", module: "meat" },
       { to: "/catalog", label: "Catalogue", icon: "stocks", module: "catalog" },

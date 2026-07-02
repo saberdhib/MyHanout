@@ -19,6 +19,7 @@ from app.models.forecast_evaluation import ForecastEvaluation
 from app.models.haccp import HygieneRecord, HygieneTask
 from app.models.inventory import InventorySnapshot
 from app.models.invoice import Invoice, InvoiceLine
+from app.models.loyalty import LoyaltyAccount, LoyaltyTransaction, LoyaltyTxnKind
 from app.models.markdown import MarkdownSuggestion
 from app.models.meat import MeatCut, MeatLot
 from app.models.model_artifact import ModelArtifact, RetrainTrigger
@@ -84,6 +85,9 @@ __all__ = [
     "Invitation",
     "Invoice",
     "InvoiceLine",
+    "LoyaltyAccount",
+    "LoyaltyTransaction",
+    "LoyaltyTxnKind",
     "MarkdownSuggestion",
     "MeatCut",
     "MeatLot",
