@@ -41,10 +41,11 @@ MODULES: dict[str, str] = {
     "haccp": "Hygiène (HACCP)",
     "integrations": "Intégrations",
     "meat": "Boucherie (traçabilité)",
+    "support": "Aide & support",
 }
 
 # Modules toujours présents (socle minimal).
-CORE = {"dashboard", "chat", "catalog", "stocks", "finance", "suppliers"}
+CORE = {"dashboard", "chat", "catalog", "stocks", "finance", "suppliers", "support"}
 
 # Par profil (type de commerce) : modules DÉSACTIVÉS. Le reste est actif.
 # Profil inconnu -> rien de désactivé (générique complet).

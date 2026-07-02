@@ -363,7 +363,51 @@ async def seed() -> None:
             from app.services.pipeline_service import run_job
 
             await run_job(session, "daily")
+
+            # Démo support : un ticket ouvert par le commerçant (+ 1er message).
+            from app.models import SupportMessage, SupportTicket
+
+            ticket = SupportTicket(
+                subject="Comment relier ma caisse ?",
+                category="connecteurs",
+                created_by_user_id=owner_user.id,
+            )
+            session.add(ticket)
+            await session.flush()
+            session.add(
+                SupportMessage(
+                    ticket_id=ticket.id,
+                    author_user_id=owner_user.id,
+                    author_kind="merchant",
+                    body="Bonjour, je voudrais connecter ma caisse pour remonter les ventes.",
+                )
+            )
             await session.commit()
+
+        # Changelog produit (GLOBAL) : 2 notes publiées pour la démo.
+        from app.models import ReleaseCategory, ReleaseNote
+
+        session.add_all(
+            [
+                ReleaseNote(
+                    version="1.2",
+                    title="Backoffice plateforme",
+                    body="Gestion centralisée des commerces, abonnements et support.",
+                    category=ReleaseCategory.FEATURE,
+                    published=True,
+                    published_at=datetime.now(UTC),
+                ),
+                ReleaseNote(
+                    version="1.1",
+                    title="Agent Démarque anti-gaspillage",
+                    body="Suggestions de remise explicables sur les produits en fin de vie.",
+                    category=ReleaseCategory.FEATURE,
+                    published=True,
+                    published_at=datetime.now(UTC),
+                ),
+            ]
+        )
+        await session.commit()
         log.info("seed.done", organization=org.slug)
 
 

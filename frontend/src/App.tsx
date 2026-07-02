@@ -30,6 +30,7 @@ import Settings from "./pages/Settings";
 import Controls from "./pages/Controls";
 import Haccp from "./pages/Haccp";
 import Admin from "./pages/Admin";
+import Support from "./pages/Support";
 
 export default function App() {
   return (
@@ -65,6 +66,7 @@ export default function App() {
         <Route path="settings" element={<Settings />} />
         <Route path="controls" element={<Controls />} />
         <Route path="haccp" element={<Haccp />} />
+        <Route path="support" element={<Support />} />
         <Route path="admin" element={<Admin />} />
       </Route>
     </Routes>

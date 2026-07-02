@@ -22,6 +22,7 @@ from app.models.organization import Membership, MembershipRole, Organization, Or
 from app.models.platform import Plan, Subscription, SubscriptionStatus
 from app.models.product import Product
 from app.models.sale import Sale
+from app.models.support import SupportTicket, TicketStatus
 from app.models.user import User
 from app.schemas.platform import ClientDetail, ClientSummary, PlatformOverview
 
@@ -146,6 +147,14 @@ async def client_detail(session: AsyncSession, org_id: int) -> ClientDetail | No
             .select_from(TenantConnector)
             .where(TenantConnector.organization_id == org_id)
         )
+        open_tickets = await session.scalar(
+            select(func.count())
+            .select_from(SupportTicket)
+            .where(
+                SupportTicket.organization_id == org_id,
+                SupportTicket.status.in_([TicketStatus.OPEN, TicketStatus.PENDING]),
+            )
+        )
 
     return ClientDetail(
         organization_id=org.id,
@@ -161,7 +170,7 @@ async def client_detail(session: AsyncSession, org_id: int) -> ClientDetail | No
         sales=sales or 0,
         invoices=invoices or 0,
         connectors_configured=connectors or 0,
-        open_tickets=0,  # câblé au Lot 3 (support)
+        open_tickets=open_tickets or 0,
         last_sale_at=last_sale.isoformat() if last_sale else None,
         created_at=org.created_at.isoformat() if org.created_at else None,
         trial_ends_on=sub.trial_ends_on if sub else None,

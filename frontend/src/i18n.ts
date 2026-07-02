@@ -48,6 +48,7 @@ const EN: Record<string, string> = {
   Réglages: "Settings",
   "MyHanout Ops": "MyHanout Ops",
   Backoffice: "Backoffice",
+  "Aide & support": "Help & support",
   // Header / commun
   "Assistant WhatsApp": "WhatsApp assistant",
   "Basculer le thème": "Toggle theme",

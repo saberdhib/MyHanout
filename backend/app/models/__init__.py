@@ -46,6 +46,14 @@ from app.models.sale import Sale
 from app.models.signal import SignalDefinition, SignalObservation
 from app.models.stock import Stock
 from app.models.supplier import Supplier
+from app.models.support import (
+    ReleaseCategory,
+    ReleaseNote,
+    SupportMessage,
+    SupportTicket,
+    TicketPriority,
+    TicketStatus,
+)
 from app.models.user import Role, User
 from app.models.webhook import WebhookEndpoint
 
@@ -101,6 +109,12 @@ __all__ = [
     "Sale",
     "Stock",
     "Supplier",
+    "SupportTicket",
+    "SupportMessage",
+    "ReleaseNote",
+    "ReleaseCategory",
+    "TicketPriority",
+    "TicketStatus",
     "Role",
     "User",
     "WebhookEndpoint",

@@ -71,6 +71,7 @@ const groups: { title: string; items: Item[] }[] = [
       { to: "/connectors", label: "Connecteurs", icon: "plug", module: "integrations" },
       { to: "/integrations", label: "Intégrations", icon: "plug", module: "integrations" },
       { to: "/suppliers", label: "Fournisseurs", icon: "supplier", module: "suppliers" },
+      { to: "/support", label: "Aide & support", icon: "chat", module: "support" },
       { to: "/settings", label: "Réglages", icon: "plug" },
     ],
   },

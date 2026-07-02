@@ -160,3 +160,36 @@ def accountant_client(anon_client):
 def org_b_client(anon_client):
     """Owner de l'org B (pour les tests d'isolation)."""
     return _auth_client(anon_client, "owner@b.local")
+
+
+# --- Opérateur plateforme (backoffice, Lot 2/3) -----------------------------
+
+
+async def _ensure_platform_admin(email: str = "ops@myhanout.local") -> None:
+    """Crée (idempotent) un opérateur plateforme superadmin dans la base de test."""
+    from sqlalchemy import select
+
+    from app.core.tenancy import tenant_context
+    from app.models.platform import PlatformAdmin, PlatformRole
+    from app.models.user import User
+
+    async with TestSession() as s:
+        with tenant_context(None):
+            existing = await s.scalar(select(User).where(User.email == email))
+            if existing is None:
+                u = User(email=email, hashed_password=hash_password("secret"))
+                s.add(u)
+                await s.flush()
+                s.add(PlatformAdmin(user_id=u.id, role=PlatformRole.SUPERADMIN, is_active=True))
+                await s.commit()
+
+
+@pytest.fixture
+def platform_client(anon_client):
+    """Client authentifié en tant qu'opérateur plateforme (superadmin)."""
+    loop = asyncio.new_event_loop()
+    try:
+        loop.run_until_complete(_ensure_platform_admin())
+    finally:
+        loop.close()
+    return _auth_client(anon_client, "ops@myhanout.local")

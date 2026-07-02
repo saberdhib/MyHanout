@@ -146,8 +146,13 @@ H3 (index composites). ~1 brique, peu de risque, énorme gain de crédibilité.
 Compte `PlatformAdmin` + garde-fou cross-tenant audité + modèles `Subscription`/statut
 d'org + vue 360 clients + provisioning. C'est le socle « agent-as-a-service ».
 
-**Lot 3 — Support & mises à jour 🟠**
+**Lot 3 — Support & mises à jour 🟠 ✅ FAIT**
 `SupportTicket` (client + backoffice) + `ReleaseNote`/changelog in-app.
+→ Tickets tenant (`support_ticket`/`support_message`) : le commerçant ne voit que les
+siens (garde-fou), l'opérateur les voit tous (cross-tenant audité). Changelog produit
+global (`release_note`, publié → visible commerces). Migration 0024. API `support.py`
+(commerçant) + section `platform.py` (opérateur). Front : page `Support.tsx` +
+backoffice enrichi. Impersonation auditée : toujours en option (non implémentée).
 
 **Lot 4 — RLS Postgres (defense-in-depth) 🟠**
 Migration RLS + GUC par requête + tests. Argument de vente « isolation garantie DB ».

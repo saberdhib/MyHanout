@@ -9,13 +9,9 @@ from __future__ import annotations
 
 import asyncio
 
-import pytest
 from sqlalchemy import select
 
-from app.core.security import hash_password
 from app.core.tenancy import tenant_context
-from app.models.platform import PlatformAdmin, PlatformRole
-from app.models.user import User
 from tests.conftest import TestSession
 
 
@@ -26,31 +22,6 @@ def _run(coro):
         return loop.run_until_complete(coro)
     finally:
         loop.close()
-
-
-async def _ensure_platform_admin(email: str, password: str = "secret") -> None:
-    async with TestSession() as s:
-        with tenant_context(None):
-            existing = await s.scalar(select(User).where(User.email == email))
-            if existing is None:
-                u = User(email=email, hashed_password=hash_password(password))
-                s.add(u)
-                await s.flush()
-                s.add(PlatformAdmin(user_id=u.id, role=PlatformRole.SUPERADMIN, is_active=True))
-                await s.commit()
-
-
-@pytest.fixture
-def platform_client(anon_client):
-    """Client authentifié en tant qu'opérateur plateforme (superadmin)."""
-    _run(_ensure_platform_admin("ops@myhanout.local"))
-    r = anon_client.post(
-        "/api/v1/auth/login", json={"email": "ops@myhanout.local", "password": "secret"}
-    )
-    assert r.status_code == 200, r.text
-    assert r.json()["platform_role"] == "superadmin"
-    anon_client.headers["Authorization"] = f"Bearer {r.json()['access_token']}"
-    return anon_client
 
 
 def _bearer(anon_client, email: str, password: str = "secret") -> dict:
@@ -82,6 +53,13 @@ def test_tenant_user_cannot_access_platform(client):
 
 def test_anon_cannot_access_platform(anon_client):
     assert anon_client.get("/api/v1/platform/clients").status_code == 401
+
+
+def test_login_exposes_platform_role(platform_client):
+    r = platform_client.post(
+        "/api/v1/auth/login", json={"email": "ops@myhanout.local", "password": "secret"}
+    )
+    assert r.json()["platform_role"] == "superadmin"
 
 
 # --- Provisioning ------------------------------------------------------------

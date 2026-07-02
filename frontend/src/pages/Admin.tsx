@@ -2,14 +2,22 @@ import { useCallback, useEffect, useState } from "react";
 import { Card } from "../components/Card";
 import { Badge } from "../components/Charts";
 import {
+  createRelease,
   getPlatformClients,
   getPlatformOverview,
+  getPlatformReleases,
+  getPlatformTickets,
+  platformReplyTicket,
   platformRole,
   provisionClient,
+  publishRelease,
   setClientPlan,
   setClientStatus,
+  setTicketStatus,
   type ClientSummary,
   type PlatformOverview,
+  type ReleaseNote,
+  type Ticket,
 } from "../api/client";
 
 const PLANS = ["trial", "starter", "pro", "enterprise"];
@@ -195,7 +203,195 @@ export default function Admin() {
           </table>
         </div>
       </Card>
+
+      {!error && (
+        <div className="grid gap-6 lg:grid-cols-2">
+          <PlatformTickets />
+          <PlatformReleases />
+        </div>
+      )}
     </div>
+  );
+}
+
+const TICKET_TONE: Record<string, string> = {
+  open: "high",
+  pending: "medium",
+  resolved: "success",
+  closed: "dismissed",
+};
+
+function PlatformTickets() {
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [active, setActive] = useState<Ticket | null>(null);
+  const [reply, setReply] = useState("");
+
+  const load = useCallback(async () => {
+    setTickets((await getPlatformTickets()).items);
+  }, []);
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const send = async () => {
+    if (!active || !reply.trim()) return;
+    const t = await platformReplyTicket(active.id, reply.trim());
+    setReply("");
+    setActive(t);
+    await load();
+  };
+  const resolve = async () => {
+    if (!active) return;
+    const t = await setTicketStatus(active.id, "resolved");
+    setActive(t);
+    await load();
+  };
+
+  return (
+    <Card title="Tickets support" subtitle={`${tickets.length} ticket(s), tous commerces`}>
+      <div className="space-y-2">
+        {tickets.map((t) => (
+          <button
+            key={t.id}
+            onClick={() => setActive(t)}
+            className={`flex w-full items-center justify-between gap-2 rounded-card border p-3 text-left ${
+              active?.id === t.id
+                ? "border-brand/40 bg-brand/5"
+                : "border-night/[0.06] dark:border-white/10"
+            }`}
+          >
+            <span className="min-w-0 flex-1 truncate text-sm">
+              <span className="font-medium">{t.subject}</span>
+              <span className="ml-2 text-xs text-night/40 dark:text-surface/40">
+                {t.organization_name}
+              </span>
+            </span>
+            <Badge value={TICKET_TONE[t.status] ?? "low"} />
+          </button>
+        ))}
+        {tickets.length === 0 && (
+          <p className="py-4 text-center text-sm text-night/40 dark:text-surface/40">
+            Aucun ticket ouvert.
+          </p>
+        )}
+      </div>
+
+      {active && (
+        <div className="mt-4 space-y-3 border-t border-night/[0.06] pt-4 dark:border-white/10">
+          <div className="max-h-56 space-y-2 overflow-y-auto">
+            {active.messages.map((m) => (
+              <div
+                key={m.id}
+                className={`rounded-card p-2.5 text-sm ${
+                  m.author_kind === "platform" ? "bg-brand/10" : "bg-night/[0.04] dark:bg-white/[0.05]"
+                }`}
+              >
+                <div className="text-[11px] font-semibold uppercase text-night/40 dark:text-surface/40">
+                  {m.author_kind === "platform" ? "MyHanout" : "Commerçant"}
+                </div>
+                {m.body}
+              </div>
+            ))}
+          </div>
+          <div className="flex gap-2">
+            <input
+              value={reply}
+              onChange={(e) => setReply(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && send()}
+              placeholder="Répondre…"
+              className="flex-1 rounded-card border border-night/10 bg-transparent px-3 py-2 text-sm dark:border-white/15"
+            />
+            <button onClick={send} className="rounded-pill bg-brand px-3 py-2 text-xs font-semibold text-white">
+              Répondre
+            </button>
+            <button
+              onClick={resolve}
+              className="rounded-pill bg-emerald-500/15 px-3 py-2 text-xs font-semibold text-emerald-600 dark:text-emerald-300"
+            >
+              Résoudre
+            </button>
+          </div>
+        </div>
+      )}
+    </Card>
+  );
+}
+
+function PlatformReleases() {
+  const [releases, setReleases] = useState<ReleaseNote[]>([]);
+  const [form, setForm] = useState({ version: "", title: "", body: "" });
+
+  const load = useCallback(async () => {
+    setReleases((await getPlatformReleases()).items);
+  }, []);
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const create = async () => {
+    if (!form.version || !form.title || !form.body) return;
+    await createRelease(form.version, form.title, form.body);
+    setForm({ version: "", title: "", body: "" });
+    await load();
+  };
+  const publish = async (id: number) => {
+    await publishRelease(id);
+    await load();
+  };
+
+  return (
+    <Card title="Notes de version" subtitle="Changelog produit publié aux commerces">
+      <div className="space-y-2">
+        <div className="grid grid-cols-3 gap-2">
+          <input
+            placeholder="Version"
+            value={form.version}
+            onChange={(e) => setForm((f) => ({ ...f, version: e.target.value }))}
+            className="rounded-card border border-night/10 bg-transparent px-2 py-1.5 text-sm dark:border-white/15"
+          />
+          <input
+            placeholder="Titre"
+            value={form.title}
+            onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+            className="col-span-2 rounded-card border border-night/10 bg-transparent px-2 py-1.5 text-sm dark:border-white/15"
+          />
+        </div>
+        <textarea
+          placeholder="Description"
+          rows={2}
+          value={form.body}
+          onChange={(e) => setForm((f) => ({ ...f, body: e.target.value }))}
+          className="w-full rounded-card border border-night/10 bg-transparent px-2 py-1.5 text-sm dark:border-white/15"
+        />
+        <button
+          disabled={!form.version || !form.title || !form.body}
+          onClick={create}
+          className="rounded-pill bg-brand px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-40"
+        >
+          Créer (brouillon)
+        </button>
+      </div>
+
+      <div className="mt-4 space-y-2 border-t border-night/[0.06] pt-4 dark:border-white/10">
+        {releases.map((r) => (
+          <div key={r.id} className="flex items-center justify-between gap-2 text-sm">
+            <span className="min-w-0 flex-1 truncate">
+              <span className="font-semibold">v{r.version}</span> · {r.title}
+            </span>
+            {r.published ? (
+              <Badge value="success" />
+            ) : (
+              <button
+                onClick={() => publish(r.id)}
+                className="rounded-pill bg-brand/10 px-3 py-1 text-xs font-semibold text-brand-dark dark:text-brand-light"
+              >
+                Publier
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+    </Card>
   );
 }
 

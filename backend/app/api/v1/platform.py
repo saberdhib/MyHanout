@@ -21,7 +21,14 @@ from app.schemas.platform import (
     SetPlanRequest,
     SetStatusRequest,
 )
-from app.services import platform_service
+from app.schemas.support import (
+    CreateReleaseRequest,
+    ReleaseNoteOut,
+    ReplyRequest,
+    SetTicketStatusRequest,
+    TicketOut,
+)
+from app.services import platform_service, support_service
 
 router = APIRouter(prefix="/platform", tags=["platform"])
 
@@ -127,3 +134,99 @@ async def set_plan(
     detail = await platform_service.client_detail(session, org_id)
     assert detail is not None
     return detail
+
+
+# --- Support (tickets cross-tenant) -----------------------------------------
+
+
+@router.get("/tickets", response_model=ListResponse[TicketOut])
+async def list_tickets(
+    status: str | None = None,
+    session: AsyncSession = Depends(get_db),
+    _: PlatformContext = Depends(require_platform_scope("tickets")),
+) -> ListResponse[TicketOut]:
+    items = await support_service.list_all_tickets(session, status=status)
+    return ListResponse(items=items, total=len(items))
+
+
+@router.get("/tickets/{ticket_id}", response_model=TicketOut)
+async def get_ticket(
+    ticket_id: int,
+    session: AsyncSession = Depends(get_db),
+    _: PlatformContext = Depends(require_platform_scope("tickets")),
+) -> TicketOut:
+    ticket = await support_service.get_ticket_platform(session, ticket_id)
+    if ticket is None:
+        raise HTTPException(status_code=404, detail="Ticket introuvable")
+    return ticket
+
+
+@router.post("/tickets/{ticket_id}/reply", response_model=TicketOut)
+async def reply_ticket(
+    ticket_id: int,
+    body: ReplyRequest,
+    session: AsyncSession = Depends(get_db),
+    admin: PlatformContext = Depends(require_platform_scope("tickets")),
+) -> TicketOut:
+    ticket = await support_service.platform_reply(session, ticket_id, admin.user_id, body.body)
+    if ticket is None:
+        raise HTTPException(status_code=404, detail="Ticket introuvable")
+    return ticket
+
+
+@router.post("/tickets/{ticket_id}/status", response_model=TicketOut)
+async def set_ticket_status(
+    ticket_id: int,
+    body: SetTicketStatusRequest,
+    session: AsyncSession = Depends(get_db),
+    admin: PlatformContext = Depends(require_platform_scope("tickets")),
+) -> TicketOut:
+    try:
+        ticket = await support_service.set_ticket_status(
+            session, ticket_id, admin.user_id, body.status
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    if ticket is None:
+        raise HTTPException(status_code=404, detail="Ticket introuvable")
+    return ticket
+
+
+# --- Notes de version (changelog produit) -----------------------------------
+
+
+@router.get("/releases", response_model=ListResponse[ReleaseNoteOut])
+async def list_releases(
+    session: AsyncSession = Depends(get_db),
+    _: PlatformContext = Depends(require_platform_scope("clients:read")),
+) -> ListResponse[ReleaseNoteOut]:
+    items = await support_service.list_all_releases(session)
+    return ListResponse(items=items, total=len(items))
+
+
+@router.post("/releases", response_model=ReleaseNoteOut, status_code=201)
+async def create_release(
+    body: CreateReleaseRequest,
+    session: AsyncSession = Depends(get_db),
+    admin: PlatformContext = Depends(require_platform_scope("*")),
+) -> ReleaseNoteOut:
+    return await support_service.create_release(
+        session,
+        admin.user_id,
+        version=body.version,
+        title=body.title,
+        body=body.body,
+        category=body.category,
+    )
+
+
+@router.post("/releases/{note_id}/publish", response_model=ReleaseNoteOut)
+async def publish_release(
+    note_id: int,
+    session: AsyncSession = Depends(get_db),
+    admin: PlatformContext = Depends(require_platform_scope("*")),
+) -> ReleaseNoteOut:
+    note = await support_service.publish_release(session, note_id, admin.user_id)
+    if note is None:
+        raise HTTPException(status_code=404, detail="Note introuvable")
+    return note

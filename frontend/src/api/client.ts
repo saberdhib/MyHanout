@@ -1053,3 +1053,72 @@ export const setClientPlan = (
       subscription_status,
     })
     .then((r) => r.data);
+
+// --- Support & mises à jour (Lot 3) ----------------------------------------
+export interface TicketMessage {
+  id: number;
+  author_kind: string; // merchant | platform
+  author_user_id: number | null;
+  body: string;
+  created_at: string | null;
+}
+export interface Ticket {
+  id: number;
+  subject: string;
+  category: string | null;
+  status: string;
+  priority: string;
+  created_by_user_id: number | null;
+  assigned_admin_id: number | null;
+  created_at: string | null;
+  updated_at: string | null;
+  messages: TicketMessage[];
+  organization_id: number | null;
+  organization_name: string | null;
+}
+export interface ReleaseNote {
+  id: number;
+  version: string;
+  title: string;
+  body: string;
+  category: string;
+  published: boolean;
+  published_at: string | null;
+  created_at: string | null;
+}
+
+// Commerçant
+export const getMyTickets = (status?: string) =>
+  api
+    .get<ListResponse<Ticket>>("/support/tickets", { params: status ? { status } : {} })
+    .then((r) => r.data);
+export const getMyTicket = (id: number) =>
+  api.get<Ticket>(`/support/tickets/${id}`).then((r) => r.data);
+export const createTicket = (subject: string, body: string, category?: string, priority = "normal") =>
+  api
+    .post<Ticket>("/support/tickets", { subject, body, category, priority })
+    .then((r) => r.data);
+export const replyTicket = (id: number, body: string) =>
+  api.post<Ticket>(`/support/tickets/${id}/messages`, { body }).then((r) => r.data);
+export const getReleases = () =>
+  api.get<ListResponse<ReleaseNote>>("/releases").then((r) => r.data);
+
+// Plateforme (backoffice)
+export const getPlatformTickets = (status?: string) =>
+  api
+    .get<ListResponse<Ticket>>("/platform/tickets", { params: status ? { status } : {} })
+    .then((r) => r.data);
+export const getPlatformTicket = (id: number) =>
+  api.get<Ticket>(`/platform/tickets/${id}`).then((r) => r.data);
+export const platformReplyTicket = (id: number, body: string) =>
+  api.post<Ticket>(`/platform/tickets/${id}/reply`, { body }).then((r) => r.data);
+export const setTicketStatus = (id: number, status: string) =>
+  api.post<Ticket>(`/platform/tickets/${id}/status`, { status }).then((r) => r.data);
+export const getPlatformReleases = () =>
+  api.get<ListResponse<ReleaseNote>>("/platform/releases").then((r) => r.data);
+export const createRelease = (version: string, title: string, body: string, category = "feature") =>
+  api
+    .post<ReleaseNote>("/platform/releases", { version, title, body, category })
+    .then((r) => r.data);
+export const publishRelease = (id: number) =>
+  api.post<ReleaseNote>(`/platform/releases/${id}/publish`).then((r) => r.data);

@@ -244,3 +244,13 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   Suspension d'un commerce → blocage immédiat de ses users (`deps._ensure_org_active`).
   Le login expose `platform_role` (claim `plat`, indice UX ; l'accès reste vérifié en base).
   Seed : opérateur `platform@myhanout.example`. Migration `0023`. Tests `tests/test_platform.py`.
+- **Support & mises à jour (Lot 3)** : tickets **tenant** (`support_ticket`/`support_message`,
+  `TenantMixin`) — le commerçant ne voit que les siens (garde-fou), l'opérateur les voit
+  **tous** (`current_org=None`, audité). Changelog produit **global** (`release_note`, non
+  tenant ; publié → visible par tous les commerces). `services/support_service.py`
+  (⚠️ écriture cross-tenant : la réponse plateforme estampille `organization_id`
+  **explicitement** ; recharge colonnes+messages via requêtes pour éviter le lazy-load async).
+  API commerçant `api/v1/support.py` (`/support/tickets`, `/releases`) + section opérateur
+  dans `api/v1/platform.py` (`/platform/tickets`, `/tickets/{id}/reply|status`, `/releases`).
+  Front : page `Support.tsx` (commerçant) + tickets/notes dans `Admin.tsx`. Module `support`
+  (socle CORE). Migration `0024`. Tests `tests/test_support.py`.

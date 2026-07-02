@@ -42,6 +42,7 @@ from app.api.v1 import (
     staffing,
     stocks,
     stream,
+    support,
     telegram,
     webhooks,
     whatsapp,
@@ -88,3 +89,4 @@ api_router.include_router(slack.router)
 api_router.include_router(api_keys.router)
 api_router.include_router(webhooks.router)
 api_router.include_router(platform.router)
+api_router.include_router(support.router)
