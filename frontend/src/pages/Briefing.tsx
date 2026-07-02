@@ -74,10 +74,19 @@ export default function Briefing() {
 
       {!briefing && (
         <Card title="Aucun briefing">
-          <p className="py-4 text-sm text-night/50 dark:text-surface/50">
-            Cliquez sur « Générer le briefing » — vos agents (alertes, réassort, démarque,
-            production) proposeront les actions du jour.
-          </p>
+          <div className="flex flex-col items-center py-6 text-center">
+            <img
+              src="/empty/calm.png"
+              alt=""
+              width="160"
+              height="160"
+              className="mb-4 h-40 w-40 opacity-90"
+            />
+            <p className="max-w-md text-sm text-night/50 dark:text-surface/50">
+              Cliquez sur « Générer le briefing » — vos agents (alertes, réassort, démarque,
+              production) proposeront les actions du jour.
+            </p>
+          </div>
         </Card>
       )}
 
