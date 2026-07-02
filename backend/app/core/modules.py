@@ -29,6 +29,7 @@ MODULES: dict[str, str] = {
     "promos": "Promotions",
     "loyalty": "Fidélité client",
     "reengagement": "Relance client",
+    "reservations": "Réservations (click & collect)",
     "markdown": "Démarque (anti-gaspi)",
     "production": "Production & recettes",
     "pricing": "Prix conseillés",

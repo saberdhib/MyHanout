@@ -51,6 +51,7 @@ const EN: Record<string, string> = {
   "Aide & support": "Help & support",
   Fidélité: "Loyalty",
   "Relance client": "Re-engagement",
+  Réservations: "Reservations",
   // Header / commun
   "Assistant WhatsApp": "WhatsApp assistant",
   "Basculer le thème": "Toggle theme",

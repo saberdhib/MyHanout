@@ -39,6 +39,7 @@ from app.api.v1 import (
     recommendations,
     reengagement,
     report,
+    reservations,
     signals,
     slack,
     staffing,
@@ -77,6 +78,7 @@ api_router.include_router(recommendations.router)
 api_router.include_router(markdown.router)
 api_router.include_router(loyalty.router)
 api_router.include_router(reengagement.router)
+api_router.include_router(reservations.router)
 api_router.include_router(recipes.router)
 api_router.include_router(production.router)
 api_router.include_router(briefing.router)

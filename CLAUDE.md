@@ -255,6 +255,14 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   `/send?segment=` scope `orders`). Page `Reengagement.tsx` (module `reengagement`).
   Réglages `reengagement_*`. ⚠️ En suite de tests, l'envoi doit tourner dans une org SANS
   connecteur (sinon un vrai client business est résolu). Tests `tests/test_reengagement.py`.
+- **Réservations client (click & collect)** : `reservation`/`reservation_line` (TenantMixin,
+  migration `0029` + RLS). Cycle HITL `pending → confirmed → ready → collected | cancelled`
+  (`services/reservation_service.py`) : à `ready` notif transactionnelle WhatsApp (résolveur),
+  à `collected` **crédit fidélité** one-shot (`loyalty_credited`) via `loyalty_service.earn`.
+  Totaux calculés depuis le catalogue. API `api/v1/reservations.py` (`/reservations` lecture
+  scope `stocks`, `POST` + `/{id}/status` scope `orders`). Page `Reservations.tsx` (module
+  `reservations`). ⚠️ Tests : parcours en org dédiée (sans connecteur → résolveur mock, prix
+  produit maîtrisé). Tests `tests/test_reservations.py`.
 - **Backoffice plateforme (SaaS, agent-as-a-service)** : plan **cross-tenant** pour
   l'opérateur MyHanout — l'**inverse** du garde-fou (cf. §5). Modèles **globaux** (non
   tenant) `platform_admin` (rôles `superadmin`/`support`/`billing`) + `subscription`

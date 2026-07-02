@@ -273,6 +273,31 @@ async def _seed_business_data(session: AsyncSession, seeds: Path) -> None:
         )
     )
 
+    # Démo click & collect : une réservation confirmée pour Amina.
+    from app.models.reservation import Reservation, ReservationLine, ReservationStatus
+
+    demo_prod = next(iter(products.values()))
+    reservation = Reservation(
+        customer_id=amina.id,
+        customer_name=amina.name,
+        customer_phone=amina.phone,
+        status=ReservationStatus.CONFIRMED,
+        pickup_date=date.today() + timedelta(days=1),
+        notes="À récupérer en fin de journée.",
+        total_amount=float((demo_prod.unit_price or 0) * 2),
+    )
+    session.add(reservation)
+    await session.flush()
+    reservation.lines.append(
+        ReservationLine(
+            product_id=demo_prod.id,
+            product_name=demo_prod.name,
+            quantity=2,
+            unit_price=float(demo_prod.unit_price or 0),
+            line_total=float((demo_prod.unit_price or 0) * 2),
+        )
+    )
+
     log.info("seed.business", suppliers=len(suppliers), products=len(products), sales=sales_count)
 
 

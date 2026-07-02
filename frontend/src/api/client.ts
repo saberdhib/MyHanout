@@ -1059,6 +1059,44 @@ export const earnPoints = (customerId: number, amount: number) =>
 export const redeemReward = (customerId: number) =>
   api.post<RedeemResult>(`/loyalty/${customerId}/redeem`).then((r) => r.data);
 
+// --- Réservations client (click & collect) ----------------------------------
+export interface ReservationLine {
+  id: number;
+  product_id: number;
+  product_name: string | null;
+  quantity: number;
+  unit_price: number;
+  line_total: number;
+}
+export interface Reservation {
+  id: number;
+  customer_id: number | null;
+  customer_name: string | null;
+  customer_phone: string | null;
+  status: string;
+  pickup_date: string | null;
+  notes: string | null;
+  total_amount: number;
+  loyalty_credited: boolean;
+  created_at: string | null;
+  lines: ReservationLine[];
+  explanation: string | null;
+}
+export const getReservations = (status?: string) =>
+  api
+    .get<ListResponse<Reservation>>("/reservations", { params: status ? { status } : {} })
+    .then((r) => r.data);
+export const createReservation = (body: {
+  customer_id?: number;
+  customer_name?: string;
+  customer_phone?: string;
+  pickup_date?: string;
+  notes?: string;
+  lines: { product_id: number; quantity: number; unit_price?: number }[];
+}) => api.post<Reservation>("/reservations", body).then((r) => r.data);
+export const setReservationStatus = (id: number, status: string) =>
+  api.post<Reservation>(`/reservations/${id}/status`, { status }).then((r) => r.data);
+
 // --- Relance client (segments ciblés) ---------------------------------------
 export interface ReengagementCustomer {
   customer_id: number;

@@ -44,6 +44,7 @@ from app.models.product import Product
 from app.models.promo import PromoCampaign
 from app.models.recipe import ProductionPlan, Recipe, RecipeItem
 from app.models.recommendation import Recommendation
+from app.models.reservation import Reservation, ReservationLine, ReservationStatus
 from app.models.sale import Sale
 from app.models.signal import SignalDefinition, SignalObservation
 from app.models.stock import Stock
@@ -103,6 +104,9 @@ __all__ = [
     "Recipe",
     "RecipeItem",
     "Recommendation",
+    "Reservation",
+    "ReservationLine",
+    "ReservationStatus",
     "SignalDefinition",
     "SignalObservation",
     "Organization",
