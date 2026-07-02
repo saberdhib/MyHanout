@@ -138,6 +138,12 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
 ## 9. Où regarder
 - API : `backend/app/api/v1/` (`router.py` agrège). Endpoints : `docs/api-design.md`.
 - Démo : `docs/DEMO.md`. Déploiement : `docs/DEPLOY.md`. Tenancy/rôles : `docs/multitenancy.md`.
+- **Mode démo blindé** : `make seed-demo` (`app/db/seed_demo.py`) charge une **boucherie
+  fictive sur 3 mois** (org `boucherie-demo`, `boucher@myhanout.example`) pour qu'une démo
+  **allume toutes les pages** sans saisie manuelle (ventes saisonnières, alertes, démarques
+  appliquées→Impact, échéancier/trésorerie, fidélité, réservations, production, chaîne du
+  froid, briefing). Idempotent, 100 % fictif, keyless. SKU préfixés `BCHD-` (unicité globale
+  de `product.sku`). Distinct du `make seed` (épicerie « demo »). Tests `tests/test_seed_demo.py`.
 - Dossier delivery (discovery/strategy/archi C4/ADRs) : `docs/delivery/`.
 - **Affiches promo** : `POST /promos/{id}/visual` (provider `intelligence/imaging/`).
 - **Import factures email** : `POST /invoices/import/email` (provider `ingestion/email/`).

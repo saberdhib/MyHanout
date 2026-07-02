@@ -9,10 +9,22 @@
 ```bash
 cp .env.example .env
 docker compose up -d --build      # postgres+pgvector, redis, api, worker, frontend
-make seed                         # org démo + produits + ventes + 1 périssable en fin de vie + clients opt-in
+make seed                         # org démo (épicerie) : produits + ventes + 1 périssable + clients opt-in
+make seed-demo                    # ⭐ mode démo blindé : une boucherie fictive sur 3 mois
 ```
 - Dashboard : http://localhost:5173  ·  API/Swagger : http://localhost:8000/docs
 - Login démo : `admin@myhanout.example` / `admin` (auto-login en dev).
+
+### ⭐ Mode démo blindé (`make seed-demo`)
+Charge **d'une seule commande** une boucherie fictive complète (`boucher@myhanout.example` /
+`admin`) : ~14 produits réalistes, **90 jours de ventes saisonnières** (pic week-end, lundi
+fermé), stocks bas → alertes de réassort, lots en fin de vie → **démarques** (dont 2 déjà
+appliquées → cash récupéré visible dans **Impact**), factures fournisseurs à échéances
+étalées → **échéancier & trésorerie**, clients fidèles + **réservations** click&collect
+(collectée/confirmée/en attente), recette merguez → **production**, frigos + capteur en
+dérive → **chaîne du froid**, et le **briefing du jour** consolidé. Objectif : **toutes les
+pages s'allument** sans aucune saisie manuelle devant le commerçant. Idempotent, 100 % fictif,
+zéro clé externe. Données isolées de l'org « demo » (SKU préfixés `BCHD-`).
 
 ## 1. Le tableau de bord vivant (1 min)
 - KPIs (références, alertes, factures, **MAPE** qualité prévision) + **signaux du jour**

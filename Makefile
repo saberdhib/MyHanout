@@ -7,7 +7,7 @@ BACKEND := $(COMPOSE) exec api
 
 .PHONY: help up down logs build restart ps \
         lint format typecheck test check \
-        migrate makemigration seed shell
+        migrate makemigration seed seed-demo shell
 
 help: ## Affiche cette aide
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -52,6 +52,9 @@ makemigration: ## Génère une migration (m="message")
 
 seed: ## Charge les données de seed
 	$(BACKEND) python -m app.db.seed
+
+seed-demo: ## Charge le mode démo blindé (boucherie fictive, 3 mois, toutes les pages)
+	$(BACKEND) python -m app.db.seed_demo
 
 shell: ## Shell Python dans le conteneur api
 	$(BACKEND) python
