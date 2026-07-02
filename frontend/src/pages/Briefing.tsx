@@ -13,6 +13,7 @@ const CAT: Record<string, { label: string; icon: string; cls: string }> = {
   markdown: { label: "Démarque", icon: "🏷️", cls: "bg-amber-500/15 text-amber-600 dark:text-amber-300" },
   reassort: { label: "Réassort", icon: "🛒", cls: "bg-brand/15 text-brand-dark dark:text-brand-light" },
   production: { label: "Production", icon: "🥖", cls: "bg-night/10 text-night/60 dark:bg-white/10 dark:text-surface/60" },
+  reengagement: { label: "Relance", icon: "📣", cls: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300" },
 };
 
 export default function Briefing() {

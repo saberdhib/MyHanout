@@ -161,6 +161,32 @@ async def _gather_items(session: AsyncSession) -> list[dict]:
             }
         )
 
+    # 5) Relance client (segments fidélité à contacter, opt-in only).
+    from app.services.reengagement_service import build_segments
+
+    seg_label = {
+        "reward_ready": "récompense prête",
+        "almost_reward": "presque une récompense",
+        "inactive": "à reconquérir",
+    }
+    segments = await build_segments(session)
+    for s in segments.segments:
+        if s.contactable <= 0:
+            continue
+        label = seg_label.get(s.segment, s.segment)
+        items.append(
+            {
+                "category": "reengagement",
+                "priority": 4,
+                "title": f"Relancer {s.contactable} client(s) · {label}",
+                "detail": s.explanation,
+                "action": "Envoyer la relance ciblée",
+                "value": 0.0,
+                "entity_type": f"reengagement:{s.segment}",
+                "entity_id": None,
+            }
+        )
+
     items.sort(key=lambda it: (it["priority"], -it["value"]))
     return items
 
@@ -170,6 +196,7 @@ def _summary(items: list[dict]) -> tuple[str, float]:
     n_reassort = sum(1 for i in items if i["category"] == "reassort")
     n_markdown = sum(1 for i in items if i["category"] == "markdown")
     n_prod = sum(1 for i in items if i["category"] == "production")
+    n_reeng = sum(1 for i in items if i["category"] == "reengagement")
     value = round(sum(i["value"] for i in items), 2)
     parts = []
     if n_alert:
@@ -180,6 +207,8 @@ def _summary(items: list[dict]) -> tuple[str, float]:
         parts.append(f"{n_markdown} démarque(s) (~{value:.0f}€ récupérables)")
     if n_prod:
         parts.append(f"{n_prod} à produire")
+    if n_reeng:
+        parts.append(f"{n_reeng} relance(s) client")
     detail = ", ".join(parts) if parts else "rien d'urgent aujourd'hui"
     return f"{len(items)} action(s) du jour : {detail}.", value
 

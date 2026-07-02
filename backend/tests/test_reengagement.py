@@ -144,6 +144,23 @@ def test_segments_and_optin_send(anon_client):
     assert res["skipped_no_consent"] == 1
 
 
+def test_reengagement_appears_in_briefing():
+    """Le briefing du matin remonte les segments à relancer (opt-in)."""
+    org_id = _run(_new_org_with_owner("reeng-brief", "reeng-brief@test.local"))
+    _run(_seed_customer("reeng-brief", name="Prêt", balance=150, opt_in=True, phone="+2126000009"))
+
+    async def _scenario():
+        from app.services.briefing_service import compute_briefing
+
+        async with TestSession() as s:
+            with tenant_context(org_id):
+                briefing = await compute_briefing(s, persist=False, refresh_agents=False)
+                cats = {i.category for i in briefing.items}
+                assert "reengagement" in cats
+
+    _run(_scenario())
+
+
 def test_send_unknown_segment_422(client):
     assert client.post("/api/v1/reengagement/send", params={"segment": "bogus"}).status_code == 422
 

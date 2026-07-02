@@ -212,7 +212,8 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   page front `Production.tsx` (module `production`).
 - **Briefing du matin** (orchestration proactive) : agent « Tâches du jour »
   (`agent_briefing`) + `services/briefing_service.py` qui **consolide** alertes +
-  réassort + démarque + production en tâches priorisées (modèles `daily_briefing`/
+  réassort + démarque + production + **relance client** (segments opt-in, cf.
+  `reengagement_service`) en tâches priorisées (modèles `daily_briefing`/
   `briefing_item`). `api/v1/briefing.py` (`/briefing`, `/generate`, `/{id}/send`,
   `/items/{id}/done`). Câblé dans le **cycle quotidien** (`pipeline_service` job
   `daily` → asset `_asset_briefing`). Envoi WhatsApp/Slack (mock). Page `Briefing.tsx`
