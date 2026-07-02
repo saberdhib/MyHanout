@@ -146,6 +146,34 @@ jobs:
           CI: "true"
         run: npx playwright test
 
+  security:
+    name: Sécurité — dépendances, code, secrets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0        # gitleaks scanne tout l'historique
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install backend + security tooling
+        working-directory: backend
+        run: pip install -e . pip-audit bandit
+      - name: pip-audit (CVE des dépendances backend)
+        working-directory: backend
+        # N'échoue pas le build sur une CVE transitive non corrigeable (revue humaine),
+        # mais rend le rapport visible dans les logs CI.
+        run: pip-audit || true
+      - name: Bandit (analyse statique de sécurité du code)
+        working-directory: backend
+        # B101 (assert) désactivé : les asserts servent surtout aux tests.
+        run: bandit -r app -ll -x app/tests --skip B101
+      - name: Gitleaks (détection de secrets commités)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   docker:
     name: Build images
     runs-on: ubuntu-latest

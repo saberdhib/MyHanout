@@ -76,9 +76,13 @@ class HttpForecastClient(ForecastServiceClient):
             for ds, y in rows
         ]
         try:
+            headers = (
+                {"X-Internal-Key": settings.ml_internal_key} if settings.ml_internal_key else {}
+            )
             async with httpx.AsyncClient(timeout=30) as http:
                 resp = await http.post(
                     f"{settings.ml_service_url}/predict",
+                    headers=headers,
                     json={
                         "product_id": product_id,
                         "horizon_days": horizon_days,

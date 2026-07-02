@@ -13,6 +13,7 @@ from app.core.exceptions import register_exception_handlers
 from app.core.logging import configure_logging, get_logger
 from app.core.metrics import setup_metrics
 from app.core.rate_limit import RateLimitMiddleware
+from app.core.security_headers import SecurityHeadersMiddleware
 from app.core.tracing import TracingMiddleware, setup_tracing
 from app.schemas.common import HealthResponse
 
@@ -35,6 +36,7 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    app.add_middleware(SecurityHeadersMiddleware)
     app.add_middleware(AuditMiddleware)
     app.add_middleware(RateLimitMiddleware)
     # Ajouté en dernier => middleware le plus externe : corrèle tous les logs.

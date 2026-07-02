@@ -15,13 +15,21 @@ from __future__ import annotations
 import os
 from datetime import date, timedelta
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI, Header, HTTPException
 from pydantic import BaseModel
 
 MODEL_VERSION = os.environ.get("ML_MODEL_VERSION", "v1")
 WINDOW = int(os.environ.get("ML_WINDOW", "28"))
+# Secret partagé avec le backend. Vide → keyless (local/CI). Défini → exigé.
+INTERNAL_KEY = os.environ.get("ML_INTERNAL_KEY", "")
 
 app = FastAPI(title="MyHanout ML Service", version="0.1.0")
+
+
+def require_internal_key(x_internal_key: str | None = Header(default=None)) -> None:
+    """Auth interne : si un secret est configuré, l'exiger sur les endpoints de calcul."""
+    if INTERNAL_KEY and x_internal_key != INTERNAL_KEY:
+        raise HTTPException(status_code=401, detail="clé interne invalide")
 
 
 class HistoryPoint(BaseModel):
@@ -72,14 +80,14 @@ def model_version() -> dict:
 
 
 @app.post("/train", response_model=dict)
-def train(req: TrainRequest) -> dict:
+def train(req: TrainRequest, _: None = Depends(require_internal_key)) -> dict:
     """Entraînement (stub versionné) : ici la moyenne mobile ne nécessite pas de fit."""
     n = len(req.history)
     return {"model": req.model, "model_version": MODEL_VERSION, "trained_on": n}
 
 
 @app.post("/predict", response_model=ForecastResult)
-def predict(req: PredictRequest) -> ForecastResult:
+def predict(req: PredictRequest, _: None = Depends(require_internal_key)) -> ForecastResult:
     if not req.history:
         return ForecastResult(
             product_id=req.product_id,

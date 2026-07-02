@@ -25,26 +25,32 @@ Tout est tenant-scopé : **il n'existe aucun moyen pour TOI de gérer l'ensemble
 clients**. C'est l'architecture inverse du garde-fou tenant, donc à concevoir
 explicitement (cf. §« Plateforme SaaS » plus bas). Sans ça, pas d'« agent-as-a-service ».
 
-### C2. `SECRET_KEY` par défaut `"change-me"`, sans garde au démarrage
+### C2. `SECRET_KEY` par défaut `"change-me"`, sans garde au démarrage ✅ FAIT (Lot 1)
 JWT **et** chiffrement des connecteurs en dépendent. Un déploiement qui oublie de la
 changer = tokens forgeables + secrets déchiffrables. **Fix** : refuser de démarrer en
 `ENV=production` si `SECRET_KEY` est la valeur par défaut (ou < 32 chars).
+→ `Settings._enforce_prod_secret` (validator Pydantic) dans `backend/app/config.py`.
 
-### C3. ml-service **sans authentification**
+### C3. ml-service **sans authentification** ✅ FAIT (Lot 1)
 `ml-service/` expose `/predict` sans aucun contrôle. En interne c'est tolérable, mais
 dès qu'il est déployé (réseau, k8s), n'importe qui peut l'appeler. **Fix** : secret
 partagé `X-Internal-Key` entre backend et ml-service.
+→ `require_internal_key` (dépendance FastAPI) sur `/train` + `/predict`, en-tête posé
+côté client dans `service_client.py`. `ML_INTERNAL_KEY` vide = keyless (local/CI).
 
-### C4. Pas de scan sécurité dans la CI
+### C4. Pas de scan sécurité dans la CI ✅ FAIT (Lot 1)
 Aucun `pip-audit` / `bandit` / `trivy` (images) / `gitleaks` (secrets) / Dependabot.
 Pour un produit qui manipule données commerçants + secrets, c'est un prérequis de
 confiance (et souvent exigé en due diligence). **Fix** : ajouter un job `security`.
+→ Job `security` dans `.github/workflows/ci.yml` : `pip-audit`, `bandit -r app`, gitleaks.
 
 ## 🟠 IMPORTANT — pour « scalable & pro »
 
-### H1. Pas d'en-têtes de sécurité HTTP
+### H1. Pas d'en-têtes de sécurité HTTP ✅ FAIT (Lot 1)
 Manque CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy.
 **Fix** : middleware `SecurityHeaders` (quelques lignes).
+→ `SecurityHeadersMiddleware` (`backend/app/core/security_headers.py`), câblé dans
+`main.py` ; HSTS ajouté hors `ENV=local`.
 
 ### H2. Isolation tenant uniquement applicative (pas de RLS Postgres)
 Le garde-fou ORM est bon mais **une requête SQL brute ou un bug de code contourne
@@ -52,10 +58,11 @@ l'isolation**. Le standard « pro » multi-tenant = **Row-Level Security Postgre
 (defense-in-depth) : `SET app.current_org` + policies `USING (organization_id = ...)`.
 **Fix** : migration activant RLS + set du GUC par requête. (Gros, mais argument de vente.)
 
-### H3. Index composites tenant manquants
+### H3. Index composites tenant manquants ✅ FAIT (Lot 1)
 Le garde-fou filtre par `organization_id` sur **chaque** requête, mais les index sont
 souvent sur la seule FK. **Fix** : index `(organization_id, <colonne chaude>)` sur les
 tables volumineuses (sale, stock, invoice, temperature_reading, recommendation…).
+→ Migration `0022_tenant_composite_indexes` (7 index composites, réversible).
 
 ### H4. JWT non révocable
 Refresh tokens stateless, pas de rotation ni de blocklist. Impossible de déconnecter
@@ -125,7 +132,7 @@ Un **espace admin MyHanout** qui opère **au-dessus** des tenants :
 
 ## Feuille de route proposée (ordre de valeur)
 
-**Lot 1 — Durcissement sécurité (rapide, forte confiance) 🔴🟠**
+**Lot 1 — Durcissement sécurité (rapide, forte confiance) 🔴🟠 ✅ FAIT**
 C2 (garde SECRET_KEY) + C3 (auth ml-service) + C4 (job CI sécurité) + H1 (headers) +
 H3 (index composites). ~1 brique, peu de risque, énorme gain de crédibilité.
 

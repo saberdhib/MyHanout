@@ -8,8 +8,11 @@ from __future__ import annotations
 
 from functools import lru_cache
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+_DEFAULT_SECRET = "change-me"
+_PROD_ENVS = {"production", "prod", "staging"}
 
 
 class Settings(BaseSettings):
@@ -122,6 +125,9 @@ class Settings(BaseSettings):
     slack_signing_secret: str = ""  # vérification de signature (optionnel)
     slack_default_channel: str = ""  # canal par défaut pour les notifications
 
+    # Secret partagé backend ↔ ml-service (auth interne). Vide = ml-service keyless (local).
+    ml_internal_key: str = ""
+
     # --- Forecasting ---
     forecast_model: str = "naive"
     forecast_horizon_days: int = 14
@@ -187,6 +193,22 @@ class Settings(BaseSettings):
         if isinstance(v, str):
             return [o.strip() for o in v.split(",") if o.strip()]
         return v
+
+    @model_validator(mode="after")
+    def _enforce_prod_secret(self) -> Settings:
+        """En prod/staging : refuse une SECRET_KEY par défaut ou trop courte.
+
+        Le JWT ET le chiffrement des connecteurs en dépendent — une clé faible en
+        production = tokens forgeables + secrets déchiffrables. En local/CI, aucun
+        blocage (mock-first)."""
+        if self.env.lower() in _PROD_ENVS and (
+            self.secret_key == _DEFAULT_SECRET or len(self.secret_key) < 32
+        ):
+            raise ValueError(
+                "SECRET_KEY faible ou par défaut interdite en production : "
+                "définissez une clé aléatoire d'au moins 32 caractères."
+            )
+        return self
 
     @property
     def sqlalchemy_url(self) -> str:
