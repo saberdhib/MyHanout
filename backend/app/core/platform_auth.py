@@ -21,6 +21,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_db
 from app.core.exceptions import AuthError, PermissionDeniedError
+from app.core.rls import set_session_org
 from app.core.security import JWTError, decode_token
 from app.core.tenancy import set_current_org
 from app.models.platform import PLATFORM_ROLE_PERMISSIONS, PlatformAdmin, PlatformRole
@@ -69,8 +70,10 @@ async def get_platform_admin(
 
     role = PlatformRole(admin.role)
     perms = sorted(PLATFORM_ROLE_PERMISSIONS.get(role, set()))
-    # Cross-tenant : on désactive le filtrage ORM par organisation.
+    # Cross-tenant : on désactive le filtrage ORM (garde-fou applicatif) ET la RLS
+    # (GUC vide = accès complet) pour ce plan plateforme audité.
     set_current_org(None)
+    await set_session_org(session, None)
     return PlatformContext(
         user_id=user_id,
         email=str(payload.get("email", "")),

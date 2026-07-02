@@ -90,10 +90,16 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   en base** (pas seulement via claim JWT) et **audité** (`platform_service.platform_audit`).
   Un commerce `organization.status ∈ {suspended, cancelled}` bloque ses utilisateurs
   (`core/deps._ensure_org_active`).
-- **Limite** : le SQL brut (hors ORM) n'est PAS filtré → filtrer l'org explicitement
-  **— idem pour un `DELETE`/`UPDATE` ORM en masse** (l'event ne couvre que les SELECT) :
-  filtrer `organization_id` à la main (cf. remplacement des recos dans `recommendation_service`).
-  (cf. `PgVectorStore`). Test d'isolation : `tests/test_tenancy.py` (A ≠ B).
+- **Limite (garde-fou applicatif)** : le SQL brut (hors ORM) n'est PAS filtré par l'event
+  → filtrer l'org explicitement **— idem pour un `DELETE`/`UPDATE` ORM en masse** (l'event
+  ne couvre que les SELECT) : filtrer `organization_id` à la main (cf. remplacement des recos
+  dans `recommendation_service`, `PgVectorStore`). Test d'isolation : `tests/test_tenancy.py`.
+- **Defense-in-depth : RLS Postgres (Lot 4)** — en prod pg, la **Row-Level Security**
+  (`FORCE`, migration `0025`) rattrape ce trou : même une requête SQL brute est filtrée
+  par la policy `tenant_isolation` (`organization_id = current_setting('app.current_org')`).
+  Le GUC est posé par `core/rls.py::set_session_org` à l'auth (org réelle) et réinitialisé
+  par requête (`get_session`) ; vide/NULL = accès complet (plateforme/seed/workers).
+  No-op sur sqlite (tests). Ne dispense PAS de filtrer le SQL brut à la main (RLS = 2ᵉ filet).
 
 ## 6. Pièges réels (déjà rencontrés — évite-les)
 - **Async lazy-load** : accéder à une relation non chargée lève `MissingGreenlet`.

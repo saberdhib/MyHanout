@@ -28,9 +28,17 @@ AsyncSessionLocal = async_sessionmaker(
 
 
 async def get_session() -> AsyncGenerator[AsyncSession, None]:
-    """Dépendance FastAPI : fournit une session et la ferme proprement."""
+    """Dépendance FastAPI : fournit une session et la ferme proprement.
+
+    Réinitialise le GUC RLS (`app.current_org` → vide) en début de requête : une
+    connexion recyclée du pool ne doit pas hériter du tenant d'une requête précédente.
+    L'auth (get_current_user / clé API / plateforme) posera ensuite l'org réelle.
+    """
+    from app.core.rls import set_session_org
+
     async with AsyncSessionLocal() as session:
         try:
+            await set_session_org(session, None)
             yield session
             await session.commit()
         except Exception:

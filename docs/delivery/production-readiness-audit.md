@@ -58,11 +58,15 @@ Manque CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy.
 → `SecurityHeadersMiddleware` (`backend/app/core/security_headers.py`), câblé dans
 `main.py` ; HSTS ajouté hors `ENV=local`.
 
-### H2. Isolation tenant uniquement applicative (pas de RLS Postgres)
+### H2. Isolation tenant uniquement applicative (pas de RLS Postgres) ✅ FAIT (Lot 4)
 Le garde-fou ORM est bon mais **une requête SQL brute ou un bug de code contourne
 l'isolation**. Le standard « pro » multi-tenant = **Row-Level Security Postgres**
 (defense-in-depth) : `SET app.current_org` + policies `USING (organization_id = ...)`.
 **Fix** : migration activant RLS + set du GUC par requête. (Gros, mais argument de vente.)
+→ Migration `0025` : `ENABLE`+`FORCE ROW LEVEL SECURITY` + policy `tenant_isolation` sur
+les **35 tables tenant** (GUC vide = accès plateforme/seed). GUC posé par `core/rls.py`
+(`set_session_org`) à l'auth ; réinitialisé par requête (`get_session`). Test d'intégration
+pg : `test_rls_blocks_raw_sql_cross_tenant` (SQL brut cross-tenant bloqué + WITH CHECK).
 
 ### H3. Index composites tenant manquants ✅ FAIT (Lot 1)
 Le garde-fou filtre par `organization_id` sur **chaque** requête, mais les index sont
@@ -154,8 +158,9 @@ global (`release_note`, publié → visible commerces). Migration 0024. API `sup
 (commerçant) + section `platform.py` (opérateur). Front : page `Support.tsx` +
 backoffice enrichi. Impersonation auditée : toujours en option (non implémentée).
 
-**Lot 4 — RLS Postgres (defense-in-depth) 🟠**
+**Lot 4 — RLS Postgres (defense-in-depth) 🟠 ✅ FAIT**
 Migration RLS + GUC par requête + tests. Argument de vente « isolation garantie DB ».
+→ Migration 0025 (35 tables), `core/rls.py`, test d'intégration pg.
 
 **Lot 5 — CD + MLOps avancé 🟠🟡**
 Registry/tags images + release ; registry de modèles + retrain déclenché par dérive.

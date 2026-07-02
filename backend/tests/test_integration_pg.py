@@ -102,6 +102,72 @@ async def test_forecast_service_on_pg(pg_session):
 
 
 @pytest.mark.asyncio
+async def test_rls_blocks_raw_sql_cross_tenant(pg_session):
+    """RLS Postgres (defense-in-depth) : même en SQL BRUT (hors garde-fou ORM),
+    une session scopée sur une org ne voit pas les lignes d'une autre org.
+
+    Prérequis : migration 0025 appliquée (alembic upgrade head)."""
+    from app.core.tenancy import tenant_context
+    from app.models.organization import Organization
+    from app.models.product import Product
+
+    async with pg_session() as s:
+        # Vérifie que la RLS est bien active (sinon test non pertinent).
+        rls_on = await s.scalar(
+            text("SELECT relrowsecurity FROM pg_class WHERE relname = 'product'")
+        )
+        if not rls_on:
+            pytest.skip("RLS non active (migration 0025 non appliquée)")
+
+        demo_id = await _demo_org_id(s)
+        # Crée une seconde org + un produit qui lui appartient (GUC non posé => accès
+        # complet, l'ORM estampille l'org via tenant_context).
+        other = Organization(name="RLS Other", slug=f"rls-{id(s)}")
+        s.add(other)
+        await s.flush()
+        with tenant_context(other.id):
+            p = Product(sku=f"RLS-{id(s)}", name="RLS", unit="kg")
+            s.add(p)
+            await s.flush()
+            other_pid = p.id
+        await s.commit()
+
+        # Scope RLS sur l'org démo : le produit de l'autre org est INVISIBLE en SQL brut.
+        await s.execute(
+            text("SELECT set_config('app.current_org', :v, false)"), {"v": str(demo_id)}
+        )
+        visible = await s.scalar(
+            text("SELECT count(*) FROM product WHERE id = :id"), {"id": other_pid}
+        )
+        assert visible == 0  # RLS bloque, même sans garde-fou ORM
+
+        # Scope sur l'autre org : le produit redevient visible.
+        await s.execute(
+            text("SELECT set_config('app.current_org', :v, false)"), {"v": str(other.id)}
+        )
+        visible = await s.scalar(
+            text("SELECT count(*) FROM product WHERE id = :id"), {"id": other_pid}
+        )
+        assert visible == 1
+
+        # WITH CHECK : insérer une ligne pour une AUTRE org que le scope courant échoue.
+        await s.execute(
+            text("SELECT set_config('app.current_org', :v, false)"), {"v": str(demo_id)}
+        )
+        from sqlalchemy.exc import DBAPIError
+
+        with pytest.raises(DBAPIError):  # violation RLS WITH CHECK
+            await s.execute(
+                text(
+                    "INSERT INTO supplier (organization_id, name, created_at, updated_at) "
+                    "VALUES (:org, 'illegal', now(), now())"
+                ),
+                {"org": other.id},
+            )
+        await s.rollback()
+
+
+@pytest.mark.asyncio
 async def test_pgvector_store_roundtrip(pg_session):
     """RAG sur vrai pgvector : insertion vector(1536) + recherche cosine, tenant."""
     from app.core.tenancy import tenant_context
