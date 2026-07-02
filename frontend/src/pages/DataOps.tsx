@@ -3,19 +3,37 @@ import { Card } from "../components/Card";
 import { Badge } from "../components/Charts";
 import { usePolling } from "../hooks/usePolling";
 import { useEventStream } from "../hooks/useEventStream";
-import { getPipelineHealth, getPipelineRuns, triggerPipeline } from "../api/client";
+import {
+  getModels,
+  getPipelineHealth,
+  getPipelineRuns,
+  retrainModels,
+  triggerPipeline,
+} from "../api/client";
 
-const JOBS = ["daily", "snapshot_inventory", "ingest_signals", "recommend", "scan_alerts"];
+const JOBS = ["daily", "snapshot_inventory", "ingest_signals", "recommend", "scan_alerts", "retrain"];
 
 export default function DataOps() {
   const health = usePolling(() => getPipelineHealth(), 15000);
   const runs = usePolling(() => getPipelineRuns(), 12000);
+  const models = usePolling(() => getModels(true), 20000);
   const [busy, setBusy] = useState<string | null>(null);
 
   const refreshAll = useCallback(() => {
     health.refresh();
     runs.refresh();
-  }, [health, runs]);
+    models.refresh();
+  }, [health, runs, models]);
+
+  async function retrain() {
+    setBusy("retrain");
+    try {
+      await retrainModels();
+      refreshAll();
+    } finally {
+      setBusy(null);
+    }
+  }
 
   const onEvent = useCallback(
     (e: { type: string }) => {
@@ -123,6 +141,60 @@ export default function DataOps() {
               <tr>
                 <td colSpan={6} className="py-6 text-center text-night/40 dark:text-surface/40">
                   Aucun run. Déclenche un job ci-dessus.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </Card>
+
+      <Card
+        title="Modèles (registre MLOps)"
+        subtitle="Version active par produit — traçabilité entraînement & qualité"
+        action={
+          <button
+            onClick={retrain}
+            disabled={busy !== null}
+            className="rounded-pill bg-brand/10 px-3 py-1.5 text-xs font-semibold text-brand-dark disabled:opacity-50 dark:text-brand-light"
+          >
+            {busy === "retrain" ? "…" : "Réentraîner tout"}
+          </button>
+        }
+      >
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-night/10 text-left text-night/50 dark:border-white/10 dark:text-surface/50">
+              <th className="py-2">Produit</th>
+              <th>Modèle</th>
+              <th>Version</th>
+              <th>MAE</th>
+              <th>MAPE</th>
+              <th>Déclencheur</th>
+            </tr>
+          </thead>
+          <tbody>
+            {(models.data ?? []).map((m) => (
+              <tr
+                key={m.id}
+                className="border-b border-night/[0.06] last:border-0 dark:border-white/[0.06]"
+              >
+                <td className="py-2">{m.product_id ?? "global"}</td>
+                <td>{m.model_name}</td>
+                <td className="font-medium">{m.version}</td>
+                <td>{m.mae != null ? m.mae.toFixed(2) : "—"}</td>
+                <td>{m.mape != null ? `${(m.mape * 100).toFixed(0)}%` : "—"}</td>
+                <td>
+                  <Badge value={m.trigger === "drift" ? "high" : "low"} />
+                  <span className="ml-1 text-xs text-night/50 dark:text-surface/50">
+                    {m.trigger}
+                  </span>
+                </td>
+              </tr>
+            ))}
+            {(models.data ?? []).length === 0 && (
+              <tr>
+                <td colSpan={6} className="py-6 text-center text-night/40 dark:text-surface/40">
+                  Aucun modèle. Lance « Réentraîner tout » ou le job retrain.
                 </td>
               </tr>
             )}

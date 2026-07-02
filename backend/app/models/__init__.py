@@ -21,6 +21,7 @@ from app.models.inventory import InventorySnapshot
 from app.models.invoice import Invoice, InvoiceLine
 from app.models.markdown import MarkdownSuggestion
 from app.models.meat import MeatCut, MeatLot
+from app.models.model_artifact import ModelArtifact, RetrainTrigger
 from app.models.order import Order, OrderLine
 from app.models.organization import (
     Invitation,
@@ -85,6 +86,8 @@ __all__ = [
     "MarkdownSuggestion",
     "MeatCut",
     "MeatLot",
+    "ModelArtifact",
+    "RetrainTrigger",
     "Membership",
     "MembershipRole",
     "Order",

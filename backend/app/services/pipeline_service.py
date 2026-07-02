@@ -129,6 +129,14 @@ async def _asset_briefing(session: AsyncSession, run: PipelineRun, today: date) 
     return briefing.total_items
 
 
+async def _asset_retrain(session: AsyncSession, run: PipelineRun, today: date) -> int:
+    # MLOps : réentraîne tous les produits (cycle planifié) et versionne dans le registre.
+    from app.services.model_registry_service import retrain_all
+
+    artifacts = await retrain_all(session)
+    return len(artifacts)
+
+
 # Registre des jobs : un job = une suite d'assets exécutés sous un même run.
 JOBS: dict[str, list[Asset]] = {
     "snapshot_inventory": [_asset_snapshot_inventory],
@@ -136,6 +144,7 @@ JOBS: dict[str, list[Asset]] = {
     "recommend": [_asset_recommend],
     "scan_alerts": [_asset_scan_alerts],
     "briefing": [_asset_briefing],
+    "retrain": [_asset_retrain],
     "daily": [
         _asset_snapshot_inventory,
         _asset_ingest_signals,

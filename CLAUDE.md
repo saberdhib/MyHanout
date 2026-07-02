@@ -260,3 +260,12 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   dans `api/v1/platform.py` (`/platform/tickets`, `/tickets/{id}/reply|status`, `/releases`).
   Front : page `Support.tsx` (commerçant) + tickets/notes dans `Admin.tsx`. Module `support`
   (socle CORE). Migration `0024`. Tests `tests/test_support.py`.
+- **Livraison continue & MLOps (Lot 5)** : CD `.github/workflows/cd.yml` (build+push images
+  GHCR sur `main`→`:main`/`:sha`, tag `v*`→`:version`/`:latest`). **Registre de modèles**
+  `model_artifact` (TenantMixin, migration `0026`, RLS incluse) : 1 version **active** par
+  (produit, modèle) + métriques + déclencheur (`manual`/`scheduled`/`drift`/`seed`).
+  `services/model_registry_service.py` (`retrain_product`/`retrain_all`/`retrain_on_drift`,
+  ⚠️ désactivation = mutation d'instances chargées, pas d'`UPDATE` en masse). Boucle dérive :
+  `scan_alerts` émet `forecast_drift` (MAPE > `mlops_drift_mape_threshold`) → `retrain_on_drift`.
+  Job pipeline `retrain` (planifié). API `/mlops/models|/retrain` (versionne). Front : registre
+  dans `DataOps.tsx`. `artifact_uri` prêt pour MinIO (prophet/lgbm). Tests `tests/test_model_registry.py`.

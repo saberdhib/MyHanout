@@ -88,6 +88,35 @@ async def scan_alerts(
             )
         )
 
+    # Règle 3 — dérive de précision : MAPE d'un produit au-dessus du seuil configuré.
+    from app.config import settings
+    from app.services.mlops_service import aggregate_metrics
+
+    for row in await aggregate_metrics(session):
+        mape = row["mape"]
+        pid = row["product_id"]
+        if mape is None or mape <= settings.mlops_drift_mape_threshold:
+            continue
+        if await _open_exists(session, AlertKind.FORECAST_DRIFT, pid):
+            continue
+        seuil = settings.mlops_drift_mape_threshold
+        created.append(
+            Alert(
+                kind=AlertKind.FORECAST_DRIFT,
+                priority=AlertPriority.MEDIUM,
+                title=f"Dérive de prévision : produit #{pid}",
+                message=f"MAPE {mape:.0%} au-dessus du seuil {seuil:.0%}.",
+                rule="mape > mlops_drift_mape_threshold",
+                threshold=float(settings.mlops_drift_mape_threshold),
+                observed_value=float(mape),
+                recommended_action="Réentraîner le modèle de ce produit.",
+                explanation="La précision des prévisions s'est dégradée (dérive détectée).",
+                entity_type="product",
+                entity_id=pid,
+                pipeline_run_id=pipeline_run_id,
+            )
+        )
+
     if created:
         from app.services import webhook_service
 

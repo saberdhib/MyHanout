@@ -364,6 +364,12 @@ async def seed() -> None:
 
             await run_job(session, "daily")
 
+            # MLOps : bootstrap du registre de modèles (une version par produit).
+            from app.models.model_artifact import RetrainTrigger
+            from app.services.model_registry_service import retrain_all
+
+            await retrain_all(session, trigger=RetrainTrigger.SEED)
+
             # Démo support : un ticket ouvert par le commerçant (+ 1er message).
             from app.models import SupportMessage, SupportTicket
 

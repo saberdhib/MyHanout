@@ -224,6 +224,32 @@ export const createDailyEntry = (entry: {
 export const getMlopsMetrics = () =>
   api.get<{ metrics: MlopsMetric[] }>("/mlops/metrics").then((r) => r.data.metrics);
 
+// Registre de modèles (MLOps)
+export interface ModelArtifact {
+  id: number;
+  product_id: number | null;
+  model_name: string;
+  version: string;
+  baseline: number;
+  n_observations: number;
+  mae: number | null;
+  mape: number | null;
+  trigger: string;
+  active: boolean;
+  artifact_uri: string | null;
+  trained_at: string | null;
+}
+export const getModels = (activeOnly = true) =>
+  api
+    .get<{ models: ModelArtifact[] }>("/mlops/models", { params: { active_only: activeOnly } })
+    .then((r) => r.data.models);
+export const retrainModels = (productId?: number) =>
+  api
+    .post<{ retrained: number; models: ModelArtifact[] }>("/mlops/retrain", null, {
+      params: productId ? { product_id: productId } : {},
+    })
+    .then((r) => r.data);
+
 // --- Demo pack : chat, signaux, promos ------------------------------------
 
 export interface ChatReply {

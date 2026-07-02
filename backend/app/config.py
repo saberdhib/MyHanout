@@ -138,6 +138,8 @@ class Settings(BaseSettings):
     ml_service_url: str = "http://ml-service:8001"
     # Version de modèle exposée par défaut (traçabilité MLOps quand inprocess).
     model_version: str = "v1"
+    # MLOps : MAPE au-delà de laquelle un modèle est jugé « dérivé » (alerte + retrain).
+    mlops_drift_mape_threshold: float = 0.35
 
     # --- Recommandations (réassort explicable) ---
     # Tampon de sécurité (fraction de la demande prévue) et seuils des règles.

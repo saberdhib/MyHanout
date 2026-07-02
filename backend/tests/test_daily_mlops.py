@@ -61,5 +61,15 @@ def test_mlops_retrain_versions_model(client):
     resp = client.post("/api/v1/mlops/retrain", params={"product_id": 1})
     assert resp.status_code == 200
     data = resp.json()
-    assert data["model_version"]
-    assert data["products_retrained"] >= 1
+    assert data["retrained"] >= 1
+    art = data["models"][0]
+    assert art["version"].startswith("v")  # versionné dans le registre
+    assert art["active"] is True
+    assert art["trigger"] == "manual"
+
+    # Le registre expose l'artefact actif ; un 2ᵉ retrain incrémente la version.
+    listing = client.get("/api/v1/mlops/models", params={"product_id": 1, "active_only": True})
+    assert listing.status_code == 200
+    assert len(listing.json()["models"]) == 1  # un seul actif par produit
+    again = client.post("/api/v1/mlops/retrain", params={"product_id": 1}).json()
+    assert again["models"][0]["version"] != art["version"]
