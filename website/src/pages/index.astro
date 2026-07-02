@@ -155,6 +155,45 @@ function icon(name: string) {
     </div>
   </section>
 
+  <!-- ===================== POUR VOTRE MÉTIER (verticaux) ===================== -->
+  <section class="container-x py-24">
+    <div class="mx-auto max-w-2xl text-center">
+      <span class="eyebrow reveal">Pour votre métier</span>
+      <h2 class="reveal mt-5 text-3xl font-extrabold tracking-tight text-night sm:text-4xl">
+        Pensé pour les commerces alimentaires de proximité
+      </h2>
+      <p class="reveal mt-4 text-night-700/70">
+        Un socle commun, adapté à votre métier : la navigation et les agents s'ajustent
+        automatiquement à votre type de commerce.
+      </p>
+    </div>
+    <div class="reveal mt-12 grid grid-cols-2 gap-5 lg:grid-cols-4">
+      {
+        [
+          ["boucherie", "Boucherie", "Lots, découpe, rendement, traçabilité"],
+          ["boulangerie", "Boulangerie", "Production du jour, recettes, fournées"],
+          ["primeur", "Primeur", "Frais, démarque anti-gaspi, DLC"],
+          ["epicerie", "Épicerie", "Réassort, marges, prix conseillés"],
+        ].map(([slug, title, desc]) => (
+          <article class="group overflow-hidden rounded-2xl border border-night/[0.06] bg-white shadow-sm transition-shadow hover:shadow-md">
+            <img
+              src={`/verticals/${slug}.png`}
+              alt={`MyHanout AI pour ${title}`}
+              width="800"
+              height="800"
+              loading="lazy"
+              class="aspect-square w-full object-cover"
+            />
+            <div class="p-4">
+              <h3 class="font-bold text-night">{title}</h3>
+              <p class="mt-1 text-sm text-night-700/70">{desc}</p>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
   <!-- ===================== FONCTIONS (bento) ===================== -->
   <section id="fonctions" class="container-x scroll-mt-24 py-24">
     <div class="mx-auto max-w-2xl text-center">
