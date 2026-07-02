@@ -1051,6 +1051,27 @@ export const createMeatLot = (body: {
 export const setMeatBreakdown = (id: number, cuts: MeatCutIn[]) =>
   api.put<MeatLotSummary>(`/meat/lots/${id}/breakdown`, { cuts }).then((r) => r.data);
 
+// --- Tableau d'impact (ROI en euros) ----------------------------------------
+export interface ImpactLine {
+  label: string;
+  amount: number;
+  unit: string; // € | h
+  kind: string; // gain | detected | revenue | time
+  explanation: string;
+}
+export interface ImpactView {
+  period_days: number;
+  currency: string;
+  estimated_value_eur: number;
+  time_saved_hours: number;
+  revenue: number;
+  lines: ImpactLine[];
+  explanation: string;
+  disclaimer: string;
+}
+export const getImpact = (days = 30) =>
+  api.get<ImpactView>("/impact", { params: { days } }).then((r) => r.data);
+
 // --- Fidélité client --------------------------------------------------------
 export interface Customer {
   id: number;

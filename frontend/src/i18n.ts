@@ -53,6 +53,7 @@ const EN: Record<string, string> = {
   "Relance client": "Re-engagement",
   Réservations: "Reservations",
   Échéancier: "Payables",
+  "Impact (€)": "Impact (€)",
   // Header / commun
   "Assistant WhatsApp": "WhatsApp assistant",
   "Basculer le thème": "Toggle theme",

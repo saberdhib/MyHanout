@@ -21,6 +21,7 @@ from app.api.v1 import (
     finance,
     forecasts,
     haccp,
+    impact,
     imports,
     invoices,
     loyalty,
@@ -77,6 +78,7 @@ api_router.include_router(pipelines.router)
 api_router.include_router(recommendations.router)
 api_router.include_router(markdown.router)
 api_router.include_router(loyalty.router)
+api_router.include_router(impact.router)
 api_router.include_router(reengagement.router)
 api_router.include_router(reservations.router)
 api_router.include_router(recipes.router)

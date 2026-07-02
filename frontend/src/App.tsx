@@ -35,6 +35,7 @@ import Loyalty from "./pages/Loyalty";
 import Reengagement from "./pages/Reengagement";
 import Reservations from "./pages/Reservations";
 import Payables from "./pages/Payables";
+import Impact from "./pages/Impact";
 
 export default function App() {
   return (
@@ -43,6 +44,7 @@ export default function App() {
       <Route path="/signup" element={<Onboarding />} />
       <Route element={<Layout />}>
         <Route index element={<Dashboard />} />
+        <Route path="impact" element={<Impact />} />
         <Route path="briefing" element={<Briefing />} />
         <Route path="report" element={<Report />} />
         <Route path="recommendations" element={<Recommendations />} />

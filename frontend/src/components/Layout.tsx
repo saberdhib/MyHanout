@@ -25,6 +25,7 @@ const groups: { title: string; items: Item[] }[] = [
     title: "Pilotage",
     items: [
       { to: "/", label: "Dashboard", icon: "dashboard", end: true, module: "dashboard" },
+      { to: "/impact", label: "Impact (€)", icon: "finance", module: "impact" },
       { to: "/briefing", label: "Briefing du matin", icon: "calendar", module: "briefing" },
       { to: "/report", label: "Bilan hebdo", icon: "finance", module: "report" },
       {

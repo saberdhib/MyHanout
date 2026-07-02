@@ -14,6 +14,7 @@ from __future__ import annotations
 # Catalogue des modules du socle (clé -> libellé).
 MODULES: dict[str, str] = {
     "dashboard": "Tableau de bord",
+    "impact": "Impact (ROI en €)",
     "briefing": "Briefing du matin",
     "report": "Bilan hebdo",
     "controls": "Contrôles & pertes",

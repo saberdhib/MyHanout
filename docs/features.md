@@ -48,6 +48,9 @@
 - **Snapshots d'inventaire**, **historique des prix** (achat/vente) traçé.
 
 ## 📊 Dashboard & app (frontend)
+- **Tableau d'impact (ROI en €)** : consolide la valeur produite/révélée par l'outil sur
+  une période — gaspillage évité, cash récupéré, trop-payé détecté, démarque inconnue,
+  temps gagné. Le chiffre en euros qui justifie l'abonnement.
 - **Tableau de bord** : KPIs (CA, marge, ruptures évitées, stock à risque), graphiques
   (sans dépendance), répartition des ventes.
 - **Pages** : Briefing, Bilan hebdo, Recommandations, Alertes, Démarque, Production,

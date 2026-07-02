@@ -244,6 +244,12 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   `services/staffing_service.py`. `api/v1/pricing.py` (`/pricing/suggestions|apply`),
   `api/v1/staffing.py` (`/staffing/plan`). Pages `Pricing.tsx`/`Staffing.tsx`
   (modules `pricing`/`staffing`). Réglages : `pricing_*`/`staffing_*` dans `config.py`.
+- **Tableau d'impact (ROI en €)** : `services/impact_service.py` consolide la valeur
+  déjà produite/révélée par l'outil sur une période (gaspillage évité + cash récupéré des
+  démarques appliquées, trop-payé fournisseur + démarque inconnue via `control_service`,
+  CA click&collect, temps gagné = décisions assistées × 5 min). Lecture seule, chiffré,
+  `disclaimer` non comptable. API `GET /impact?days=` (scope `forecasts`). Page `Impact.tsx`
+  (module `impact`, en tête de nav). Tests `tests/test_impact.py` (org dédiée). Pas de table.
 - **Fidélité client** : rétention — compte de points + grand livre explicable
   (`loyalty_account`/`loyalty_transaction`, TenantMixin, migration `0028` + RLS). Moteur pur
   `intelligence/loyalty/engine.py` (points = ⌊montant × `loyalty_points_per_euro`⌋, statut
