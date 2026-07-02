@@ -147,6 +147,11 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   (`api/v1/finance.py`), services `services/finance/`, classifieur OPEX/CAPEX
   `intelligence/finance/` (ABC + mock keyless + llm), alertes `intelligence/finance/alerts.py`.
   Référentiel global `expense_category` (non tenant). Voir `docs/data-model.md`.
+  **Échéancier fournisseurs + trésorerie prévisionnelle** : `services/finance/payables_service.py`
+  (factures non payées groupées par horizon retard/7j/30j/+, projection cash 4 semaines =
+  ventes estimées − échéances dues). Lecture seule + `explanation`/`disclaimer`.
+  API `GET /finance/payables` + `POST /finance/invoices/{id}/pay` (HITL, scope `finance`).
+  Page front `Payables.tsx`. Tests `tests/test_payables.py` (org dédiée). Non comptable.
 - **Site vitrine** : `website/` (Astro). Pages dans `website/src/pages/`, composants
   `website/src/components/`, tokens de marque dupliqués dans `website/tailwind.config.mjs`
   (garder synchro avec `frontend/src/theme/tokens.js`). Détails : `website/README.md`.

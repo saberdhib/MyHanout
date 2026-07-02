@@ -36,6 +36,7 @@ const groups: { title: string; items: Item[] }[] = [
       { to: "/alerts", label: "Alertes", icon: "quality", module: "alerts" },
       { to: "/chat", label: "Assistant", icon: "chat", module: "chat" },
       { to: "/finance", label: "Finance", icon: "finance", module: "finance" },
+      { to: "/payables", label: "Échéancier", icon: "finance", module: "finance" },
     ],
   },
   {

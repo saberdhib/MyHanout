@@ -408,6 +408,46 @@ export interface FinanceAlert {
 }
 
 export const getTreasury = () => api.get<TreasuryView>("/finance/treasury").then((r) => r.data);
+
+// --- Échéancier fournisseurs + trésorerie prévisionnelle ---
+export interface PayableInvoice {
+  invoice_id: number;
+  number: string | null;
+  supplier_name: string | null;
+  due_date: string | null;
+  amount: number;
+  days_to_due: number | null;
+  overdue: boolean;
+}
+export interface PayableBucket {
+  key: string;
+  label: string;
+  count: number;
+  amount: number;
+  invoices: PayableInvoice[];
+}
+export interface CashWeek {
+  week_start: string;
+  expected_inflow: number;
+  payables_due: number;
+  net: number;
+  running_balance: number;
+  explanation: string;
+}
+export interface PayablesView {
+  currency: string;
+  total_due: number;
+  overdue_amount: number;
+  opening_balance: number;
+  buckets: PayableBucket[];
+  weeks: CashWeek[];
+  alert: string | null;
+  explanation: string;
+  disclaimer: string;
+}
+export const getPayables = () => api.get<PayablesView>("/finance/payables").then((r) => r.data);
+export const payInvoice = (id: number) =>
+  api.post(`/finance/invoices/${id}/pay`).then((r) => r.data);
 export const getInventoryValue = () =>
   api.get<InventoryValuation>("/finance/inventory-value").then((r) => r.data);
 export const getMargins = () => api.get<MarginReport>("/finance/margins").then((r) => r.data);

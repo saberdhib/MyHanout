@@ -119,3 +119,43 @@ class FinanceAlert(BaseModel):
 class FinanceAlerts(BaseModel):
     alerts: list[FinanceAlert] = []
     explanation: str
+
+
+# --- Échéancier fournisseurs + trésorerie prévisionnelle --------------------
+class PayableInvoice(BaseModel):
+    invoice_id: int
+    number: str | None = None
+    supplier_name: str | None = None
+    due_date: str | None = None
+    amount: float
+    days_to_due: int | None = None  # négatif = en retard
+    overdue: bool
+
+
+class PayableBucket(BaseModel):
+    key: str  # overdue | d7 | d30 | later | no_date
+    label: str
+    count: int
+    amount: float
+    invoices: list[PayableInvoice] = []
+
+
+class CashWeek(BaseModel):
+    week_start: str
+    expected_inflow: float
+    payables_due: float
+    net: float
+    running_balance: float
+    explanation: str
+
+
+class PayablesView(BaseModel):
+    currency: str = "EUR"
+    total_due: float
+    overdue_amount: float
+    opening_balance: float
+    buckets: list[PayableBucket] = []
+    weeks: list[CashWeek] = []
+    alert: str | None = None
+    explanation: str
+    disclaimer: str

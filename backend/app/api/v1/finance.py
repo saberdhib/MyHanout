@@ -25,6 +25,7 @@ from app.schemas.finance import (
     InventoryValuation,
     InvoiceClassificationOut,
     MarginReport,
+    PayablesView,
     TreasuryView,
 )
 from app.services.finance.classification_service import (
@@ -34,6 +35,7 @@ from app.services.finance.classification_service import (
 )
 from app.services.finance.inventory_valuation import compute_inventory_value
 from app.services.finance.margin_service import compute_margins
+from app.services.finance.payables_service import compute_payables
 from app.services.finance.treasury_service import compute_treasury
 
 router = APIRouter(prefix="/finance", tags=["finance"])
@@ -48,6 +50,35 @@ async def treasury(
 ) -> TreasuryView:
     """Vue de trésorerie estimée (entrées/sorties + alerte cash) sur la période."""
     return await compute_treasury(session, date_from=date_from, date_to=date_to)
+
+
+@router.get("/payables", response_model=PayablesView)
+async def payables(
+    session: AsyncSession = Depends(get_db),
+    _: CurrentUser = Depends(require_permission("finance")),
+) -> PayablesView:
+    """Échéancier fournisseurs (factures à payer par horizon) + projection cash hebdo."""
+    return await compute_payables(session)
+
+
+@router.post("/invoices/{invoice_id}/pay", response_model=dict)
+async def mark_paid(
+    invoice_id: int,
+    session: AsyncSession = Depends(get_db),
+    _: CurrentUser = Depends(require_permission("finance")),
+) -> dict:
+    """Marque une facture comme payée (human-in-the-loop, met à jour l'échéancier)."""
+    from datetime import UTC, datetime
+
+    from fastapi import HTTPException
+
+    invoice = await session.get(Invoice, invoice_id)
+    if invoice is None:
+        raise HTTPException(status_code=404, detail="Facture introuvable")
+    invoice.paid = True
+    invoice.paid_at = datetime.now(UTC)
+    await session.commit()
+    return {"invoice_id": invoice_id, "paid": True}
 
 
 @router.get("/inventory-value", response_model=InventoryValuation)
