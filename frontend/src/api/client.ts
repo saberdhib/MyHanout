@@ -1059,6 +1059,40 @@ export const earnPoints = (customerId: number, amount: number) =>
 export const redeemReward = (customerId: number) =>
   api.post<RedeemResult>(`/loyalty/${customerId}/redeem`).then((r) => r.data);
 
+// --- Relance client (segments ciblés) ---------------------------------------
+export interface ReengagementCustomer {
+  customer_id: number;
+  name: string | null;
+  phone: string | null;
+  balance: number;
+  contactable: boolean;
+}
+export interface ReengagementSegment {
+  segment: string;
+  message: string;
+  explanation: string;
+  total: number;
+  contactable: number;
+  customers: ReengagementCustomer[];
+}
+export interface SegmentsResponse {
+  segments: ReengagementSegment[];
+  disclaimer: string;
+}
+export interface ReengagementSendResult {
+  segment: string;
+  sent: number;
+  skipped_no_consent: number;
+  skipped_no_phone: number;
+  message: string;
+}
+export const getReengagementSegments = () =>
+  api.get<SegmentsResponse>("/reengagement/segments").then((r) => r.data);
+export const sendReengagement = (segment: string) =>
+  api
+    .post<ReengagementSendResult>("/reengagement/send", null, { params: { segment } })
+    .then((r) => r.data);
+
 // --- Backoffice plateforme (SaaS : pilotage cross-tenant du parc) -----------
 export interface PlatformOverview {
   clients_total: number;

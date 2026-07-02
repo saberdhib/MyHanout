@@ -159,6 +159,9 @@ class Settings(BaseSettings):
     loyalty_points_per_euro: float = 1.0  # points gagnés par euro dépensé
     loyalty_reward_threshold: int = 100  # points pour une récompense
     loyalty_reward_label: str = "Bon de 5 €"  # récompense au palier
+    # Relance client (segmentation)
+    reengagement_almost_gap: int = 20  # points sous le palier → segment « presque »
+    reengagement_inactive_days: int = 30  # sans activité au-delà → segment « inactif »
 
     # --- Recommandations (réassort explicable) ---
     # Tampon de sécurité (fraction de la demande prévue) et seuils des règles.

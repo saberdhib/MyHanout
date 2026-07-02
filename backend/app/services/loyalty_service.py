@@ -105,12 +105,13 @@ async def redeem(session: AsyncSession, customer_id: int) -> RedeemResult | None
         )
     )
     await session.commit()
+    bal = account.points_balance
     return RedeemResult(
         customer_id=customer_id,
         reward_label=label,
         points_spent=threshold,
-        points_balance=account.points_balance,
-        explanation=f"« {label} » remis au client (−{threshold} pts). Solde : {account.points_balance} pts.",
+        points_balance=bal,
+        explanation=f"« {label} » remis au client (−{threshold} pts). Solde : {bal} pts.",
     )
 
 

@@ -246,6 +246,14 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   caisse ne sont pas nominatives) — human-in-the-loop. API `api/v1/loyalty.py`
   (`/loyalty`, `/{cid}/earn` scope `orders`, `/{cid}/redeem`). Page `Loyalty.tsx` (module
   `loyalty`). Réglages : `loyalty_*` dans `config.py`. Tests `tests/test_loyalty.py`.
+- **Relance client ciblée** : moteur pur `intelligence/reengagement/engine.py` segmente les
+  clients fidèles (récompense prête > presque récompense > inactif) + rédige le message.
+  `services/reengagement_service.py` : `build_segments` (aperçu) + `send_campaign` (envoi
+  **opt-in only** RGPD via le résolveur WhatsApp, **audité** `reengagement.send`, HITL).
+  Sans table dédiée (stateless + audit). API `api/v1/reengagement.py` (`/segments`,
+  `/send?segment=` scope `orders`). Page `Reengagement.tsx` (module `reengagement`).
+  Réglages `reengagement_*`. ⚠️ En suite de tests, l'envoi doit tourner dans une org SANS
+  connecteur (sinon un vrai client business est résolu). Tests `tests/test_reengagement.py`.
 - **Backoffice plateforme (SaaS, agent-as-a-service)** : plan **cross-tenant** pour
   l'opérateur MyHanout — l'**inverse** du garde-fou (cf. §5). Modèles **globaux** (non
   tenant) `platform_admin` (rôles `superadmin`/`support`/`billing`) + `subscription`
