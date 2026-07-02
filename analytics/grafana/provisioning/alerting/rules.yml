@@ -1,0 +1,73 @@
+# Règles d'alerte Grafana (unified alerting, provisioning fichier).
+# Basées sur les métriques Prometheus exposées par l'API (app/core/metrics.py) :
+#   myhanout_pipeline_runs_total{job,status}, myhanout_requests_total{method,path,status}
+#
+# NB : brancher un « contact point » (Slack/email/webhook) + une notification policy
+# selon l'environnement (non provisionné ici car spécifique au client — cf. docs).
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: myhanout-technique
+    folder: MyHanout
+    interval: 1m
+    rules:
+      # 1) Un run de pipeline a échoué dans les 15 dernières minutes.
+      - uid: myhanout-pipeline-failures
+        title: Échecs de pipeline data
+        condition: C
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Un ou plusieurs runs de pipeline ont échoué (15 min)."
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 900
+              to: 0
+            datasourceUid: prometheus
+            model:
+              refId: A
+              instant: true
+              expr: sum(increase(myhanout_pipeline_runs_total{status="failed"}[15m]))
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [0]
+
+      # 2) Taux d'erreurs HTTP 5xx élevé (> 0.1 req/s sur 5 min).
+      - uid: myhanout-http-5xx
+        title: Taux d'erreurs HTTP 5xx élevé
+        condition: C
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "L'API renvoie des 5xx à un rythme anormal (5 min)."
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: prometheus
+            model:
+              refId: A
+              instant: true
+              expr: sum(rate(myhanout_requests_total{status=~"5.."}[5m]))
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [0.1]

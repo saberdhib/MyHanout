@@ -57,6 +57,7 @@ from app.models.support import (
 )
 from app.models.user import Role, User
 from app.models.webhook import WebhookEndpoint
+from app.models.webhook_inbound import WebhookInbound
 
 __all__ = [
     "Base",
@@ -121,4 +122,5 @@ __all__ = [
     "Role",
     "User",
     "WebhookEndpoint",
+    "WebhookInbound",
 ]

@@ -38,6 +38,18 @@ services:
       echo 'bucket myhanout-raw prêt';
       "
 
+  # --- Métriques (scrape de l'API /metrics) ---
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./analytics/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
   # --- Observabilité métier/technique ---
   grafana:
     image: grafana/grafana:latest
@@ -66,3 +78,4 @@ services:
 volumes:
   minio_data:
   grafana_data:
+  prometheus_data:

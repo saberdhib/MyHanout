@@ -146,6 +146,14 @@ class Settings(BaseSettings):
     model_version: str = "v1"
     # MLOps : MAPE au-delà de laquelle un modèle est jugé « dérivé » (alerte + retrain).
     mlops_drift_mape_threshold: float = 0.35
+    # Stockage des artefacts de modèles : mock (défaut keyless, URI déterministe, zéro
+    # réseau) | minio (S3-compatible, requiert `pip install minio` + creds ci-dessous).
+    artifact_store: str = "mock"
+    minio_endpoint: str = ""  # ex. "minio:9000"
+    minio_access_key: str = ""
+    minio_secret_key: str = ""
+    minio_bucket: str = "myhanout-models"
+    minio_secure: bool = False
 
     # --- Recommandations (réassort explicable) ---
     # Tampon de sécurité (fraction de la demande prévue) et seuils des règles.

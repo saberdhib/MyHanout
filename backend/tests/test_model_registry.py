@@ -40,6 +40,8 @@ def test_retrain_versions_and_single_active():
                 a2 = await reg.retrain_product(s, 1, trigger=RetrainTrigger.SCHEDULED)
                 await s.commit()
                 assert a1.version != a2.version  # versions incrémentées
+                # Artefact sérialisé + stocké (mock keyless → URI déterministe).
+                assert a2.artifact_uri and a2.artifact_uri.startswith("mock://")
                 actives = await reg.list_models(s, 1, active_only=True)
                 assert len(actives) == 1  # un seul actif
                 assert actives[0].id == a2.id

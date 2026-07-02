@@ -66,6 +66,28 @@ async def register_model(
         )
     )
     version = f"v{(count or 0) + 1}"
+
+    # Sérialise l'artefact entraîné (paramètres du modèle) et le pousse dans le store.
+    # Naive = baseline ; prophet/lgbm sérialiseraient leur modèle binaire ici.
+    if artifact_uri is None:
+        import json
+
+        from app.core.tenancy import get_current_org
+        from app.intelligence.mlops import get_artifact_store
+
+        org = get_current_org() or 0
+        key = f"{org}/{product_id or 'global'}/{model_name}/{version}.json"
+        blob = json.dumps(
+            {
+                "model": model_name,
+                "version": version,
+                "baseline": round(baseline, 4),
+                "n_observations": n_observations,
+                "metrics": {"mae": mae, "mape": mape},
+            }
+        ).encode()
+        artifact_uri = get_artifact_store().put(key, blob)
+
     artifact = ModelArtifact(
         product_id=product_id,
         model_name=model_name,

@@ -268,4 +268,14 @@ impl derrière l'ABC + branchement dans la fabrique + fallback mock + test avec 
   ⚠️ désactivation = mutation d'instances chargées, pas d'`UPDATE` en masse). Boucle dérive :
   `scan_alerts` émet `forecast_drift` (MAPE > `mlops_drift_mape_threshold`) → `retrain_on_drift`.
   Job pipeline `retrain` (planifié). API `/mlops/models|/retrain` (versionne). Front : registre
-  dans `DataOps.tsx`. `artifact_uri` prêt pour MinIO (prophet/lgbm). Tests `tests/test_model_registry.py`.
+  dans `DataOps.tsx`. Artefacts sérialisés via `ArtifactStore` (ABC + mock keyless par défaut,
+  MinIO en option — `intelligence/mlops/storage.py`) ; `artifact_uri` renseigné à chaque
+  enregistrement. Tests `tests/test_model_registry.py`.
+- **Idempotence webhooks entrants** : WhatsApp/Slack re-livrent parfois le même event
+  (retries). Dédup par `external_id`/`event_id` dans la table **globale** `webhook_inbound`
+  (`messaging/idempotency.py::mark_seen`, migration `0027`). Câblé dans `api/v1/whatsapp.py`
+  (id du message) et `api/v1/slack.py` (`event_id`). Tests `tests/test_webhook_idempotency.py`.
+- **Alerting (infra)** : Prometheus scrape `/metrics` (`docker-compose.data.yml` +
+  `analytics/prometheus/`), datasource + **règles Grafana provisionnées**
+  (`analytics/grafana/provisioning/alerting/rules.yml`). Le *contact point* de notification
+  (Slack/email) reste à brancher par client.

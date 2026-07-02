@@ -105,9 +105,17 @@ dans Data Ops. `artifact_uri` prêt pour la sérialisation MinIO (prophet/lgbm).
 - ✅ Limite de taille des uploads (OCR/factures) : `MAX_UPLOAD_MB` → 413 (`core/uploads.py`).
 - ✅ Pagination bornée : `core/pagination.py` (`MAX_PAGE_SIZE`), appliquée aux listes
   (alerts, registre de modèles…). Reste à étendre au fil de l'eau aux listes restantes.
-- ✅ Erreurs centralisées : Sentry optionnel (`SENTRY_DSN`, soft-import). Alerting Grafana :
-  métriques exposées + alerte applicative `forecast_drift` ; règles Grafana à brancher (infra).
-- ⏳ Idempotence webhooks entrants (WhatsApp/Slack) : dédup des events — reste à faire.
+- ✅ Erreurs centralisées : Sentry optionnel (`SENTRY_DSN`, soft-import). ✅ Alerting Grafana :
+  service Prometheus (scrape `/metrics`) + datasource + **règles provisionnées**
+  (`analytics/grafana/provisioning/alerting/rules.yml` : échecs pipeline, taux 5xx) +
+  alerte applicative `forecast_drift`. Reste (spécifique client) : le *contact point*
+  (Slack/email) de notification.
+- ✅ Idempotence webhooks entrants (WhatsApp/Slack) : dédup par `external_id`/`event_id`
+  (table globale `webhook_inbound`, migration 0027, `messaging/idempotency.py`).
+
+**Reliquat Lot 5 traité** : sérialisation des artefacts de modèles via `ArtifactStore`
+(mock keyless par défaut, MinIO en option) — `intelligence/mlops/storage.py`,
+`artifact_uri` renseigné à chaque enregistrement.
 
 ---
 

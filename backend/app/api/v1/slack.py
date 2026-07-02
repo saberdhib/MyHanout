@@ -37,6 +37,12 @@ async def slack_webhook(
     if event.get("type") != "message" or event.get("bot_id") or event.get("subtype"):
         return {"ok": True, "skipped": True}
 
+    # Idempotence : Slack re-livre le même event (event_id) sur non-2xx / timeout.
+    from app.messaging.idempotency import mark_seen
+
+    if not await mark_seen(session, "slack", payload.get("event_id")):
+        return {"ok": True, "skipped": "duplicate"}
+
     channel = str(event.get("channel", ""))
     text = event.get("text", "")
     if not channel:

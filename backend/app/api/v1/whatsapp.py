@@ -53,7 +53,14 @@ async def receive_webhook(
     client = get_whatsapp_client()
     replies: list[dict] = []
 
+    from app.messaging.idempotency import mark_seen
+
+    skipped = 0
     for msg in messages:
+        # Idempotence : Meta re-livre parfois le même message (retries réseau).
+        if not await mark_seen(session, "whatsapp", msg.external_id):
+            skipped += 1
+            continue
         if msg.type == "image" and msg.media_id:
             reply = await handle_image(session, msg.from_, msg.media_id)
         else:
@@ -62,4 +69,4 @@ async def receive_webhook(
             await client.send_text(msg.from_, reply)
         replies.append({"to": msg.from_, "reply": reply})
 
-    return {"received": len(messages), "replies": replies}
+    return {"received": len(messages), "replies": replies, "skipped_duplicates": skipped}

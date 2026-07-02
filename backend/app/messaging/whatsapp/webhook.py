@@ -37,6 +37,8 @@ class InboundMessage(BaseModel):
     type: str  # "text" | "image"
     text: str | None = None
     media_id: str | None = None
+    # Identifiant du message côté fournisseur (wamid…) — pour l'idempotence.
+    external_id: str | None = None
 
 
 def parse_incoming(payload: dict) -> list[InboundMessage]:
@@ -55,10 +57,14 @@ def parse_incoming(payload: dict) -> list[InboundMessage]:
                 for msg in value.get("messages", []):
                     sender = msg.get("from", "")
                     mtype = msg.get("type", "text")
+                    ext_id = msg.get("id")
                     if mtype == "text":
                         messages.append(
                             InboundMessage(
-                                from_=sender, type="text", text=msg.get("text", {}).get("body", "")
+                                from_=sender,
+                                type="text",
+                                text=msg.get("text", {}).get("body", ""),
+                                external_id=ext_id,
                             )
                         )
                     elif mtype == "image":
@@ -67,14 +73,22 @@ def parse_incoming(payload: dict) -> list[InboundMessage]:
                                 from_=sender,
                                 type="image",
                                 media_id=msg.get("image", {}).get("id"),
+                                external_id=ext_id,
                             )
                         )
         return messages
 
     # Format simplifié.
     sender = payload.get("from", "")
+    ext_id = payload.get("id")
     if payload.get("image_id"):
-        messages.append(InboundMessage(from_=sender, type="image", media_id=payload["image_id"]))
+        messages.append(
+            InboundMessage(
+                from_=sender, type="image", media_id=payload["image_id"], external_id=ext_id
+            )
+        )
     elif payload.get("message") is not None:
-        messages.append(InboundMessage(from_=sender, type="text", text=payload["message"]))
+        messages.append(
+            InboundMessage(from_=sender, type="text", text=payload["message"], external_id=ext_id)
+        )
     return messages
