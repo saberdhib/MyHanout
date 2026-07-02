@@ -46,3 +46,18 @@ docker compose exec api python -m app.db.seed   # optionnel (données démo)
 - Conteneurs managés (ECS/Cloud Run/Fly), **PostgreSQL managé + pgvector**, Redis managé.
 - Secrets via gestionnaire (SSM / Secret Manager) — ne jamais committer `.env`.
 - CI/CD : GitHub Actions (lint + typecheck + tests + build images + intégration pg).
+
+## Livraison continue (images GHCR)
+Le workflow `.github/workflows/cd.yml` **construit et pousse** les images vers le
+GitHub Container Registry :
+- push sur `main` → `ghcr.io/<owner>/myhanout-{backend,frontend,ml-service}:main` + `:sha-<court>`
+- tag `vX.Y.Z`   → `:X.Y.Z` + `:latest` (release)
+
+Déploiement (opéré côté infra, non automatisé ici pour rester agnostique) :
+```bash
+docker pull ghcr.io/<owner>/myhanout-backend:main   # ou :vX.Y.Z
+# puis rollout sur la cible (compose/k8s/Cloud Run) avec le .env de prod.
+```
+Prérequis prod avant rollout : `SECRET_KEY` aléatoire (>=32c, sinon l'API refuse de
+démarrer), `alembic upgrade head` (applique la RLS `0025`), `ML_INTERNAL_KEY` si
+`FORECAST_SERVICE_CLIENT=http`.
